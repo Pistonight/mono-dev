@@ -1,0 +1,27 @@
+# Taskfile include for JS ecosystem
+#
+
+version: '3'
+
+tasks:
+  eslint-check:
+    cmds:
+      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache
+  eslint-fix:
+    cmds:
+      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache --fix
+
+  prettier-check:
+    cmds:
+      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache
+  prettier-fix:
+    cmds:
+      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache --fix
+
+  tsc-check:
+    cmds:
+      - pnpm exec tsc
+
+  tsc-check-build:
+    cmds:
+      - pnpm exec tsc --build

@@ -1,0 +1,39 @@
+# Taskfile include for Rust ecosystem
+#
+
+version: '3'
+
+tasks:
+  clippy-all:
+    cmds:
+      - task: cargo-clippy-check
+        vars:
+          FLAGS: --all-targets --all-features
+
+  clippy-package:
+    cmds:
+      - task: cargo-clippy-check
+        vars:
+          FLAGS: --package {{.PACKAGE}} --all-targets --all-features
+
+  clippy-package-feature:
+    cmds:
+      - task: cargo-clippy-check
+        vars:
+          FLAGS: --package {{.PACKAGE}} --all-targets --features {{.FEATURES}}
+
+  clippy:
+    vars:
+      CLIPPY_FLAGS: >
+        -D warnings
+        -D clippy::todo
+    cmds:
+      - cargo clippy {{.FLAGS}} -- {{.CLIPPY_FLAGS}}
+
+  fmt-check:
+    cmds:
+      - cargo fmt --all --check
+
+  fmt-fix:
+    cmds:
+      - cargo fmt --all
