@@ -1,6 +1,12 @@
 # Standard/Convention
 This is the pattern downstream projects should follow
 
+- [Prettier](#prettier)
+- [ESLint](#eslint)
+- [TSC](#tsc)
+- [Cargo](#cargo-clippy-and-format)
+- [Docker](#docker)
+
 ## Standard Tasks
 `Taskfile.yml` is both configuration for runner commands, and
 our documentation for those commands. Use these standard task names 
@@ -93,13 +99,6 @@ Rust library crates do not include the `Cargo.lock` file.
 
 Singlerepos should also not have submodules - upgrade it to a monorepo
 if that's needed!!
-
-
-#### For non-JS projects:
-Clone `mono-dev` and gitignore it
-```
-git clone https://github.com/Pistonight/mono-dev
-```
 
 ## Workflows
 ### Prettier
@@ -309,6 +308,7 @@ tasks:
       - task: cargo:fmt-check
   
   fix:
+    desc: Fix code
     deps: [cargo:fmt-fix]
 
 ```

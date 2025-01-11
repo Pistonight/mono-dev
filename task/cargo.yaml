@@ -6,19 +6,19 @@ version: '3'
 tasks:
   clippy-all:
     cmds:
-      - task: cargo-clippy-check
+      - task: clippy
         vars:
           FLAGS: --all-targets --all-features
 
   clippy-package:
     cmds:
-      - task: cargo-clippy-check
+      - task: clippy
         vars:
           FLAGS: --package {{.PACKAGE}} --all-targets --all-features
 
   clippy-package-feature:
     cmds:
-      - task: cargo-clippy-check
+      - task: clippy
         vars:
           FLAGS: --package {{.PACKAGE}} --all-targets --features {{.FEATURES}}
 
