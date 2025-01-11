@@ -13,7 +13,7 @@ on:
 ### PR Builds
 Run in PR; Doesn't have access to repo's secrets
 ```yaml
-  pull-request:
+  pull_request:
     branches:
       - main
 ```

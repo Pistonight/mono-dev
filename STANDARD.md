@@ -101,6 +101,10 @@ Singlerepos should also not have submodules - upgrade it to a monorepo
 if that's needed!!
 
 ## Workflows
+**NOTE** In singlerepos, add `optional: true` to the Taskfile includes,
+if `mono-dev` is cloned by a task. Otherwise, task will fail when `mono-dev`
+doesn't exist
+
 ### Prettier
 Prettier workflow should be added to `check` command for each package in a monorepo.
 The `mono-dev` package provide Taskfile includes.
