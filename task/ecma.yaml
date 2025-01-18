@@ -13,10 +13,10 @@ tasks:
 
   prettier-check:
     cmds:
-      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache
+      - pnpm exec prettierw
   prettier-fix:
     cmds:
-      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache --fix
+      - pnpm exec prettierw --fix
 
   tsc-check:
     cmds:
