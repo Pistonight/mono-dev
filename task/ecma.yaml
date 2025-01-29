@@ -25,3 +25,11 @@ tasks:
   tsc-check-build:
     cmds:
       - pnpm exec tsc --build
+
+  vite-dev:
+    cmds:
+      - pnpm exec vite dev --host
+
+  vite-build:
+    cmds:
+      - pnpm exec vite build

@@ -4,6 +4,7 @@ This is the pattern downstream projects should follow
 - [Prettier](#prettier)
 - [ESLint](#eslint)
 - [TSC](#tsc)
+- [Vite](#vite)
 - [Cargo](#cargo-clippy-and-format)
 - [Docker](#docker)
 
@@ -262,6 +263,10 @@ tasks:
       - task: ecma:tsc-check-build # tsc-check for non-vite
 
 ```
+
+### Vite
+Use the `ecma:vite-dev` and `ecma:vite-build` tasks to execute
+vite with pnpm
 
 ### Cargo Clippy and Format
 `mono-dev` provides wrapper for clippy with common clippy flags

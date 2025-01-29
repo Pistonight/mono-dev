@@ -1,9 +1,14 @@
 version: "3"
 
 tasks:
-    check:
-        cmds:
-            - node scripts/prettierw.js
-    fix:
-        cmds:
-            - node scripts/prettierw.js --fix
+  check:
+    cmds:
+      - node scripts/prettierw.js
+  fix:
+    cmds:
+      - node scripts/prettierw.js --fix
+
+  push:
+    cmds:
+      - git remote set-url origin git@github.com:Pistonight/mono-dev
+      - git push
