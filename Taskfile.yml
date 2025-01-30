@@ -8,7 +8,7 @@ tasks:
     cmds:
       - node scripts/prettierw.js --fix
 
-  push:
+  git-push:
     cmds:
       - git remote set-url origin git@github.com:Pistonight/mono-dev
       - git push
