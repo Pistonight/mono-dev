@@ -25,8 +25,6 @@ export function override(configs, overrides) {
 const defaultOverrides = {
     // typescript has coverage already
     "@typescript-eslint/no-unused-vars": "off",
-    // force type to be import as type
-    "@typescript-eslint/consistent-type-imports": "warn",
     "@typescript-eslint/restrict-template-expressions": [
         "warn",
         {
@@ -71,6 +69,8 @@ export function config(configObj) {
                     "warn",
                     { allowConstantExport: true },
                 ],
+                // force type to be import as type
+                "@typescript-eslint/consistent-type-imports": "warn",
             },
         },
     );
