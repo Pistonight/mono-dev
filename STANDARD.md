@@ -233,7 +233,7 @@ Then create `tsconfig.json`
 ```
 
 Note:
-- For bundler-agnostic config, replace `vite` with `node`
+- For bundler-agnostic config, replace `vite` with `browser` (or `node` if DOM lib is not needed)
 - For singlerepo, change `..` to `.`
 - For the main vite project, edit the `tsconfig.app.json` instead:
     ```json
