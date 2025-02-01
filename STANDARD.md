@@ -152,7 +152,7 @@ However there's no CLI wrapper, so `eslint` does need to be installed in the mon
 
 1. Add `eslint` to the catalog in `pnpm-workspace.yaml`
     ```yaml
-    catelog:
+    catalog:
       eslint: ^9
 
     ```
