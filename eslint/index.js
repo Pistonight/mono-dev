@@ -24,7 +24,12 @@ export function override(configs, overrides) {
 
 const defaultOverrides = {
     // typescript has coverage already
-    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+            varsIgnorePattern: "^_",
+        },
+    ],
     "@typescript-eslint/restrict-template-expressions": [
         "warn",
         {
