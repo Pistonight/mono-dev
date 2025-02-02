@@ -28,6 +28,7 @@ const defaultOverrides = {
         "warn",
         {
             varsIgnorePattern: "^_",
+            argsIgnorePattern: "^_",
         },
     ],
     "@typescript-eslint/restrict-template-expressions": [
@@ -74,6 +75,7 @@ export function config(configObj) {
                     "warn",
                     { allowConstantExport: true },
                 ],
+                "no-unused-vars": "off",
                 // force type to be import as type
                 "@typescript-eslint/consistent-type-imports": "warn",
             },
