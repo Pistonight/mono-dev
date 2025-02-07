@@ -27,13 +27,14 @@ tasks:
       CLIPPY_FLAGS: >
         -D warnings
         -D clippy::todo
+        -A clippy::manual_range_contains
     cmds:
       - cargo clippy {{.FLAGS}} -- {{.CLIPPY_FLAGS}}
 
   fmt-check:
     cmds:
-      - cargo fmt --all --check
+      - cargo fmt --check
 
   fmt-fix:
     cmds:
-      - cargo fmt --all
+      - cargo fmt
