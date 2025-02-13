@@ -28,6 +28,8 @@ tasks:
         -D warnings
         -D clippy::todo
         -A clippy::manual_range_contains
+    env:
+      RUSTDOCFLAGS: -D warnings
     cmds:
       - cargo clippy {{.FLAGS}} -- {{.CLIPPY_FLAGS}}
 
