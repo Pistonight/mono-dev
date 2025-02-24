@@ -6,7 +6,15 @@ version: '3'
 tasks:
   check-modification:
     cmds:
-      - cmd: if ! [ -z "$(git status --porcelain=v1 | rg '{{.CHECK_PATH}}')" ] ; then echo '{{.CHECK_MESSAGE}} (Make sure the changes are commited)'; exit 2; fi
+      - cmd: >
+          if ! [ -z "$(git status --porcelain=v1 | rg '{{.CHECK_PATH}}')" ];
+          then 
+            for file in $(git ls-files -dmo --exclude-standard); do
+              git diff $file;
+            done;
+            echo '{{.CHECK_MESSAGE}} (Make sure the changes are commited)';
+            exit 2;
+          fi
         silent: true
       - cmd: echo 'modification check passed!'
         silent: true
