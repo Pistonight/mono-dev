@@ -134,17 +134,30 @@ jobs:
           cache: 'pnpm'
 ```
 ### Rust & cargo tools
+Rust toolchain
 ```yaml
       - uses: dtolnay/rust-toolchain@stable
         with:
           # targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
 ```
+Cargo install from source
 ```yaml
       - uses: baptiste0928/cargo-install@v3
         with:
-          crate: wasm-pack
-          #features: foo
+          crate: workex
+          git: https://github.com/Pistonite/workex
+          # features: foo
+```
+Binary install for supported tools
+```yaml
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-hack,cargo-minimal-versions
+          # Possible values:
+          # - none: disable all fallback
+          # - cargo-binstall (default): cargo-binstall (includes quickinstall)
+          # fallback: none
 ```
 ### Python & pip
 ```yaml
