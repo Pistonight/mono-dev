@@ -40,3 +40,26 @@ tasks:
   fmt-fix:
     cmds:
       - cargo fmt
+
+  wasm-pack-build:
+    vars:
+      OUTPUT: "./target/wasm32-unknown-unknown/release/{{.PACKAGE}}.wasm"
+    cmds:
+      - defer: rm -f {{.OUTPUT}}.old
+        silent: true
+      - cmd: >
+          if stat {{.OUTPUT}};
+          then
+            cp -p {{.OUTPUT}} {{.OUTPUT}}.old;
+            cargo build --lib --target wasm32-unknown-unknown --release --target-dir target
+            if test {{.OUTPUT}} -nt {{.OUTPUT}}.old;
+            then
+              wasm-pack build {{.WASM_PACK_ARGS}} -- --target-dir target;
+            else
+              echo 'skipping wasm-pack because cargo output did not change'
+            fi
+          else
+            wasm-pack build {{.WASM_PACK_ARGS}} -- --target-dir target;
+          fi
+        silent: true
+
