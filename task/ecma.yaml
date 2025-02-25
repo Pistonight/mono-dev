@@ -28,7 +28,8 @@ tasks:
 
   vite-dev:
     cmds:
-      - pnpm exec vite dev --host
+      - cmd: pnpm exec vite dev --host
+        ignore_error: true
 
   vite-build:
     cmds:
