@@ -22,6 +22,7 @@
     },
     "exports": {
         "./eslint": "./eslint/index.js",
-        "./vite": "./vite/index.js"
+        "./vite": "./vite/index.js",
+        "./vite/yaml": "./vite/yaml.d.ts"
     }
 }

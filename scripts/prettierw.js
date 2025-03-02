@@ -42,10 +42,7 @@ const options = {
     /* CONTEXT OPTIONS */
     contextOptions: {},
     // /* FORMAT OPTIONS */
-    formatOptions: {
-        endOfLine: "auto",
-        tabWidth: 4,
-    },
+    formatOptions: { endOfLine: "auto", tabWidth: 4 },
 };
 
 run(options, {}, {});

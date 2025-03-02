@@ -26,16 +26,11 @@ const defaultOverrides = {
     // typescript has coverage already
     "@typescript-eslint/no-unused-vars": [
         "warn",
-        {
-            varsIgnorePattern: "^_",
-            argsIgnorePattern: "^_",
-        },
+        { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
     ],
     "@typescript-eslint/restrict-template-expressions": [
         "warn",
-        {
-            allowNumber: true,
-        },
+        { allowNumber: true },
     ],
     // we have TypeScript
     "react/prop-types": "off",
@@ -43,9 +38,7 @@ const defaultOverrides = {
 
 export function config(configObj) {
     const config = tseslint.config(
-        {
-            ignores: configObj.ignores || [],
-        },
+        { ignores: configObj.ignores || [] },
         {
             extends: [js.configs.recommended, ...tseslint.configs.strict],
             files: ["**/*.{ts,tsx}"],
@@ -57,11 +50,7 @@ export function config(configObj) {
                     tsconfigRootDir: configObj.tsconfigRootDir || undefined,
                 },
             },
-            settings: {
-                react: {
-                    version: "18",
-                },
-            },
+            settings: { react: { version: "18" } },
             plugins: {
                 "react-hooks": reactHooks,
                 "react-refresh": reactRefresh,
