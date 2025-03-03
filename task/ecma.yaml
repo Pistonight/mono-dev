@@ -34,3 +34,12 @@ tasks:
   vite-build:
     cmds:
       - pnpm exec vite build
+
+  vitest-watch:
+    cmds:
+      - cmd: pnpm exec vitest --watch
+        ignore_error: true
+
+  vitest:
+    cmds:
+      - pnpm exec vitest run

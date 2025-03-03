@@ -37,6 +37,7 @@ const defaultOverrides = {
 };
 
 export function config(configObj) {
+    const enableReact = configObj.react ?? true;
     const config = tseslint.config(
         { ignores: configObj.ignores || [] },
         {
@@ -50,20 +51,34 @@ export function config(configObj) {
                     tsconfigRootDir: configObj.tsconfigRootDir || undefined,
                 },
             },
-            settings: { react: { version: "18" } },
+            settings: { 
+                ...(
+                enableReact ? {
+                        react: { version: "18" }
+                    } : {}
+                )
+            },
             plugins: {
-                "react-hooks": reactHooks,
-                "react-refresh": reactRefresh,
-                react,
+                ...(
+                enableReact ? {
+                        "react-hooks": reactHooks,
+                        "react-refresh": reactRefresh,
+                        react,
+                    } : {}
+                )
             },
             rules: {
-                ...react.configs.recommended.rules,
-                ...react.configs["jsx-runtime"].rules,
-                ...reactHooks.configs.recommended.rules,
-                "react-refresh/only-export-components": [
-                    "warn",
-                    { allowConstantExport: true },
-                ],
+                ...(
+                enableReact ? {
+                        ...react.configs.recommended.rules,
+                        ...react.configs["jsx-runtime"].rules,
+                        ...reactHooks.configs.recommended.rules,
+                        "react-refresh/only-export-components": [
+                            "warn",
+                            { allowConstantExport: true },
+                        ],
+                    } : {}
+                ),
                 "no-unused-vars": "off",
                 // force type to be import as type
                 "@typescript-eslint/consistent-type-imports": "warn",
