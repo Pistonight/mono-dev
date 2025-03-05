@@ -1,0 +1,45 @@
+name: CHANGEME
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-book:
+    name: build-book
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: true
+      - uses: ./.github/steps/setup
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # run the thing
+      - run: task install-deps
+      - run: task build-website
+
+      # upload for pages
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: packages/app/dist
+          retention-days: 3
+
+  deploy-to-pages:
+    name: deploy-to-pages
+    needs:
+      - build-book
+    if: github.event_name != 'pull_request'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
