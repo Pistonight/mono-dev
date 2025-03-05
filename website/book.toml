@@ -1,0 +1,21 @@
+[book]
+authors = ["Pistonight"]
+language = "en"
+multilingual = false
+src = "src"
+title = "mono-dev"
+
+command = "mdbook-admonish"
+assets_version = "3.0.2" # do not edit: managed by `mdbook-admonish install`
+
+
+[output.html]
+default-theme = "frappe"
+preferred-dark-theme = "frappe"
+smart-punctuation = true
+git-repository-url = "https://github.com/Pistonight/mono-dev"
+additional-css = [
+    "theme/mdbook-admonish.css",
+    "theme/catppuccin.css", 
+    "theme/catppuccin-admonish.css"
+]
