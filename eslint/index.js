@@ -42,7 +42,7 @@ export function config(configObj) {
         { ignores: configObj.ignores || [] },
         {
             extends: [js.configs.recommended, ...tseslint.configs.strict],
-            files: ["**/*.{ts,tsx}"],
+            files: ["**/*.{ts,mts,cts,tsx}"],
             languageOptions: {
                 ecmaVersion: 2020,
                 globals: globals.browser,
@@ -51,34 +51,34 @@ export function config(configObj) {
                     tsconfigRootDir: configObj.tsconfigRootDir || undefined,
                 },
             },
-            settings: { 
-                ...(
-                enableReact ? {
-                        react: { version: "18" }
-                    } : {}
-                )
+            settings: {
+                ...(enableReact
+                    ? {
+                          react: { version: "18" },
+                      }
+                    : {}),
             },
             plugins: {
-                ...(
-                enableReact ? {
-                        "react-hooks": reactHooks,
-                        "react-refresh": reactRefresh,
-                        react,
-                    } : {}
-                )
+                ...(enableReact
+                    ? {
+                          "react-hooks": reactHooks,
+                          "react-refresh": reactRefresh,
+                          react,
+                      }
+                    : {}),
             },
             rules: {
-                ...(
-                enableReact ? {
-                        ...react.configs.recommended.rules,
-                        ...react.configs["jsx-runtime"].rules,
-                        ...reactHooks.configs.recommended.rules,
-                        "react-refresh/only-export-components": [
-                            "warn",
-                            { allowConstantExport: true },
-                        ],
-                    } : {}
-                ),
+                ...(enableReact
+                    ? {
+                          ...react.configs.recommended.rules,
+                          ...react.configs["jsx-runtime"].rules,
+                          ...reactHooks.configs.recommended.rules,
+                          "react-refresh/only-export-components": [
+                              "warn",
+                              { allowConstantExport: true },
+                          ],
+                      }
+                    : {}),
                 "no-unused-vars": "off",
                 // force type to be import as type
                 "@typescript-eslint/consistent-type-imports": "warn",
