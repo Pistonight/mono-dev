@@ -24,7 +24,7 @@ jobs:
       # upload for pages
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: packages/app/dist
+          path: website/book
           retention-days: 3
 
   deploy-to-pages:
