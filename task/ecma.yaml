@@ -4,27 +4,15 @@
 version: '3'
 
 tasks:
-  eslint-check:
+  mono-check-clean:
     cmds:
-      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache
-  eslint-fix:
+      - pnpm exec mono-lint --clean
+  mono-check:
     cmds:
-      - pnpm exec eslint src --report-unused-disable-directives --max-warnings 0 --cache --fix
-
-  prettier-check:
+      - pnpm exec mono-lint
+  mono-fix:
     cmds:
-      - pnpm exec prettierw
-  prettier-fix:
-    cmds:
-      - pnpm exec prettierw --fix
-
-  tsc-check:
-    cmds:
-      - pnpm exec tsc
-
-  tsc-check-build:
-    cmds:
-      - pnpm exec tsc --build
+      - pnpm exec mono-lint --fix
 
   vite-dev:
     cmds:

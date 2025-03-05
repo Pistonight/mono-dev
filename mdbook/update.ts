@@ -16,11 +16,12 @@ await $`rm ${dir}/template/theme/book.js`;
 await $`mdbook-admonish install ${dir}/template --css-dir ${dir}/template/theme`;
 
 // download catppuccin
-const catppuccinAdmonishCss = await fetch("https://github.com/catppuccin/mdBook/releases/download/v3.1.0/catppuccin-admonish.css")
-await Bun.file(`${dir}/template/theme/catppuccin-admonish.css`)
-.write(
-    await catppuccinAdmonishCss.text()
-)
+const catppuccinAdmonishCss = await fetch(
+    "https://github.com/catppuccin/mdBook/releases/download/v3.1.0/catppuccin-admonish.css",
+);
+await Bun.file(`${dir}/template/theme/catppuccin-admonish.css`).write(
+    await catppuccinAdmonishCss.text(),
+);
 // we vendor the main catppuccin theme so it doesn't change
 // const catppuccinCss = await fetch("https://github.com/catppuccin/mdBook/releases/download/v3.1.0/catppuccin.css")
 // await Bun.file(`${dir}/template/theme/catppuccin.css`)
@@ -47,7 +48,7 @@ for (const line of content.split("\n")) {
     admonishPreprossor.push(line);
 }
 
-const book =`[book]
+const book = `[book]
 authors = ["CHANGE--ME"]
 language = "en"
 multilingual = false
@@ -74,7 +75,7 @@ const indexFile = Bun.file(`${dir}/template/theme/index.hbs`);
 const indexLines = (await indexFile.text()).split("\n");
 const lines = [];
 let i = 0;
-for (;i<indexLines.length; i++) {
+for (; i < indexLines.length; i++) {
     if (indexLines[i].trim().startsWith(`<ul id="theme-list"`)) {
         lines.push(indexLines[i]);
         i++;
@@ -83,15 +84,17 @@ for (;i<indexLines.length; i++) {
     lines.push(indexLines[i]);
 }
 const makeCatppuccinTag = (id: string, name: string) => {
-    return `<li role="none"><button role="menuitem" class="theme" id="${id}">${name}</button></li> `
-}
-lines.push(...[
-    makeCatppuccinTag("latte", "Latte"),
-    makeCatppuccinTag("frappe", "Frappé"),
-    makeCatppuccinTag("macchiato", "Macchiato"),
-    makeCatppuccinTag("mocha", "Mocha"),
-]);
-for (;i<indexLines.length; i++) {
+    return `<li role="none"><button role="menuitem" class="theme" id="${id}">${name}</button></li> `;
+};
+lines.push(
+    ...[
+        makeCatppuccinTag("latte", "Latte"),
+        makeCatppuccinTag("frappe", "Frappé"),
+        makeCatppuccinTag("macchiato", "Macchiato"),
+        makeCatppuccinTag("mocha", "Mocha"),
+    ],
+);
+for (; i < indexLines.length; i++) {
     if (!indexLines[i].trim().startsWith("</ul>")) {
         continue;
     }
@@ -99,7 +102,7 @@ for (;i<indexLines.length; i++) {
     i++;
     break;
 }
-for (;i<indexLines.length; i++) {
+for (; i < indexLines.length; i++) {
     lines.push(indexLines[i]);
 }
 await indexFile.write(lines.join("\n"));

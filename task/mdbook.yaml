@@ -1,0 +1,25 @@
+version: '3'
+
+tasks:
+  install-theme:
+    # vars: 
+    # - MDBOOK_TARGET: path to the book's package
+    # - MONO_DEV: path to mono-dev root
+    vars:
+      MDBOOK_TARGET_RESOLVED: '{{.MDBOOK_TARGET| default "."}}'
+    cmds:
+      - rm -rf {{.MDBOOK_TARGET_RESOLVED}}/theme
+      - cp -r {{.MONO_DEV}}/mdbook/theme {{.MDBOOK_TARGET_RESOLVED}}
+      - cp -r {{.MONO_DEV}}/mdbook/css {{.MDBOOK_TARGET_RESOLVED}}/theme/extra-css
+
+  install-theme-monorepo:
+    cmds:
+      - task: install-theme
+        vars:
+          MONO_DEV: ../mono-dev
+
+  install-theme-singlerepo:
+    cmds:
+      - task: install-theme
+        vars:
+          MONO_DEV: ./mono-dev

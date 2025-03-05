@@ -1,0 +1,78 @@
+{
+    /* https://aka.ms/tsconfig */
+    "compilerOptions": {
+        // -- we are only type checking, so no emit config is needed
+        "noEmit": true,
+
+        /* === Section: Project */
+        "composite": true,
+        "incremental": true,
+        // "tsBuildInfoFile" is generated to be in node_modules/.tsc/
+
+        // -- probably useless project options
+        // "disableSourceOfProjectReferenceRedirect": true,  /* Disable preferring source files instead of declaration files when referencing composite projects. */
+        // "disableSolutionSearching": true,                 /* Opt a project out of multi-project reference checking when editing. */
+        // "disableReferencedProjectLoad": true,             /* Reduce the number of projects loaded automatically by TypeScript. */
+
+        /* === Section: Language and Environment */
+        // extra lib needs to be declared using /// directives:
+        // - /// <reference lib="dom" />
+        // - /// <reference lib="dom.iterable" />
+        "lib": ["esnext"],
+
+        "target": "esnext",
+        "useDefineForClassFields": true,
+        "jsx": "preserve",
+        "moduleDetection": "force",
+
+        /* === Section: Modules */
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        // "baseUrl" will be set to the root of the folder, or not set if checking ts files in root
+
+        // Types needs to be included manually using /// directives,
+        // to avoid types being auto-included from node_modules
+        // - /// <reference types="node" />
+        // - /// <reference types="bun" />
+        // - /// <reference types="vite/client" />
+        "typeRoots": [],
+        "types": [],
+        "allowImportingTsExtensions": true,
+
+        // this is becoming natively supported in many runtime/frameworks, so let's just enable it
+        "resolveJsonModule": true,
+
+        /* === Section: JavaScript Support */
+        // JS support aren't enabled. If you use JS, you opt-out of type-checking automatically
+        "allowJs": false,
+        "checkJs": false,
+
+        /* === Section: Interop Constraints */
+        // This means modules are enough for tools other than tsc to understand
+        "isolatedModules": true,
+        // This option might be useful in the future for libraries (like deno/JSR)
+        // "isolatedDeclarations": true,
+        // This isn't what you think it is. It means you cannot import X from "foo.ts",
+        // if the file is actually "FoO.ts". (like the opposite of C includes)
+        "forceConsistentCasingInFileNames": true,
+
+        /* === Section: Type Checking */
+        "strict": true,
+        // these are covered by strict
+        // noImplicitAny: true,
+        // noImplicitThis: true,
+        "noImplicitOverride": true,
+        // these are off because eslint covers them and allows marking them with _ to opt-out
+        // "noUnusedLocals": true,
+        // "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+
+        // -- other options are unused for now, but interesting to consider
+        // "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
+        // "noUncheckedIndexedAccess": true,                 /* Add 'undefined' to a type when accessed using an index. */
+        // "noPropertyAccessFromIndexSignature": true,       /* Enforces using indexed accessors for keys declared using an indexed type. */
+
+        /* === Section: Completeness */
+        "skipLibCheck": true
+    }
+}

@@ -1,12 +1,40 @@
 version: "3"
 
+includes:
+  mdbook:
+    taskfile: ./task/mdbook.yaml
+    internal: true
+
 tasks:
+  pull-book-update:
+    cmds:
+      - bun mdbook/update.ts
+
+  install-deps:
+    cmds:
+      - task: mdbook:install-theme
+        vars:
+          MDBOOK_TARGET: website
+          MONO_DEV: .
+
+  dev-website:
+    cmds:
+      - task: build-website
+      - mdbook watch website &
+      - live-server website/book -p 8081
+
+  build-website:
+    desc: (Re-)build the book
+    cmds:
+      - rm -rf website/book
+      - mdbook build website
+
   check:
     cmds:
-      - node scripts/prettierw.js
+      - node scripts/monolint.js
   fix:
     cmds:
-      - node scripts/prettierw.js --fix
+      - node scripts/monolint.js --fix
 
   git-push:
     cmds:

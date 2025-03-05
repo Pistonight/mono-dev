@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import vitePluginReact from "@vitejs/plugin-react";
 import vitePluginTsConfigPaths from "vite-tsconfig-paths";
 import vitePluginYaml from "@modyfi/vite-plugin-yaml";
@@ -22,6 +23,38 @@ const filterDependencies = (input) => {
     );
 };
 
+const findHttps = () => {
+    const findHttpsFromDirectory = (directory) => {
+        try {
+            const key = path.join(directory, ".cert", "cert.key");
+            const cert = path.join(directory, ".cert", "cert.pem");
+            if (fs.existsSync(key) && fs.existsSync(cert)) {
+                console.log(
+                    `[mono-dev] using HTTPS key and cert from "${directory}"`,
+                );
+                return { key, cert };
+            }
+        } catch {
+            // ignore
+        }
+        return undefined;
+    };
+    let config = findHttpsFromDirectory(".");
+    if (config) {
+        return config;
+    }
+    config = findHttpsFromDirectory("..");
+    if (config) {
+        return config;
+    }
+    config = findHttpsFromDirectory("../..");
+    if (config) {
+        return config;
+    }
+    console.warn("[mono-dev] HTTPS key and cert not found, not using HTTPS.");
+    return undefined;
+};
+
 export default function monodev(monoConfig) {
     return (config) => {
         console.log("[mono-dev] injecting mono-dev configuration");
@@ -29,11 +62,9 @@ export default function monodev(monoConfig) {
         const makePlugins = () => {
             const plugins = [];
             plugins.push(vitePluginTsConfigPaths());
+            plugins.push(vitePluginYaml());
             if (monoConfig.react) {
                 plugins.push(vitePluginReact());
-            }
-            if (monoConfig.yaml) {
-                plugins.push(vitePluginYaml());
             }
             if (monoConfig.wasm) {
                 plugins.push(vitePluginWasm());
@@ -110,6 +141,21 @@ export default function monodev(monoConfig) {
                 } else {
                     config.build.manualChunks[key] = ManualChunks[key];
                 }
+            }
+        }
+
+        // === Server Config ===
+        if (!config.server) {
+            config.server = {};
+        }
+        if (monoConfig.https) {
+            if (config.server.https) {
+                console.warn(
+                    "[mono-dev] not searching for HTTPS config because it is already specified",
+                );
+            } else {
+                const httpsConfig = findHttps();
+                config.server.https = httpsConfig;
             }
         }
 

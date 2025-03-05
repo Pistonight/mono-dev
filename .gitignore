@@ -1,1 +1,6 @@
 node_modules
+.prettierignore
+/tsconfig*.json
+/eslint.config.js
+/website/theme
+/website/book
