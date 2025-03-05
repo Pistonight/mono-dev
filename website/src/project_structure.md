@@ -1,6 +1,6 @@
 # Project Structure
 
-The standard defines 3 possible project structure.
+The Standard defines 3 possible project structure.
 
 ## Monorepo
 This is common for large projects, where multiple small projects and
@@ -68,7 +68,7 @@ members = [
 ```
 
 The root `pnpm-workspace.yaml` should declare a PNPM Workspace like:
-```
+```yaml
 packages:
   - packages/some-js-package
 

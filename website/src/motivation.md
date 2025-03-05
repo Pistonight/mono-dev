@@ -16,14 +16,14 @@ and copy from that.
 In the past, I don't often switch between projects. Maybe once or twice
 per year. However, another problem started to surface as I created
 more and more projects based on TypeScript/Web tech stacks.
-Recently I have even started using [`bun`] to run TypeScript on the server,
+Recently I have even started using [`bun`](https://bun.sh) to run TypeScript on the server,
 while 5 years ago I would be disgusted at the idea of running anything
 other than blazing fast, optimized, compiled languages on the server (I was a junior
 back then). 
 
 As I make these projects, common pattern/code emerge.
 At some point, I started creating these internal libraries that 
-all my projects would depend on. One of the example is `pure` (https://pure.pistonite.dev),
+all my projects would depend on. One of the example is [`pure`](https://pure.pistonite.dev),
 a pure-TypeScript library to bootstrap a web application with dark mode,
 multi-languages, `Result` type, etc. Now, I not only have a configuration
 hell, I also have my internal dependency hell!!

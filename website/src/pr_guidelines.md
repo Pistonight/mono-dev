@@ -37,7 +37,11 @@ Code without documentation will quickly become unworkable. The rule of thumb is
 I should be able to tell what a function/component does without looking at the implementation.
 
 This is something that requires pretty high skill level and experience to do effectively.
-It's very common even for large, widely-used projects to not do this properly. For example, this function:
+It's very common even for large, widely-used projects to not do this properly,
+and it's frustrating to having to dig into the code or setup a minimal environment
+to find out what the function returns for, say, empty string.
+
+For example, this function:
 ```typescript
 /** Parses a number from an input string */
 function parseNumber(input: string): number {
@@ -55,7 +59,6 @@ A good documentation looks like this
 /** 
  * Parses a number from an input string.
  *
- *
  * The input should be string representation of a positive integer in decimal.
  * If anything other than 0-9 is in the input, it returns 0.
  * Leading 0's are ignored, and an empty string also gives 0
@@ -71,11 +74,12 @@ They express in code instead of natural language or what the behavior of a funct
 is.
 
 ```admonish warning
-WARNING: DO NOT use LLM to generate documentation comments!!!!
+DO NOT use LLM to generate documentation comments!!!!
 
 LLMs lack the context that YOU, as the developer, know. They cannot generate effective documentation
 unless you tell them the context, which takes more effort than you just writing the comment yourself.
-You can however, write the comment and ask LLM to reword it to sound more fluent.
+You can however, write the comment and ask LLM to reword it to sound more fluent,
+say if English is not your first language.
 
 For example, here's my prompt:
 - "Can you generate documentation for this function? It reduces the payload to avoid hittimg payload limit: function getMinimalPayload(): string;"
@@ -102,7 +106,8 @@ This is the output:
 
 These words are useless, and very obviously emitted by LLM without sufficient context.
 What is "minimal payload"? What's the format? What is left out? What is not left out?
-Documentation that pretends to be there is worse than no documentation.
+Documentation that pretends to be there is worse than no documentation. I have to spend
+brain power processing junk instead of actually looking for what I need.
 ```
 
 ## Before Pull Request

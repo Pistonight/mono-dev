@@ -42,6 +42,9 @@ Reason:
   It's a command runner written in Rust. The main thing lacking is ability to run
   tasks in parallel and it uses a DSL. `task` on the other hand uses YAML.
 
+Tasks replaces the scripting system in other package managers. For example
+instead of `npm run test`, you would run `task test`.
+
 ## Package Manager(s)
 Modern ecosystems have package managers, like `node_modules` for JS or crates for Rust.
 However, I need something outside of these to enable dependency management in monorepos
@@ -62,6 +65,7 @@ to be migrated to the latest edition of Rust as soon as it's released.
 
 Specific projects might require nightly features.
 ```
+
 The Rust Toolchain is needed not only for Rust projects, but to install
 various tools from `crates.io` - Rust's public registry.
 Follow [rustup.rs](https://rustup.rs) to set up `cargo` and any additional
@@ -80,9 +84,10 @@ to work on a Rust project, thanks to `cargo` also being a linter and formater fo
 ```admonish note
 The current NodeJS version in the standard is v20
 ```
+
 NodeJS is basically still the source of truth for the industry.
-You can install it from NodeJS website, from your distro's package manager,
-or use NVM (or NVM for windows).
+You can install it from [NodeJS.org](https://nodejs.org), from your distro's package manager,
+or use [NVM](https://github.com/nvm-sh/nvm) (or [NVM-Windows](https://github.com/coreybutler/nvm-windows) for windows).
 
 There are 2 additional tools needed globally:
 - `pnpm` - the package manager that works better with monorepos
@@ -108,7 +113,7 @@ If you are using NVM or other version managers, the global packages
 are usually tied to the node version.
 ```
 
-Other tools used in development are managed as node dependencies,
+Other JS ecosystem tools used in development are managed as node dependencies,
 so they will automatically be installed local to the project.
 
 ## Python
@@ -126,7 +131,8 @@ Python is the preferred option in non-ECMAScript projects.
 We always aim at supporting the latest version of Python.
 Hopefully there won't be Python 4.
 ```
-You can install Python from their website, from your distro's package
+
+You can install Python from [Python.org](https://www.python.org/downloads/), from your distro's package
 manager, or through a version manager.
 
 My projects do not use Python in production, so the dependencies are also

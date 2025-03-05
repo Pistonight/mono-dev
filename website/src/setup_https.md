@@ -9,7 +9,8 @@ If you are like me, who uses a VM for development and hosts the dev server
 in local network, then your host computer needs to be configured
 to trust the web app hosted by the VM's dev server.
 
-The steps are currently documented here: https://vmsetup.pistonite.dev/tool/https
+The steps for Windows are currently documented [here](https://vmsetup.pistonite.dev/tool/https).
+I might move them to this page instead in the future.
 
 The `mono-dev` Standard will look for `.cert/cert.key` and `.cert/cert.pem` 2 levels up.
 So the recommendation is to put the `.cert` folder in the repo root.
