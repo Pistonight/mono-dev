@@ -178,7 +178,9 @@ export default function monodev(monoConfig) {
                 config.server.https = { key, cert };
                 if (hostname) {
                     if (config.server.host) {
-                        console.warn(`[mono-dev] not setting server.host to because it is already specified`);
+                        console.warn(
+                            `[mono-dev] not setting server.host to because it is already specified`,
+                        );
                     } else {
                         config.server.host = hostname;
                     }
@@ -187,7 +189,9 @@ export default function monodev(monoConfig) {
                     config.server.hmr = {};
                 }
                 if (config.server.hmr.host) {
-                    console.warn(`[mono-dev] not setting server.hmr.host to because it is already specified`);
+                    console.warn(
+                        `[mono-dev] not setting server.hmr.host to because it is already specified`,
+                    );
                 } else {
                     config.server.hmr.host = hostname;
                 }
