@@ -31,14 +31,20 @@ const pathPrettierCache = "./node_modules/.mono-lint/.prettier-cache";
 void main();
 
 async function main() {
-    // we accept 2 arguments:
+    // arguments:
     // --fix/-f to fix the files
-    // --clean/-c to remove cache and regenerate configs
+    // --clean to remove cache and regenerate configs
+    // --config to only generate the config
     const argv = process.argv.slice(2);
     const fix = argv.includes("--fix") || argv.includes("-f");
     const clean = argv.includes("--clean") || argv.includes("-c");
+    const configOnly = argv.includes("--config");
 
     const hasTs = await createConfigs(clean);
+    if (configOnly) {
+        console.log("[mono-lint] config generated");
+        return;
+    }
     if (fix) {
         if (hasTs) {
             const eslint = runEslint(true);

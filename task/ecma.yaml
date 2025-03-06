@@ -4,6 +4,9 @@
 version: '3'
 
 tasks:
+  mono-config:
+    cmds:
+      - pnpm exec mono-lint --config
   mono-check-clean:
     cmds:
       - pnpm exec mono-lint --clean
@@ -20,6 +23,7 @@ tasks:
         ignore_error: true
 
   vite-build:
+    deps: [mono-config]
     cmds:
       - pnpm exec vite build
 
@@ -29,5 +33,6 @@ tasks:
         ignore_error: true
 
   vitest:
+    deps: [mono-config]
     cmds:
       - pnpm exec vitest run
