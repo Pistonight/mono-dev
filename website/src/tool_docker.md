@@ -43,16 +43,19 @@ includes:
     taskfile: ../mono-dev/task/docker.yaml
     internal: true
 
+vars:
+  DOCKER_IMAGE: pistonite/foo
+
+tasks:
+
   build:
     cmds:
       - task: docker:build
-        vars: { IMAGE: pistonite/foo }
 
   run:
     cmds:
       - task: docker:run
         vars: 
-          IMAGE: pistonite/foo
           DOCKER_RUN_FLAGS: >
             -p 8000:80
             -e FOO=BAR
@@ -61,15 +64,12 @@ includes:
   connect:
     cmds:
       - task: docker:connect
-        vars: { IMAGE: pistonite/foo }
 
   stop:
     cmds:
       - task: docker:stop
-        vars: { IMAGE: pistonite/foo }
   
   clean:
     cmds:
       - task: docker:clean
-        vars: { IMAGE: pistonite/foo }
 ```

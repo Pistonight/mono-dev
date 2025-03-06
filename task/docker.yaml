@@ -6,21 +6,23 @@ version: '3'
 tasks:
   build:
     cmds:
-      - docker build -t {{.IMAGE}} .
+      - docker build -t {{.DOCKER_IMAGE}} .
 
   run:
     cmds:
-      - docker run {{.DOCKER_RUN_FLAGS}} {{.IMAGE}}
-
+      - cmd: docker run {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}}
+        ignore_error: true
+  
   connect:
     cmds:
-      - docker exec -it $(docker container ls -q --filter ancestor={{.IMAGE}}) /bin/sh
+      - cmd: docker exec -it $(docker container ls -q --filter ancestor={{.DOCKER_IMAGE}}) /bin/sh
+        ignore_error: true 
 
   stop:
     cmds:
-      - docker stop $(docker ps ls -q -a --filter ancestor={{.IMAGE}})
+      - docker stop $(docker ps -q -a --filter ancestor={{.DOCKER_IMAGE}})
 
   clean:
     cmds:
       - docker container prune
-      - docker image rm $(docker image ls -q -a --filter reference={{.IMAGE}})
+      - docker image rm $(docker image ls -q -a --filter reference={{.DOCKER_IMAGE}})
