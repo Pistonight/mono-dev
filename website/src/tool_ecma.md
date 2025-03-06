@@ -25,7 +25,7 @@ includes:
 In monorepos, `./node_modules` can also be `../`
 ```
 
-## Check/Fix
+## Check and Fix
 `mono-dev` ships with its own "zero config" linter `mono-lint` that wraps
 `tsc`, `eslint` and `prettier` with pre-defined rules.
 
@@ -69,6 +69,30 @@ for example:
 }
 ```
 Paths in `nocheck` will not be processed by `eslint` or `prettier`
+
+### Interop with tools that checks for additional TSConfig
+Additional tools such as `bun` reads `tsconfig.json` without
+full interop with `tsc` (i.e. they have their own implementation).
+Therefore, `mono-lint` also supports an `"tsconfig"` key as a template
+to generate the main `tsconfig.json` for such tools to read.
+
+For example
+```json
+{
+    "devDependencies": {
+        "mono-dev": "workspace:*"
+    },
+    "tsconfig": {
+        "compilerOptions": {
+            "baseUrl": "src"
+        }
+    }
+}
+```
+
+This will make sure `bun` honors the `baseUrl` during bundling.
+You also need to run the `mono-config` task to generate the `tsconfig.json`
+before running `bun`.
 
 ## Test
 To add testing support, add `vitest` to the downstream project as devdependencies

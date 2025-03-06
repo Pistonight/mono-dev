@@ -102,7 +102,7 @@ async function createConfigs(clean) {
         checkIgnoreLines.push(...packageJson.nocheck);
     }
     const [ts] = await Promise.all([
-        createTsConfigs(clean),
+        createTsConfigs(clean, packageJson),
         createPrettierIgnore(checkIgnoreLines),
     ]);
     if (ts.projectCount) {
@@ -129,7 +129,7 @@ async function createConfigs(clean) {
  *
  * Also consider adding /tsconfig.*.json to .gitignore
  */
-async function createTsConfigs(clean) {
+async function createTsConfigs(clean, packageJson) {
     const existingTsConfigs = new Set();
     const tsDirectories = [];
     const rootFiles = [];
@@ -199,7 +199,6 @@ async function createTsConfigs(clean) {
             },
             include: [dir],
         };
-        console.log(`[mono-lint] creating tsconfig for ./${dir}/`);
         await fs.writeFile(tsconfig, JSON.stringify(tsconfigContent, null, 4));
         changed = true;
     });
@@ -223,7 +222,6 @@ async function createTsConfigs(clean) {
                 },
                 include: rootFiles,
             };
-            console.log("[mono-lint] creating tsconfig for ./");
             await fs.writeFile(
                 tsconfig,
                 JSON.stringify(tsconfigContent, null, 4),
@@ -239,9 +237,6 @@ async function createTsConfigs(clean) {
 
     if (projectCount) {
         if (changed || clean || !(await exists("tsconfig.json"))) {
-            console.log(
-                "[mono-lint] regenerating tsconfig.json because project structure has changed.",
-            );
             const references = tsDirectories.map((dir) => ({
                 path: `./tsconfig.${dir}.json`,
             }));
@@ -249,7 +244,11 @@ async function createTsConfigs(clean) {
                 references.push({ path: "./tsconfig._.json" });
             }
             const tsconfig = "tsconfig.json";
+
+            let packageTsConfig = packageJson.tsconfig || {};
+
             const tsconfigContent = {
+                ...packageTsConfig,
                 files: [],
                 references,
             };
