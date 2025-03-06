@@ -28,12 +28,34 @@ const findHttps = () => {
         try {
             const key = path.join(directory, ".cert", "cert.key");
             const cert = path.join(directory, ".cert", "cert.pem");
-            if (fs.existsSync(key) && fs.existsSync(cert)) {
-                console.log(
-                    `[mono-dev] using HTTPS key and cert from "${directory}"`,
-                );
-                return { key, cert };
+            if (!fs.existsSync(key) || !fs.existsSync(cert)) {
+                return undefined;
             }
+            // read the subject name (host name)
+            let hostname = "";
+            try {
+                const pemFile = fs.readFileSync(cert, "utf-8");
+                for (const line of pemFile.split("\n")) {
+                    const l = line.trim();
+                    if (l.toLowerCase().startsWith("subject=")) {
+                        const subject = l.substring("subject=".length);
+                        for (const part of subject.split(",")) {
+                            const [key, value] = part.split("=");
+                            if (key.trim().toLowerCase() === "cn") {
+                                hostname = value.trim();
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            } catch (e) {
+                console.warn(`[mono-dev] failed to read cert.pem: ${e}`);
+            }
+            console.log(
+                `[mono-dev] using HTTPS key and cert from "${directory}"`,
+            );
+            return { key, cert, hostname };
         } catch {
             // ignore
         }
@@ -63,9 +85,7 @@ export default function monodev(monoConfig) {
             const plugins = [];
             plugins.push(vitePluginTsConfigPaths());
             plugins.push(vitePluginYaml());
-            if (monoConfig.react) {
-                plugins.push(vitePluginReact());
-            }
+            plugins.push(vitePluginReact());
             if (monoConfig.wasm) {
                 plugins.push(vitePluginWasm());
             }
@@ -154,8 +174,23 @@ export default function monodev(monoConfig) {
                     "[mono-dev] not searching for HTTPS config because it is already specified",
                 );
             } else {
-                const httpsConfig = findHttps();
-                config.server.https = httpsConfig;
+                const { key, cert, hostname } = findHttps();
+                config.server.https = { key, cert };
+                if (hostname) {
+                    if (config.server.host) {
+                        console.warn(`[mono-dev] not setting server.host to because it is already specified`);
+                    } else {
+                        config.server.host = hostname;
+                    }
+                }
+                if (!config.server.hmr) {
+                    config.server.hmr = {};
+                }
+                if (config.server.hmr.host) {
+                    console.warn(`[mono-dev] not setting server.hmr.host to because it is already specified`);
+                } else {
+                    config.server.hmr.host = hostname;
+                }
             }
         }
 
