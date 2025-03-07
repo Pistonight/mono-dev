@@ -10,6 +10,7 @@
 - [Tooling](./tooling.md)
   - [TypeScript](./tool_ecma.md)
   - [Rust](./tool_cargo.md)
+  - [C/C++](./tool_ccpp.md)
   - [Go](./tool_go.md)
   - [Docker](./tool_docker.md)
   - [Mdbook](./tool_mdbook.md)

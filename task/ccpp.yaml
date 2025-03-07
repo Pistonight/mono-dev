@@ -1,0 +1,30 @@
+# Taskfile include for C/C++
+#
+
+version: '3'
+
+tasks:
+  fmt-check:
+    cmds:
+      - task: run-clang-format
+        vars:
+          CLANG_FORMAT_ARGS: -n -Werror
+
+  fmt-fix:
+    cmds:
+      - task: run-clang-format
+        vars:
+          CLANG_FORMAT_ARGS: -i
+          
+  run-clang-format:
+    cmds:
+      - cmd: > 
+          fd "\.[ch](\+\+|pp|xx)?"
+          -x clang-format
+          --style="{
+            IndentWidth: 4,
+            AccessModifierOffset: -4,
+            PointerAlignment: Left
+          }" {{.CLANG_FORMAT_ARGS}}
+        silent: true
+         
