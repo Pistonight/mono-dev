@@ -93,11 +93,16 @@ async function createConfigs(clean) {
         await fs.mkdir(cacheDir, { recursive: true });
     }
     const packageJson = JSON.parse(await fs.readFile("package.json", "utf-8"));
-    const gitignore = await fs.readFile(".gitignore", "utf-8");
-    const checkIgnoreLines = gitignore
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean);
+    let checkIgnoreLines = [];
+    try {
+        const gitignore = await fs.readFile(".gitignore", "utf-8");
+        checkIgnoreLines = gitignore
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean);
+    } catch {
+        checkIgnoreLines = [];
+    }
     if (packageJson.nocheck) {
         checkIgnoreLines.push(...packageJson.nocheck);
     }
