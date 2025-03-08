@@ -146,20 +146,26 @@ export default function monodev(monoConfig) {
         if (!config.build.rollupOptions) {
             config.build.rollupOptions = {};
         }
-        if (!config.build.manualChunks) {
-            config.build.manualChunks = {};
-        } else if (typeof config.build.manualChunks === "function") {
+        if (!config.build.rollupOptions.output) {
+            config.build.rollupOptions.output = {};
+        }
+        if (!config.build.rollupOptions.output.manualChunks) {
+            config.build.rollupOptions.output.manualChunks = {};
+        } else if (
+            typeof config.build.rollupOptions.output.manualChunks === "function"
+        ) {
             console.warn(
                 "[mono-dev] not injecting manual chunks because a function is specified.",
             );
         } else {
             for (const key in ManualChunks) {
-                if (config.build.manualChunks[key]) {
+                if (config.build.rollupOptions.output.manualChunks[key]) {
                     console.warn(
                         `[mono-dev] not injecting manual chunk ${key} because it is already specified`,
                     );
                 } else {
-                    config.build.manualChunks[key] = ManualChunks[key];
+                    config.build.rollupOptions.output.manualChunks[key] =
+                        ManualChunks[key];
                 }
             }
         }
