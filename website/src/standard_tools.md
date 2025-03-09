@@ -66,11 +66,24 @@ to be migrated to the latest edition of Rust as soon as it's released.
 Specific projects might require nightly features.
 ```
 
-The Rust Toolchain is needed not only for Rust projects, but to install
+The Rust Toolchain is needed not only for Rust projects, but also to install
 various tools from `crates.io` - Rust's public registry.
-Follow [rustup.rs](https://rustup.rs) to set up `cargo` and any additional
-dependencies. This means you also need MSVC build tools on Windows if WSL
-is not used.
+
+You can install Rust from [rustup.rs](https://rustup.rs) or from your distro's package
+manager.
+
+```admonish warning
+Windows users need to first install MSVC, which is included in the Visual Studio Build Tools (VSBT).
+This does not apply if you are using WSL.
+
+You can either:
+1. Follow the installation in the [Rustup Book](https://rust-lang.github.io/rustup/installation/windows-msvc.html),
+   which has a step-by-step walkthrough with images, but installs the whole Visual Studio IDE, or:
+2. Download and install just the build tools from [Microsoft](https://aka.ms/vs/17/release/vs_BuildTools.exe)
+
+Either way, be sure to select the latest `MSVC vXXX - VS XXXX C++ x64/x86` and `Windows 11 SDK` components
+when installing.
+```
 
 For projects, the root should define a task called `install-cargo-extra-tools`
 with the alias `icets` to invoke `cargo install` for all tools needed
