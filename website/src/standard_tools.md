@@ -95,7 +95,7 @@ to work on a Rust project, thanks to `cargo` also being a linter and formater fo
 
 ## ECMAScript ecosystem
 ```admonish note
-The current NodeJS version in the standard is v20
+The current NodeJS version in the standard is v22
 ```
 
 NodeJS is basically still the source of truth for the industry.
