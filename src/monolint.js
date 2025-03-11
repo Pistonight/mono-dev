@@ -18,6 +18,7 @@
  */
 
 import fs from "fs/promises";
+import fsSync from "fs";
 import child_process from "child_process";
 import path from "path";
 import { run as prettierCli } from "@prettier/cli";
@@ -26,9 +27,12 @@ import { run as prettierCli } from "@prettier/cli";
 // relative to where the ignore file is (like .gitignore)
 // and cannot reference outside of the directory
 const pathDotPrettierIgnore = ".prettierignore";
-const pathPrettierCache = "./node_modules/.mono-lint/.prettier-cache";
-
-void main();
+const pathCache = "./node_modules/.mono-lint";
+const pathPrettierCache = `${pathCache}/.prettier-cache`;
+const pathMonodev =
+    path.basename(path.resolve(".")) === "mono-dev"
+        ? "."
+        : "./node_modules/mono-dev";
 
 async function main() {
     // arguments:
@@ -81,16 +85,46 @@ async function main() {
  * using the same format as .gitignore.
  *
  * TypeScript configs are created based on the presence of env.d.ts files in directories.
- * See below
+ * See https://mono.pistonite.dev/tool_ecma#check-and-fix
  */
 async function createConfigs(clean) {
-    const cacheDir = "./node_modules/.mono-lint";
-    if (!(await exists(cacheDir))) {
-        await fs.mkdir(cacheDir, { recursive: true });
-    } else if (clean) {
-        console.log("[mono-lint] removing cache at ./node_modules/.mono-lint");
-        await fs.rm(cacheDir, { recursive: true });
-        await fs.mkdir(cacheDir, { recursive: true });
+    const currentVersion = JSON.parse(
+        await fs.readFile(`${pathMonodev}/package.json`),
+    ).version.trim();
+    // using sync operations here so they are less likely to fail, and when they do,
+    // it's possible to catch them
+    if (!(await exists(pathCache))) {
+        fsSync.mkdirSync(pathCache, { recursive: true });
+        fsSync.writeFileSync(`${pathCache}/version`, currentVersion);
+    } else {
+        if (!clean) {
+            // check if mono-dev version was bumped
+            try {
+                const version = fsSync
+                    .readFileSync(`${pathCache}/version`, "utf-8")
+                    .trim();
+                if (version !== currentVersion) {
+                    console.log(
+                        `[mono-lint] generating clean configs because of version update: ${version} -> ${currentVersion}`,
+                    );
+                    clean = true;
+                }
+            } catch {
+                clean = true;
+            }
+        }
+        if (clean) {
+            fsSync.rmSync(pathCache, { recursive: true });
+            fsSync.mkdirSync(pathCache, { recursive: true });
+            // this can fail for some reason
+            try {
+                fsSync.writeFileSync(`${pathCache}/version`, currentVersion);
+            } catch {
+                console.error(
+                    "[mono-lint] failed to write version file, will retry next time",
+                );
+            }
+        }
     }
     const packageJson = JSON.parse(await fs.readFile("package.json", "utf-8"));
     let checkIgnoreLines = [];
@@ -184,26 +218,37 @@ async function createTsConfigs(clean, packageJson) {
 
     let changed = false;
 
-    const monoDevPath =
-        path.basename(path.resolve(".")) === "mono-dev"
-            ? "."
-            : "./node_modules/mono-dev";
+    let tsPathMappings = {};
+    if (
+        !("name" in packageJson) &&
+        !("exports" in packageJson) &&
+        !("file" in packageJson)
+    ) {
+        tsPathMappings = await createTsPathMappings();
+    }
+    const hasTsPathMappings = Object.keys(tsPathMappings).length > 0;
 
     const directoryPromises = tsDirectories.map(async (dir) => {
         const tsconfig = `tsconfig.${dir}.json`;
         // the tsconfig only depends on the dir name,
         // we should never need to regenerate it
-        if (!clean && existingTsConfigs.has(tsconfig)) {
+        if (
+            !(dir === "src" && hasTsPathMappings) &&
+            !clean &&
+            existingTsConfigs.has(tsconfig)
+        ) {
             return;
         }
         const tsconfigContent = {
-            extends: `${monoDevPath}/tsconfig/defaults.json`,
+            extends: `${pathMonodev}/tsconfig/defaults.json`,
             compilerOptions: {
-                tsBuildInfoFile: `./node_modules/.mono-lint/tsconfig.${dir}.tsbuildinfo`,
-                baseUrl: dir,
+                tsBuildInfoFile: `${pathCache}/tsconfig.${dir}.tsbuildinfo`,
             },
             include: [dir],
         };
+        if (dir === "src" && hasTsPathMappings) {
+            tsconfigContent.compilerOptions.paths = tsPathMappings;
+        }
         await fs.writeFile(tsconfig, JSON.stringify(tsconfigContent, null, 4));
         changed = true;
     });
@@ -220,10 +265,9 @@ async function createTsConfigs(clean, packageJson) {
         const tsconfig = "tsconfig._.json";
         if (clean || !existingTsConfigs.has(tsconfig)) {
             const tsconfigContent = {
-                extends: `${monoDevPath}/tsconfig/defaults.json`,
+                extends: `${pathMonodev}/tsconfig/defaults.json`,
                 compilerOptions: {
-                    tsBuildInfoFile:
-                        "./node_modules/.mono-lint/tsconfig._.tsbuildinfo",
+                    tsBuildInfoFile: `${pathCache}/tsconfig._.tsbuildinfo`,
                 },
                 include: rootFiles,
             };
@@ -253,10 +297,14 @@ async function createTsConfigs(clean, packageJson) {
             let packageTsConfig = packageJson.tsconfig || {};
 
             const tsconfigContent = {
+                compilerOptions: {},
                 ...packageTsConfig,
                 files: [],
                 references,
             };
+            if (hasTsPathMappings) {
+                tsconfigContent.compilerOptions.paths = tsPathMappings;
+            }
             await fs.writeFile(
                 tsconfig,
                 JSON.stringify(tsconfigContent, null, 4),
@@ -269,6 +317,53 @@ async function createTsConfigs(clean, packageJson) {
         }
     }
     return { projectCount, nonTsDirectories };
+}
+
+async function createTsPathMappings() {
+    let rest = [];
+    try {
+        const top = await fs.readdir("./src");
+        for (const p of top) {
+            if (p.match(/index\.(c|m)?tsx?$/)) {
+                return {};
+            }
+            const srcPath = `src/${p}`;
+            if ((await fs.stat(srcPath)).isDirectory()) {
+                rest.push(srcPath.replace(/\/+$/, ""));
+            }
+        }
+    } catch {}
+
+    const tsPathMappings = {};
+
+    while (rest.length) {
+        const next = rest.pop();
+        if (!next) {
+            break;
+        }
+        try {
+            const files = await fs.readdir(next);
+            let dirs = [];
+            for (const f of files) {
+                const srcPath = `${next}/${f}`;
+                if (f.match(/index\.(c|m)?tsx?$/)) {
+                    tsPathMappings[next.replace(/^src\//, "self::")] = [
+                        `./${srcPath}`,
+                    ];
+                    dirs = [];
+                    break;
+                }
+                if ((await fs.stat(srcPath)).isDirectory()) {
+                    dirs.push(srcPath.replace(/\/+$/, ""));
+                }
+            }
+            rest.push(...dirs);
+        } catch {}
+    }
+
+    const entries = Object.entries(tsPathMappings);
+    entries.sort(([a], [b]) => a.localeCompare(b));
+    return Object.fromEntries(entries);
 }
 
 /**
@@ -442,3 +537,5 @@ async function exists(path) {
         return false;
     }
 }
+
+void main();

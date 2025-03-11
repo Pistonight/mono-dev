@@ -7,7 +7,11 @@ includes:
 
 tasks:
   pull-book-update:
+    desc: Update the book assets using newer mdbook version
     cmds:
+      # can comment this out for efficiency,
+      # but --force is needed so mdbook-admonish is built with latest mdbook
+      - cargo install mdbook mdbook-admonish --force 
       - bun mdbook/update.ts
 
   install-deps:
@@ -31,10 +35,10 @@ tasks:
 
   check:
     cmds:
-      - node scripts/monolint.js
+      - node src/monolint.js
   fix:
     cmds:
-      - node scripts/monolint.js --fix
+      - node src/monolint.js --fix
 
   git-push:
     cmds:

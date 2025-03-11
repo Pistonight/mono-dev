@@ -2,16 +2,21 @@ import { $ } from "bun";
 
 const dir = import.meta.dirname;
 
+// making sure the latest binaries are built
+await $`cargo install mdbook mdbook-admonish`;
+
 await $`rm -rf ${dir}/template`;
 await $`mdbook init --ignore none --force --theme ${dir}/template`;
 // no change needed to some files
-await $`rm -rf ${dir}/template/theme/css`;
-await $`rm -rf ${dir}/template/theme/fonts`;
 await $`rm ${dir}/template/theme/favicon.png`;
 await $`rm ${dir}/template/theme/favicon.svg`;
 await $`rm ${dir}/template/theme/highlight.css`;
 await $`rm ${dir}/template/theme/highlight.js`;
-await $`rm ${dir}/template/theme/book.js`;
+// we vendor these so mismatched versions of mdbook in CI don't cause issues
+// await $`rm -rf ${dir}/template/theme/css`;
+// await $`rm -rf ${dir}/template/theme/fonts`;
+// await $`rm ${dir}/template/theme/book.js`;
+
 // install additional CSS from admonish
 await $`mdbook-admonish install ${dir}/template --css-dir ${dir}/template/theme`;
 

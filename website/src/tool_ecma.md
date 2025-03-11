@@ -70,29 +70,43 @@ for example:
 ```
 Paths in `nocheck` will not be processed by `eslint` or `prettier`
 
-### Interop with tools that checks for additional TSConfig
-Additional tools such as `bun` reads `tsconfig.json` without
-full interop with `tsc` (i.e. they have their own implementation).
-Therefore, `mono-lint` also supports an `"tsconfig"` key as a template
-to generate the main `tsconfig.json` for such tools to read.
+### Remapping TS Import Path
+TS import paths can be remapped in bundled apps to avoid the "relative parent import hell".
+`mono-lint` automatically detects suitable scenarios to generate these import maps using a `self::`
+prefix.
 
-For example
-```json
-{
-    "devDependencies": {
-        "mono-dev": "workspace:*"
-    },
-    "tsconfig": {
-        "compilerOptions": {
-            "baseUrl": "src"
-        }
-    }
-}
-```
+The conditions for import map to be generated are:
+- `package.json` must NOT contain `"name"`, `"file"` or `"exports"` key,
+  AND there is no `src/index.(c|m)?tsx?` file.
+  These suggest the package is a library instead of bundled app
+- The import paths can only be generated for the `src` directory
+- One import path for the first `index.(c|m)?tsx?` found for each
+  directory in `src`.
+    ```admonish example
+    The following directory structure:
+       
+        - src/
+          - app/
+          - util/
+            - image/
+              - index.ts
+            - data/
+              - index.ts
+          - lib/
+            - foo/
+              - index.ts
+            - index.ts
 
-This will make sure `bun` honors the `baseUrl` during bundling.
-You also need to run the `mono-config` task to generate the `tsconfig.json`
-before running `bun`.
+    generates:
+    
+        self::lib -> ./src/lib/index.ts
+        self::util/image -> ./src/util/image/index.ts
+        self::util/data -> ./src/util/data/index.ts
+
+    ```
+
+For max interop with tools such as `bun`, the same import map
+will appear in `tsconfig.json` and `tsconfig.src.json`.
 
 ## Test
 To add testing support, add `vitest` to the downstream project as devdependencies
