@@ -1,4 +1,4 @@
-name: CHANGEME
+name: Deploy
 on:
   push:
     branches:
