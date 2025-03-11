@@ -2,9 +2,6 @@ import { $ } from "bun";
 
 const dir = import.meta.dirname;
 
-// making sure the latest binaries are built
-await $`cargo install mdbook mdbook-admonish`;
-
 await $`rm -rf ${dir}/template`;
 await $`mdbook init --ignore none --force --theme ${dir}/template`;
 // no change needed to some files
