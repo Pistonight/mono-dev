@@ -29,7 +29,7 @@ runs:
         version: 10
     - uses: actions/setup-node@v4 # useblacksmith/setup-node@v5
       with:
-        node-version: 20
+        node-version: 22
         cache: 'pnpm'
     - uses: oven-sh/setup-bun@v2
 
