@@ -4,3 +4,4 @@ node_modules
 /eslint.config.js
 /website/theme
 /website/book
+/pnpm-lock.yaml
