@@ -11,7 +11,12 @@ const ChunkSizeWarningLimit = 4096;
 const ManualChunks = {
     react: ["react", "react-dom", "@fluentui/react-components"],
 };
-const Dedupe = ["@pistonite/pure", "i18next", "react-i18next"];
+const Dedupe = [
+    "@pistonite/pure",
+    "@pistonite/workex",
+    "i18next",
+    "react-i18next",
+];
 
 const PackageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
 
