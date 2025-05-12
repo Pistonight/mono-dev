@@ -34,21 +34,7 @@ The root level of a monorepo has `list` and `exec` tasks:
 - `list`: List the tasks of the root level or of a package
 - `exec`: Execute a task from a package
 
-The usage is:
-```
-task list              # same as task --list
-task list -- <package> # list tasks from <package>
-task exec -- <package>:<task> # execute <task> in <package>
-```
-
-These are defined in `task/common.yaml`, and should be included like this:
-```yaml
-includes:
-  common:
-    taskfile: ./packages/mono-dev/task/common.yaml
-    flatten: true
-    optional: true
-```
+See [Common tooling](./tool_common.md) for how these tasks are defined.
 
 #### `install`
 At the root level, the `install` task should be defined to download

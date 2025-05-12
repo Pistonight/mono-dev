@@ -19,13 +19,13 @@ await $`mdbook-admonish install ${dir}/template --css-dir ${dir}/template/theme`
 
 // download catppuccin
 const catppuccinAdmonishCss = await fetch(
-    "https://github.com/catppuccin/mdBook/releases/download/v3.1.0/catppuccin-admonish.css",
+    "https://github.com/catppuccin/mdBook/releases/download/v3.1.1/catppuccin-admonish.css",
 );
 await Bun.file(`${dir}/template/theme/catppuccin-admonish.css`).write(
     await catppuccinAdmonishCss.text(),
 );
 // we vendor the main catppuccin theme so it doesn't change
-// const catppuccinCss = await fetch("https://github.com/catppuccin/mdBook/releases/download/v3.1.0/catppuccin.css")
+// const catppuccinCss = await fetch("https://github.com/catppuccin/mdBook/releases/download/v3.1.1/catppuccin.css")
 // await Bun.file(`${dir}/template/theme/catppuccin.css`)
 // .write(
 //     await catppuccinCss.text()

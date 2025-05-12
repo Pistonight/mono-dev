@@ -1,4 +1,1 @@
-:root {
-    --copy-button-filter: invert(51%) sepia(10%) saturate(393%) hue-rotate(198deg) brightness(86%) contrast(87%);
-    --copy-button-filter-hover: invert(46%) sepia(20%) saturate(1537%) hue-rotate(156deg) brightness(85%) contrast(90%);
-}
+/* We keep this file for future patching, without having to change book.toml */

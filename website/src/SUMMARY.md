@@ -8,6 +8,7 @@
   - [Contribution Guidelines](./pr_guidelines.md)
   - [HTTPS](./setup_https.md)
 - [Tooling](./tooling.md)
+  - [Common](./tool_common.md)
   - [TypeScript](./tool_ecma.md)
   - [Rust](./tool_cargo.md)
   - [C/C++](./tool_ccpp.md)
