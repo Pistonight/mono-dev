@@ -82,6 +82,8 @@ export function config(configObj) {
                 "no-unused-vars": "off",
                 // force type to be import as type
                 "@typescript-eslint/consistent-type-imports": "warn",
+                // force you to mark floating promises with `void` (warning for ease with testing)
+                "@typescript-eslint/no-floating-promises": "warn",
             },
         },
     );
