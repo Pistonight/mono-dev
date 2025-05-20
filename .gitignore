@@ -5,3 +5,5 @@ node_modules
 /website/theme
 /website/book
 /pnpm-lock.yaml
+/target
+/Cargo.lock

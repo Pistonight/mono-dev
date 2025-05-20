@@ -36,6 +36,7 @@ tasks:
   check:
     cmds:
       - node src/monolint.js
+
   fix:
     cmds:
       - node src/monolint.js --fix
