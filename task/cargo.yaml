@@ -41,6 +41,12 @@ tasks:
     cmds:
       - cargo fmt
 
+  watch-serve-doc:
+    cmds:
+      - cargo doc --target-dir target
+      - cargo watch -s "cargo doc --target-dir target" &
+      - live-server -p 8081 target/doc
+
   wasm-pack-build:
     vars:
       OUTPUT: "./target/wasm32-unknown-unknown/release/{{.PACKAGE}}.wasm"
@@ -62,4 +68,16 @@ tasks:
             wasm-pack build {{.WASM_PACK_ARGS}} -- --target-dir target;
           fi
         silent: true
+
+  update-macrotest:
+    env:
+      MACROTEST: overwrite
+    cmds:
+      - cargo test --test macrotest
+
+  update-trybuild:
+    env:
+      TRYBUILD: overwrite
+    cmds:
+      - cargo test --test trybuild
 
