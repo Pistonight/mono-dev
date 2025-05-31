@@ -7,11 +7,18 @@ const {
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_BINSTALL_CONFIG);
 console.log(cargoInstallConfigs);
 
-const runCargobinstall = (crate, git) => {
+const isWindows = process.platform === "win32";
+const runCargobinstall = (crate, config) => {
+    const { git, cli } = (config || {});
     console.log(`installing ${crate}`);
     const args = ["binstall", crate, "--no-confirm", "--no-discover-github-token"];
     if (git) {
         args.push("--git", git);
+    }
+    const cliReal = `~/.cargo/bin/${isWindows ? cli + ".exe" : cli}`;
+    if (!fs.existsSync(cliReal)) {
+        console.log(`${cliReal} not found, forcing the install`);
+        args.push("--force");
     }
 
     let child;

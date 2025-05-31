@@ -94,11 +94,6 @@ runs:
         components: ${{ steps.envjs.outputs.rust_components }}
     - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
       uses: cargo-bins/cargo-binstall@main
-    - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
-      run: node ${{ github.action_path }}/binstall-clean.js
-      shell: bash
-      env:
-        MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
     - if: ${{ steps.envjs.outputs.setup_rust == 'github' }}
       uses: Swatinem/rust-cache@v2
     - if: ${{ steps.envjs.outputs.setup_rust == 'blacksmith' }}

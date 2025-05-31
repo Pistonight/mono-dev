@@ -118,7 +118,11 @@ const setup_rust = rust_toolchain ? runnerType : false;
 const cargo_binstall_cache = setup_cargo_binstall ? runnerType : false;
 let cargo_binstall_cache_key = "";
 if (cargo_binstall_cache) {
-    cargo_binstall_cache_key = crypto.createHash("sha1").update(cargo_binstall_config).digest("hex");
+    const hash = crypto.createHash("sha256");
+    for (const [crate, config] of cargoInstallConfigs) {
+        hash.update(`${crate}:git=${config.git || ""},cli=${config.cli || ""}`);
+    }
+    cargo_binstall_cache_key = hash.digest("hex");
 }
 
 // GCloud
