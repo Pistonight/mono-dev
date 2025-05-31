@@ -10,6 +10,7 @@
  * those generated files:
  * - /eslint.config.js
  * - /tsconfig*.json
+ * - .prettierignore
  *
  * Other generated files might be placed in node_modules
  *
@@ -23,16 +24,30 @@ import child_process from "child_process";
 import path from "path";
 import { run as prettierCli } from "@prettier/cli";
 
-// prettier ignore must be here, because paths are resolved
-// relative to where the ignore file is (like .gitignore)
-// and cannot reference outside of the directory
+const TSC = "tsgo"; // use native preview
+
+const pathCurrent = path.resolve(".");
+
+// the prettierignore file must be here, because paths are resolved
+// relative to where the ignore file is (like .gitignore) and cannot
+// reference outside of the directory
 const pathDotPrettierIgnore = ".prettierignore";
 const pathCache = "./node_modules/.mono-lint";
 const pathPrettierCache = `${pathCache}/.prettier-cache`;
 const pathMonodev =
-    path.basename(path.resolve(".")) === "mono-dev"
-        ? "."
+    path.basename(pathCurrent) === "toolsets" &&
+    path.basename(path.dirname(pathCurrent)) === "mono-dev"
+        ? path.dirname(pathCurrent)
         : "./node_modules/mono-dev";
+// use the executable from mono-dev's node_modules, so downstream
+// projects don't need to install them
+// an exception is eslint is needed for eslint-lsp,
+// either installed globally or in the workspace
+const pathMonodevBin = path.join(
+    path.dirname(path.dirname(import.meta.dirname)),
+    "node_modules",
+    ".bin",
+);
 
 async function main() {
     // arguments:
@@ -61,7 +76,7 @@ async function main() {
     }
 
     if (hasTs) {
-        const tsc = runTsc();
+        const tsc = await runTsc();
         if (tsc.status) {
             console.error("[mono-lint] tsc failed, see above");
             process.exit(1);
@@ -126,7 +141,9 @@ async function createConfigs(clean) {
             }
         }
     }
-    const packageJson = JSON.parse(await fs.readFile("package.json", "utf-8"));
+    const packageJson = JSON.parse(
+        await fs.readFile(path.join(pathMonodev, "package.json"), "utf-8"),
+    );
     let checkIgnoreLines = [];
     try {
         const gitignore = await fs.readFile(".gitignore", "utf-8");
@@ -240,7 +257,7 @@ async function createTsConfigs(clean, packageJson) {
             return;
         }
         const tsconfigContent = {
-            extends: `${pathMonodev}/tsconfig/defaults.json`,
+            extends: `${pathMonodev}/toolsets/mono-lint/default-tsconfig.json`,
             compilerOptions: {
                 tsBuildInfoFile: `${pathCache}/tsconfig.${dir}.tsbuildinfo`,
             },
@@ -265,7 +282,7 @@ async function createTsConfigs(clean, packageJson) {
         const tsconfig = "tsconfig._.json";
         if (clean || !existingTsConfigs.has(tsconfig)) {
             const tsconfigContent = {
-                extends: `${pathMonodev}/tsconfig/defaults.json`,
+                extends: `${pathMonodev}/toolsets/mono-lint/default-tsconfig.json`,
                 compilerOptions: {
                     tsBuildInfoFile: `${pathCache}/tsconfig._.tsbuildinfo`,
                 },
@@ -444,8 +461,29 @@ async function createPrettierIgnore(checkIgnoreLines) {
     await fs.writeFile(prettierIgnorePath, ignore.join("\n"));
 }
 
-function runTsc() {
-    return execute("tsc", ["--build", "--pretty"]);
+async function runTsc() {
+    if (TSC === "tsc") {
+        return execute(TSC, ["--build", "--pretty"]);
+    }
+    // TSGO currently does not support --build, so we have to
+    // do that ourselves
+    const tsconfigs = [];
+    try {
+        const folder = await fs.readdir(".");
+        for (const file of folder) {
+            if (file.match(/tsconfig\..+\.json$/)) {
+                tsconfigs.push(file);
+            }
+        }
+    } catch {}
+    let tsc;
+    for (const tsconfig of tsconfigs) {
+        tsc = execute(TSC, ["--project", tsconfig, "--pretty"]);
+        if (tsc.status) {
+            break;
+        }
+    }
+    return tsc;
 }
 
 function runEslint(fix) {
@@ -506,27 +544,31 @@ function execute(bin, args) {
     if (process.platform === "win32") {
         bin += ".cmd";
     }
-    // use the executable from mono-dev's node_modules, so downstream
-    // projects don't need to install them
-    // an exception is eslint is needed for eslint-lsp,
-    // either installed globally or in the workspace
-    const binPath = path.join(
-        path.dirname(import.meta.dirname),
-        "node_modules",
-        ".bin",
-        bin,
-    );
+
+    const binPath = path.join(pathMonodevBin, bin);
 
     // execution is not parallel because:
     // 1. it's very annoying to do that in node
     // 2. multiple projects can run at the same time (external parallellism)
+    let child;
     if (process.platform === "win32") {
-        return child_process.spawnSync(`"${binPath}"`, args, {
+        child = child_process.spawnSync(`"${binPath}"`, args, {
             stdio: "inherit",
             shell: true,
         });
+    } else {
+        child = child_process.spawnSync(binPath, args, { stdio: "inherit" });
     }
-    return child_process.spawnSync(binPath, args, { stdio: "inherit" });
+    // for some reason node doesn't throw here...
+    // so we have to check the error manually
+    if (child.error) {
+        console.error(
+            `[mono-lint] failed to spawn ${bin} with args ${args.join(" ")}`,
+        );
+        console.error(child.error);
+        child.status = 1;
+    }
+    return child;
 }
 
 async function exists(path) {

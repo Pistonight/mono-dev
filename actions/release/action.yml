@@ -1,0 +1,99 @@
+name: mono-dev release
+description: Draft a release
+
+inputs:
+  artifacts-workflow:
+    description: "Workflow name to download artifacts from"
+    default: ""
+  artifacts-path:
+    description: "Path to download artifacts to"
+    default: ""
+  pack:
+    description: "Automatically pack downloaded artifacts as .zip or .tar.gz, per artifact"
+    default: true
+  append-version:
+    description: "Append version tag to packed artifacts"
+    default: true
+  task:
+    description: "Task to run after downloading artifacts but before packing or signing"
+    default: ""
+  minisign-key:
+    description: "Minisign secret key to sign the packed artifacts (requires pack = true)"
+    default: ""
+
+  files:
+    description: "Paths to files to upload to the release"
+    default: ""
+  tag:
+    description: "Release tag (defaults to github.ref_name"
+    default: "${{ github.ref_name }}"
+
+runs:
+  using: composite
+  steps:
+    - if: ${{ inputs.artifacts-workflow != '' && inputs.artifacts-path != '' }}
+      run: mkdir -p ${{ inputs.artifacts-path }}
+      shell: bash
+    - if: ${{ inputs.artifacts-workflow != '' && inputs.artifacts-path != '' }}
+      uses: dawidd6/action-download-artifact@v6
+      with:
+        github_token: ${{ github.token }}
+        workflow: ${{ inputs.artifacts-workflow }}
+        commit: ${{ github.sha }}
+        path: ${{ inputs.artifacts-path }}
+
+    - if: ${{ inputs.task != '' }}
+      run: task exec -- ${{ inputs.task }}
+
+    - id: pack
+      run: node ${{ github.action_path }}/actions/release/pack.js
+      env:
+        MONODEV_RELEASE_FILES: ${{ inputs.files }}
+        MONODEV_RELEASE_HAS_MINISIGN_KEY: ${{ inputs.minisign-key != ''}}
+        MONODEV_RELEASE_PACK: ${{ inputs.pack }}
+        MONODEV_RELEASE_ARTIFACTS_PATH: ${{ inputs.artifacts-path }}
+        MONODEV_RELEASE_APPEND_VERSION: ${{ inputs.append-version }}
+        MONODEV_RELEASE_VERSION: ${{ inputs.tag }}
+
+    - if: ${{ inputs.minisign-key != '' }}
+      uses: thomasdesr/minisign-action@v1
+      with:
+        minisign_key: ${{ inputs.minisign-key }}
+        args: -Sm ${{ steps.pack.outputs.packed_files }}
+    - if: ${{ pack == 'true' && inputs.minisign-key != '' }}
+      run: |
+        for f in "${{ inputs.artifacts-path }}/*.minisig" ; do
+          mv -- "$f" "${f%.minisig}.sig"
+        done
+      shell: bash
+    - if: ${{ inputs.minisign-key != '' }}
+      run: |
+        for f in "${{ inputs.files }}"; do
+          mv -- "$f.minisig" "$f.sig"
+        done
+      shell: bash
+
+    - uses: johnyherangi/create-release-notes@v1
+      id: release-notes
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - run: mkdir -p .github
+      shell: bash
+    - run: |
+        if [ -f .github/RELEASE_NOTES_HEADR.md ]; then
+          cat .github/RELEASE_NOTES_HEADER.md >> .github/RELEASE_NOTES.md
+        fi
+        echo "${{ steps.release-notes.outputs.release_notes }}" > .github/RELEASE_NOTES.md
+        if [ -f .github/RELEASE_NOTES_FOOTER.md ]; then
+          cat .github/RELEASE_NOTES_FOOTER.md >> .github/RELEASE_NOTES.md
+        fi
+        cat .github/RELEASE_NOTES.md
+      shell: bash
+    - uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        body_path: .github/RELEASE_NOTES.md
+        files: |
+          ${{ steps.pack.outputs.packed_files }}
+          ${{ steps.pack.outputs.signature_files }}
+        tag_name: ${{ inputs.tag }}

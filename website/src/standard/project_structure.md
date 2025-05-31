@@ -116,7 +116,19 @@ It's important to install mono-dev this way, as the ECMAScript configs
 assumes mono-dev is found in node_modules!
 ```
 
-If PNPM is not involved, then simply add it as a submodule with the path `./mono-dev`
+If PNPM is not involved, then there are 2 options:
+1. Add it as a git submodule:
 ```
 magoo install https://github.com/Pistonight/mono-dev mono-dev --name mono-dev --branch main
 ```
+2. Just clone and gitignore it:
+```yaml
+tasks:
+  install:
+    cmds:
+      - rm -rf mono-dev
+      - git clone https://github.com/Pistonight/mono-dev --depth 1
+```
+
+The second option is better for rust projects that meant to be
+installed from git, so users don't have to clone the submodule.
