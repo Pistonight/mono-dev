@@ -1,4 +1,6 @@
+import fs from "node:fs";
 import child_process from "node:child_process";
+
 const {
     MONODEV_CARGO_BINSTALL_CONFIG,
 } = process.env;
