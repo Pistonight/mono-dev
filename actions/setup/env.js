@@ -62,7 +62,7 @@ if (monodev_rust_src) {
 let rust_targets = [];
 if (monodev_rust_wasm) {
     rust_targets.push("wasm32-unknown-unknown");
-    cargoInstallConfigs.set("wasm-pack", {});
+    cargoInstallConfigs.set("wasm-pack", { cli: "wasm-pack" });
 }
 if (monodev_rust_native) {
     const nativeTargets = monodev_rust_native.split(",").map(t => t.trim().toLowerCase());
@@ -87,8 +87,8 @@ if (monodev_rust_native) {
     }
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoInstallConfigs.set("mdbook", {});
-    cargoInstallConfigs.set("mdbook-admonish", {});
+    cargoInstallConfigs.set("mdbook", { cli: "mdbook" });
+    cargoInstallConfigs.set("mdbook-admonish", { cli: "mdbook-admonish" });
 }
 if (MONODEV_TOOL_CARGO_BINSTALL) {
     // format: ,-seprated, cli-tool[(crate)][=user/repo]
