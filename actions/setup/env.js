@@ -55,7 +55,6 @@ if (MONODEV_RUST === "nightly") {
 } else if (MONODEV_RUST === "stable") {
     rust_toolchain = "stable";
 }
-const setup_rust = rust_toolchain ? runnerType : false;
 let rust_components = "clippy,rustfmt";
 if (monodev_rust_src) {
     rust_components += ",rust-src";
@@ -104,6 +103,8 @@ if (MONODEV_TOOL_CARGO_BINSTALL) {
 }
 const setup_cargo_binstall = cargoInstallConfigs.size > 0;
 const cargo_binstall_config = JSON.stringify(Array.from(cargoInstallConfigs.entries()));
+// setup rust cache for binstall even if we don't install rust toolchain
+const setup_rust = (rust_toolchain || setup_cargo_binstall) ? runnerType : false;
 
 
 // GCloud

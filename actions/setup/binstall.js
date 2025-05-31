@@ -6,6 +6,7 @@ const {
 // [crate, { git?: string }][]
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_BINSTALL_CONFIG);
 console.log(cargoInstallConfigs);
+
 const runCargobinstall = (crate, git) => {
     console.log(`installing ${crate}`);
     const args = ["binstall", crate, "--no-confirm", "--no-discover-github-token"];
