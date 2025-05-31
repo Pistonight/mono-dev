@@ -39,5 +39,5 @@ const runCargobinstall = (crate, config) => {
     }
 };
 for (const [crate, config] of cargoInstallConfigs) {
-    runCargobinstall(crate, config.git);
+    runCargobinstall(crate, config);
 }
