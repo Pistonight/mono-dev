@@ -1,7 +1,7 @@
+import child_process from "node:child_process";
 const {
     MONODEV_CARGO_BINSTALL_CONFIG,
 } = process.env;
-const childProcess = require("node:child_process");
 
 // [crate, { git?: string }][]
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_BINSTALL_CONFIG);
@@ -15,9 +15,9 @@ const runCargobinstall = (crate, git) => {
 
     let child;
     if (process.platform === "win32") {
-        child = childProcess.spawnSync(`"cargo.exe"`, args, { stdio: "inherit", shell: true });
+        child = child_process.spawnSync(`"cargo.exe"`, args, { stdio: "inherit", shell: true });
     } else {
-        child = childProcess.spawnSync("cargo", args, { stdio: "inherit" });
+        child = child_process.spawnSync("cargo", args, { stdio: "inherit" });
     }
     if (child.error) {
         console.error(`Error installing ${crate}: failed to spawn cargo`);

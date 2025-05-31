@@ -1,3 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
+import child_process from "node:child_process";
+
 const {
     MONODEV_RELEASE_FILES,
     MONODEV_RELEASE_PACK,
@@ -6,10 +10,6 @@ const {
     MONODEV_RELEASE_APPEND_VERSION,
     MONODEV_RELEASE_VERSION,
 } = process.env;
-
-const fs = require('node:fs');
-const path = require('node:path');
-const childProcess = require("node:child_process");
 
 const shouldUseZip = (name) => {
     return name.toLowerCase().includes("pc-windows-msvc")
@@ -34,7 +34,7 @@ if (shouldPack) {
             } else {
                 outputFile = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}.zip`;
             }
-            const child = childProcess.spawnSync(
+            const child = child_process.spawnSync(
                 BIN, 
                 [
                     "a", "-tzip", 
@@ -54,7 +54,7 @@ if (shouldPack) {
                 outputFile = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}.tar.gz`;
             }
             const intermediateTar = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}.tar`;
-            let child = childProcess.spawnSync(
+            let child = child_process.spawnSync(
                 BIN, 
                 [
                     "a", "-ttar", 
@@ -67,7 +67,7 @@ if (shouldPack) {
                 console.error(`Error packing ${dir_name} with tar:`, child.error || `Exited with code ${child.status}`);
                 throw new Error(`Failed to pack ${dir_name} with tar`);
             }
-            child = childProcess.spawnSync(
+            child = child_process.spawnSync(
                 BIN, 
                 [ "a", "-tgzip", outputFile, intermediateTar ],
                 { stdio: "inherit" }

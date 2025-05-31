@@ -1,3 +1,5 @@
+import fs from "node:fs";
+
 const {
     MONODEV_RUST_XPLAT_RUNNER_OS,
     MONODEV_RUST_XPLAT_ARCH,
@@ -19,7 +21,7 @@ if (MONODEV_RUST_XPLAT_RUNNER_OS === "macOS") {
 }
 build_args.push(...MONODEV_RUST_XPLAT_BUILD_ARGS);
 
-require("node:fs").appendFileSync(
+fs.appendFileSync(
     process.env.GITHUB_OUTPUT,
     `cargo_build_args=${build_args.join(" ")}\n`
 );

@@ -1,3 +1,5 @@
+import fs from "node:fs";
+
 const {
     MONODEV_RUNNER_OS,
     MONODEV_RUNNER,
@@ -143,4 +145,4 @@ const output = {
 
 const outputString = Object.entries(output).map(([key, value]) => `${key}=${value}`).join("\n");
 console.log("Output:\n", outputString);
-require("fs").appendFileSync(process.env.GITHUB_OUPUT, outputString + "\n", "utf8");
+fs.appendFileSync(process.env.GITHUB_OUPUT, outputString + "\n", "utf8");

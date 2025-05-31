@@ -27,7 +27,7 @@ inputs:
   tool-mdbook:
     default: false
   tool-cargo-binstall:
-    default: false
+    default: ""
   gcloud:
     default: ""
 
