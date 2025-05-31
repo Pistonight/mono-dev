@@ -14,3 +14,9 @@ tasks:
     silent: true
     cmds:
       - cmd: "{{.TASK_EXE}} --list"
+
+  # For projects to setup install-cargo-extra-tools
+  cargo-binstall:
+    cmds:
+      - which cargo-binstall || cargo install cargo-binstall
+      - cargo binstall {{.PACKAGES}} -y
