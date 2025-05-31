@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 
 const {
     MONODEV_RUNNER_OS,
@@ -44,7 +45,7 @@ const node_cache = monodev_ecma_pnpm ? "pnpm" : "";
 
 // Rust
 const cargoInstallConfigs = new Map();
-// ^ format: crate: { git?: string }
+// ^ format: crate: { cli, git?: string }
 
 let rust_toolchain = "";
 if (MONODEV_RUST === "nightly") {
@@ -113,9 +114,12 @@ if (MONODEV_TOOL_CARGO_BINSTALL) {
 }
 const setup_cargo_binstall = cargoInstallConfigs.size > 0;
 const cargo_binstall_config = JSON.stringify(Array.from(cargoInstallConfigs.entries()));
-// setup rust cache for binstall even if we don't install rust toolchain
-const setup_rust = (rust_toolchain || setup_cargo_binstall) ? runnerType : false;
-
+const setup_rust = rust_toolchain ? runnerType : false;
+const cargo_binstall_cache = setup_cargo_binstall ? runnerType : false;
+let cargo_binstall_cache_key = "";
+if (cargo_binstall_cache) {
+    cargo_binstall_cache_key = crypto.createHash("sha1").update(cargo_binstall_config).digest("hex");
+}
 
 // GCloud
 let setup_gcloud = false;
@@ -148,6 +152,8 @@ const output = {
     rust_targets: rust_targets.join(","),
     setup_cargo_binstall,
     cargo_binstall_config,
+    cargo_binstall_cache,
+    cargo_binstall_cache_key,
 
     setup_gcloud,
     gcloud_project_id,
