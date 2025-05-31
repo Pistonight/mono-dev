@@ -64,6 +64,8 @@ jobs:
           # install extra tools with cargo-binstall
           # installed tools are cached by rust-cache
           # format: crate to use crates.io or crate=user/repo to use github
+          # if the crate name is different from CLI tool name,
+          # use `cli-tool(crate)=user/repo`
           tool-cargo-binstall: ripgrep,workex=Pistonite/workex
 
           # TODO: python support not here yet

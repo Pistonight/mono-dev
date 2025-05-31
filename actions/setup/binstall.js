@@ -3,7 +3,7 @@ const {
     MONODEV_CARGO_BINSTALL_CONFIG,
 } = process.env;
 
-// [crate, { git?: string }][]
+// [crate, { cli, git?: string }][]
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_BINSTALL_CONFIG);
 console.log(cargoInstallConfigs);
 

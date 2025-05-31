@@ -91,13 +91,23 @@ if (bool(MONODEV_TOOL_MDBOOK)) {
     cargoInstallConfigs.set("mdbook-admonish", {});
 }
 if (MONODEV_TOOL_CARGO_BINSTALL) {
-    // format: ,-seprated, crate[=user/repo]
+    // format: ,-seprated, cli-tool[(crate)][=user/repo]
     for (const config of MONODEV_TOOL_CARGO_BINSTALL.split(",").map(part => part.trim())) {
         const [crate, repo] = config.split("=", 2);
-        if (repo) {
-            cargoInstallConfigs.set(crate, { git: repo });
+        let cliToolName;
+        let crateName;
+        if (crate.includes("(")) {
+            const parts = crate.split("(");
+            cliToolName = parts[0].trim();
+            crateName = parts[1].replace(")", "").trim();
         } else {
-            cargoInstallConfigs.set(crate, {});
+            cliToolName = crate.trim();
+            crateName = cliToolName;
+        }
+        if (repo) {
+            cargoInstallConfigs.set(crateName, { git: repo, cli: cliToolName });
+        } else {
+            cargoInstallConfigs.set(crateName, { cli: cliToolName });
         }
     }
 }
