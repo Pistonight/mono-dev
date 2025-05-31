@@ -44,6 +44,7 @@ runs:
 
     - if: ${{ inputs.task != '' }}
       run: task exec -- ${{ inputs.task }}
+      shell: bash
 
     - id: pack
       run: node ${{ github.action_path }}/actions/release/pack.js
@@ -54,6 +55,7 @@ runs:
         MONODEV_RELEASE_ARTIFACTS_PATH: ${{ inputs.artifacts-path }}
         MONODEV_RELEASE_APPEND_VERSION: ${{ inputs.append-version }}
         MONODEV_RELEASE_VERSION: ${{ inputs.tag }}
+      shell: bash
 
     - if: ${{ inputs.minisign-key != '' }}
       uses: thomasdesr/minisign-action@v1

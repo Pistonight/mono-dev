@@ -50,8 +50,10 @@ runs:
         version: 3.x
         repo-token: ${{ github.token }}
     - run: node --version
+      shell: bash
     - run: node ${{ github.action_path }}/actions/setup/env.js
       id: envjs
+      shell: bash
       env:
         MONODEV_RUNNER_OS: ${{ runner.os }}
         MONODEV_RUNNER: ${{ inputs.runner }}
@@ -98,6 +100,7 @@ runs:
       uses: cargo-bins/cargo-binstall@main
     - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
       run: node ${{ github.action_path }}/actions/setup/binstall.js
+      shell: bash
       env:
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
 

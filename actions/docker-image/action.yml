@@ -37,6 +37,7 @@ runs:
 
     - if: ${{ inputs.task != '' }}
       run: task exec -- ${{ inputs.task }}
+      shell: bash
 
     - uses: docker/login-action@v3
       with:

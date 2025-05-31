@@ -31,6 +31,7 @@ runs:
   using: composite
   steps:
     - run: node --version
+      shell: bash
     - run: node ${{ github.action_path }}/actions/rust-xplat/env.js
       id: envjs
       env:
@@ -38,22 +39,28 @@ runs:
         MONODEV_RUST_XPLAT_ARCH: ${{ inputs.arch }}
         MONODEV_RUST_XPLAT_BINARY: ${{ inputs.binary }}
         MONODEV_RUST_XPLAT_BUILD_ARGS: ${{ inputs.build-args }}
+      shell: bash
 
     - if: ${{ runner.os == 'Linux' && inputs.arch == 'x64' && inputs.tauri == 'true' }}
       run: |
         sudo apt update
         sudo apt install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+      shell: bash
 
     - if: ${{ inputs.pre-task != '' }}
       run: task ${{ inputs.pre-task }}
+      shell: bash
 
     - if: ${{ inputs.build-task == '' }}
       run: cargo build ${{ steps.envjs.outputs.cargo_build_args }}
+      shell: bash
     - if: ${{ inputs.build-task != '' }}
       run: task ${{ inputs.build-task }} -- ${{ steps.envjs.outputs.cargo_build_args }}
+      shell: bash
 
     - if: ${{ inputs.post-task != '' }}
       run: task ${{ inputs.post-task }}
+      shell: bash
 
     - if: ${{ runner.os == 'Windows' && inputs.arch == 'x64' }}
       uses: actions/upload-artifact@v4
