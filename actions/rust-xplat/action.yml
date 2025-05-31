@@ -1,0 +1,100 @@
+name: mono-dev rust-xplat
+description: Setup and Build rust binaries for multiple platforms
+
+inputs:
+  arch:
+    description: "x64 or arm64"
+    required: true
+  binary:
+    description: "Name of the binary to build (on windows, omit the .exe extension)"
+    required: true
+  build-args:
+    description: "Additional build arguments to pass to cargo"
+    default: ""
+  pre-task:
+    description: "Task to run before cargo build"
+    default: ""
+  build-task:
+    description: "Task to run instead of cargo build"
+    default: ""
+  post-task:
+    description: "Task to run after cargo build"
+    default: ""
+  tauri:
+    description: "Install Tauri Dependencies"
+    default: false
+  target-dir:
+    description: "Cargo target directory to find the built binary in"
+    default: "target"
+
+runs:
+  using: composite
+  steps:
+    - run: node --version
+      shell: bash
+    - run: node ${{ github.action_path }}/env.js
+      id: envjs
+      env:
+        MONODEV_RUST_XPLAT_RUNNER_OS: ${{ runner.os }}
+        MONODEV_RUST_XPLAT_ARCH: ${{ inputs.arch }}
+        MONODEV_RUST_XPLAT_BINARY: ${{ inputs.binary }}
+        MONODEV_RUST_XPLAT_BUILD_ARGS: ${{ inputs.build-args }}
+      shell: bash
+
+    - if: ${{ runner.os == 'Linux' && inputs.arch == 'x64' && inputs.tauri == 'true' }}
+      run: |
+        sudo apt update
+        sudo apt install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+      shell: bash
+
+    - if: ${{ inputs.pre-task != '' }}
+      run: task ${{ inputs.pre-task }}
+      shell: bash
+
+    - if: ${{ inputs.build-task == '' }}
+      run: cargo build ${{ steps.envjs.outputs.cargo_build_args }}
+      shell: bash
+    - if: ${{ inputs.build-task != '' }}
+      run: task ${{ inputs.build-task }} -- ${{ steps.envjs.outputs.cargo_build_args }}
+      shell: bash
+
+    - if: ${{ inputs.post-task != '' }}
+      run: task ${{ inputs.post-task }}
+      shell: bash
+
+    - if: ${{ runner.os == 'Windows' && inputs.arch == 'x64' }}
+      uses: actions/upload-artifact@v4
+      with:
+        path: ${{ inputs.target-dir }}/release/${{ inputs.binary }}.exe
+        name: ${{ inputs.binary }}-x86_64-pc-windows-msvc
+        retention-days: 3
+    - if: ${{ runner.os == 'Windows' && inputs.arch == 'arm64' }}
+      uses: actions/upload-artifact@v4
+      with:
+        path: ${{ inputs.target-dir }}/release/${{ inputs.binary }}.exe
+        name: ${{ inputs.binary }}-aarch64-pc-windows-msvc
+        retention-days: 3
+    - if: ${{ runner.os == 'Linux' && inputs.arch == 'x64' }}
+      uses: actions/upload-artifact@v4
+      with:
+        path: ${{ inputs.target-dir }}/release/${{ inputs.binary }}.exe
+        name: ${{ inputs.binary }}-x86_64-unknown-linux-gnu
+        retention-days: 3
+    - if: ${{ runner.os == 'Linux' && inputs.arch == 'arm64' }}
+      uses: actions/upload-artifact@v4
+      with:
+        path: ${{ inputs.target-dir }}/release/${{ inputs.binary }}.exe
+        name: ${{ inputs.binary }}-aarch64-unknown-linux-gnu
+        retention-days: 3
+    - if: ${{ runner.os == 'macOS' && inputs.arch == 'x64' }}
+      uses: actions/upload-artifact@v4
+      with:
+        path: ${{ inputs.target-dir }}/x86_64-apple-darwin/release/${{ inputs.binary }}.exe
+        name: ${{ inputs.binary }}-x86_64-apple-darwin
+        retention-days: 3
+    - if: ${{ runner.os == 'macOS' && inputs.arch == 'arm64' }}
+      uses: actions/upload-artifact@v4
+      with:
+        path: ${{ inputs.target-dir }}/aarch64-apple-darwin/release/${{ inputs.binary }}.exe
+        name: ${{ inputs.binary }}-aarch64-apple-darwin
+        retention-days: 3

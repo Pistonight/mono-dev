@@ -3,32 +3,33 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-book:
-    name: build-book
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
           submodules: true
-      - uses: ./.github/steps/setup
+      - uses: ./actions/setup
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          skip-checkout: true
+          rust: stable
+          tool-mdbook: true
 
       # run the thing
       - run: task install-deps
       - run: task build-website
-
-      # upload for pages
       - uses: actions/upload-pages-artifact@v3
         with:
           path: website/book
           retention-days: 3
 
-  deploy-to-pages:
-    name: deploy-to-pages
+  deploy-pages:
     needs:
       - build-book
     if: github.event_name != 'pull_request'

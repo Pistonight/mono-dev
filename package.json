@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -8,6 +8,7 @@
         "@eslint/js": "^9.27.0",
         "@modyfi/vite-plugin-yaml": "^1.1.1",
         "@prettier/cli": "^0.7.6",
+        "@typescript/native-preview": "7.0.0-dev.20250530.1",
         "@vitejs/plugin-react": "^4.4.0",
         "eslint": "^9.27.0",
         "eslint-plugin-react": "^7.37.5",
@@ -24,13 +25,13 @@
         "@types/bun": "^1.2.13"
     },
     "bin": {
-        "mono-lint": "./src/monolint.js",
-        "mono-langtool": "./src/monolang.js"
+        "mono-lint": "./toolsets/mono-lint/main.js",
+        "mono-langtool": "./toolsets/mono-langtool/main.js"
     },
     "exports": {
-        "./eslint": "./eslint/index.js",
-        "./vite": "./vite/index.js",
-        "./vite/client": "./vite/client.d.ts"
+        "./eslint": "./toolsets/eslint/index.js",
+        "./vite": "./toolsets/vite/index.js",
+        "./vite/client": "./toolsets/vite/client.d.ts"
     },
     "nocheck": [
         "/mdbook/css",

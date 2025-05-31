@@ -73,44 +73,10 @@ for the function by looking at the documentation. Actually, tests *are* document
 They express in code instead of natural language or what the behavior of a function or component
 is.
 
-```admonish warning
-DO NOT use LLM to generate documentation comments!!!!
+Another important thing is that LLMs love to generate useless documentation/comments,
+see [Usage of AI](./ai_guidelines.md) for more information on the my take on AI.
 
-LLMs lack the context that YOU, as the developer, know. They cannot generate effective documentation
-unless you tell them the context, which takes more effort than you just writing the comment yourself.
-You can however, write the comment and ask LLM to reword it to sound more fluent,
-say if English is not your first language.
-
-For example, here's my prompt:
-- "Can you generate documentation for this function? It reduces the payload to avoid hittimg payload limit: function getMinimalPayload(): string;"
-
-This is the output:
-
-    /**
-     * Generates a minimal payload to optimize data transmission and prevent exceeding server payload limits.
-     *
-     * This function constructs a compact string representation of the payload, ensuring 
-     * only essential data is included to reduce the request size.
-     *
-     * @returns {string} - A minimized payload string that the server can efficiently process.
-     *
-     * @example
-     * const payload = getMinimalPayload();
-     * console.log(payload); // Output: A compact string representation of the payload
-     *
-     * @remarks
-     * - The function should be used when sending requests with strict payload size limits.
-     * - Ensure that essential data is not lost while minimizing the payload.
-     */
-    function getMinimalPayload(): string;
-
-These words are useless, and very obviously emitted by LLM without sufficient context.
-What is "minimal payload"? What's the format? What is left out? What is not left out?
-Documentation that pretends to be there is worse than no documentation. I have to spend
-brain power processing junk instead of actually looking for what I need.
-```
-
-## Before Pull Request
+## Pull Request
 Always run checks and tests before you make a Pull Request. PR workflows need
 to be approved by me to run because of security. If very simple formatting
 issue fails the build and I was not there, you have to wait for another cycle
@@ -118,7 +84,6 @@ of review.
 
 I don't use git hooks, also because of security.
 
-## Pull Request
 When opening a PR, make sure the description is filled.
 Small PRs can have a one-to-two sentence description. If you are fixing a bug,
 describe what the bug is or link to the issue, explain the root cause, and explain

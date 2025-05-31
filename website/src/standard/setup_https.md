@@ -1,4 +1,4 @@
-# HTTPS
+# Setup HTTPS for Development
 
 Some Web features requires a secure context. For example, copying stuff into clipboard.
 Usually, for developer experience, the `localhost` host is considered secure.

@@ -1,0 +1,117 @@
+name: mono-dev setup
+description: Setup for mono-dev Standard Project
+
+inputs:
+  skip-checkout:
+    default: false
+  mono-dev:
+    default: false
+  runner:
+    default: "github"
+  submodules:
+    default: false
+  ecma-node:
+    default: false
+  ecma-pnpm:
+    default: false
+  ecma-bun:
+    default: false
+  rust:
+    default: false
+  rust-wasm:
+    default: false
+  rust-native:
+    default: false
+  rust-src:
+    default: false
+  tool-mdbook:
+    default: false
+  tool-cargo-binstall:
+    default: ""
+  gcloud:
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - if: ${{ inputs.skip-checkout != 'true' }}
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        submodules: ${{ inputs.submodules }}
+    - if: ${{ inputs.mono-dev == 'true' }}
+      uses: actions/checkout@v4
+      with:
+        repository: Pistonight/mono-dev
+        path: mono-dev
+        persist-credentials: false
+    - uses: arduino/setup-task@v2
+      with:
+        version: 3.x
+        repo-token: ${{ github.token }}
+    - run: node --version
+      shell: bash
+    - run: node ${{ github.action_path }}/env.js
+      id: envjs
+      shell: bash
+      env:
+        MONODEV_RUNNER_OS: ${{ runner.os }}
+        MONODEV_RUNNER: ${{ inputs.runner }}
+        MONODEV_ECMA_NODE: ${{ inputs.ecma-node }}
+        MONODEV_ECMA_PNPM: ${{ inputs.ecma-pnpm }}
+        MONODEV_RUST: ${{ inputs.rust }}
+        MONODEV_RUST_WASM: ${{ inputs.rust-wasm }}
+        MONODEV_RUST_NATIVE: ${{ inputs.rust-native }}
+        MONODEV_RUST_SRC: ${{ inputs.rust-src }}
+        MONODEV_TOOL_MDBOOK: ${{ inputs.tool-mdbook }}
+        MONODEV_TOOL_CARGO_BINSTALL: ${{ inputs.tool-cargo-binstall }}
+        MONODEV_GCLOUD: ${{ inputs.gcloud }}
+
+
+    - if: ${{ inputs.ecma-pnpm == 'true' }}
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+    - if: ${{ steps.envjs.outputs.setup_node == 'github' }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: ${{ steps.envjs.outputs.node_cache }}
+    - if: ${{ steps.envjs.outputs.setup_node == 'blacksmith' }}
+      uses: useblacksmith/setup-node@v5
+      with:
+        node-version: 22
+        cache: ${{ steps.envjs.outputs.node_cache }}
+    - if: ${{ inputs.ecma-bun == 'true' }}
+      uses: oven-sh/setup-bun@v2
+
+
+    - if: ${{ steps.envjs.outputs.rust_toolchain != '' }}
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ steps.envjs.outputs.rust_toolchain }}
+        targets: ${{ steps.envjs.outputs.rust_targets }}
+        components: ${{ steps.envjs.outputs.rust_components }}
+    - if: ${{ steps.envjs.outputs.setup_rust == 'github' }}
+      uses: Swatinem/rust-cache@v2
+    - if: ${{ steps.envjs.outputs.setup_rust == 'blacksmith' }}
+      uses: useblacksmith/rust-cache@v3
+    - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
+      uses: cargo-bins/cargo-binstall@main
+    - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
+      run: node ${{ github.action_path }}/binstall.js
+      shell: bash
+      env:
+        MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
+
+
+    - if: ${{ steps.envjs.outputs.setup_gcloud == 'true' }}
+      id: gcloud_auth
+      uses: google-github-actions/auth@v2
+      with:
+        project_id: ${{ steps.envjs.outputs.gcloud_project_id }}
+        workload_identity_provider: ${{ steps.envjs.outputs.gcloud_workload_identity_provider }}
+    - if: ${{ steps.envjs.outputs.setup_gcloud == 'true' }}
+      uses: google-github-actions/setup-gcloud@v2
+        
+
