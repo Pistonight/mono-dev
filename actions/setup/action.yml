@@ -51,7 +51,7 @@ runs:
         repo-token: ${{ github.token }}
     - run: node --version
       shell: bash
-    - run: node ${{ github.action_path }}/actions/setup/env.js
+    - run: node ${{ github.action_path }}/env.js
       id: envjs
       shell: bash
       env:
@@ -99,7 +99,7 @@ runs:
     - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
       uses: cargo-bins/cargo-binstall@main
     - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
-      run: node ${{ github.action_path }}/actions/setup/binstall.js
+      run: node ${{ github.action_path }}/binstall.js
       shell: bash
       env:
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}

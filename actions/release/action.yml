@@ -47,7 +47,7 @@ runs:
       shell: bash
 
     - id: pack
-      run: node ${{ github.action_path }}/actions/release/pack.js
+      run: node ${{ github.action_path }}/pack.js
       env:
         MONODEV_RELEASE_FILES: ${{ inputs.files }}
         MONODEV_RELEASE_HAS_MINISIGN_KEY: ${{ inputs.minisign-key != ''}}
