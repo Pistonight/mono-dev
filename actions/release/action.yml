@@ -109,7 +109,5 @@ runs:
       with:
         draft: true
         body_path: .github/RELEASE_NOTES.md
-        files: |
-          ${{ steps.pack.outputs.packed_files }}
-          ${{ steps.pack.outputs.signature_files }}
+        files: ${{ steps.pack.outputs.upload_files }}
         tag_name: ${{ inputs.tag }}
