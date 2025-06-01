@@ -49,6 +49,20 @@ const pathMonodevBin = path.join(
     ".bin",
 );
 
+const pathCurrProjPackageJson = (() => {
+    let curr = pathCurrent;
+    let currJson = path.join(curr, "package.json");
+    while (!fsSync.existsSync(currJson)) {
+        const nextCurr = path.dirname(curr);
+        if (!nextCurr || nextCurr === curr) {
+            return "."; // no package.json found, assuming current directory
+        }
+        curr = nextCurr;
+        currJson = path.join(curr, "package.json");
+    }
+    return currJson;
+})();
+
 async function main() {
     // arguments:
     // --fix/-f to fix the files
@@ -142,7 +156,7 @@ async function createConfigs(clean) {
         }
     }
     const packageJson = JSON.parse(
-        await fs.readFile(path.join(pathMonodev, "package.json"), "utf-8"),
+        await fs.readFile(pathCurrProjPackageJson, "utf-8"),
     );
     let checkIgnoreLines = [];
     try {

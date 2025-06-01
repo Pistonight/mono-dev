@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
