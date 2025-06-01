@@ -13,6 +13,7 @@ const {
     MONODEV_RUST_SRC,
     MONODEV_TOOL_MDBOOK,
     MONODEV_TOOL_CARGO_BINSTALL,
+    MONODEV_TOOL_CARGO_INSTALL,
     MONODEV_GCLOUD,
 } = process.env;
 
@@ -46,7 +47,11 @@ const node_cache = monodev_ecma_pnpm ? "pnpm" : "";
 
 // Rust
 const cargoInstallConfigs = new Map();
-// ^ format: crate: { cli, git?: string }
+const cargoBinaryInstallConfigs = new Map();
+// ^ format: crate: 
+// { cli?: string, git?: string, b?: boolean }
+// cli = name of the CLI tool if different from crate name
+// git = git repository to install from, if not specified, will use crates.io
 
 let rust_toolchain = "";
 if (MONODEV_RUST === "nightly") {
@@ -57,73 +62,93 @@ if (MONODEV_RUST === "nightly") {
 } else if (MONODEV_RUST === "stable") {
     rust_toolchain = "stable";
 }
+
 let rust_components = "clippy,rustfmt";
 if (monodev_rust_src) {
     rust_components += ",rust-src";
 }
-let rust_targets = [];
+
 if (monodev_rust_wasm) {
-    rust_targets.push("wasm32-unknown-unknown");
-    cargoInstallConfigs.set("wasm-pack", { cli: "wasm-pack" });
-}
-if (monodev_rust_native) {
-    const nativeTargets = monodev_rust_native.split(",").map(t => t.trim().toLowerCase());
-    if (nativeTargets.includes("x64")) {
-        if (isWindows) {
-            rust_targets.push("x86_64-pc-windows-msvc");
-        } else if (isLinux) {
-            rust_targets.push("x86_64-unknown-linux-gnu");
-        } else if (isMacOS) {
-            rust_targets.push("x86_64-apple-darwin");
-        }
-    }
-    if (nativeTargets.includes("arm64")) {
-        if (isWindows) {
-            // we don't support ARM on Windows yet
-            // rust_target.push("aarch64-pc-windows-msvc");
-        } else if (isLinux) {
-            rust_targets.push("aarch64-unknown-linux-gnu");
-        } else if (isMacOS) {
-            rust_targets.push("aarch64-apple-darwin");
-        }
-    }
+    cargoBinaryInstallConfigs.set("wasm-pack", { });
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoInstallConfigs.set("mdbook", { cli: "mdbook" });
-    cargoInstallConfigs.set("mdbook-admonish", { cli: "mdbook-admonish" });
+    cargoBinaryInstallConfigs.set("mdbook", { });
+    cargoBinaryInstallConfigs.set("mdbook-admonish", { });
 }
-if (MONODEV_TOOL_CARGO_BINSTALL) {
-    // format: ,-seprated, cli-tool[(crate)][=user/repo]
-    for (const config of MONODEV_TOOL_CARGO_BINSTALL.split(",").map(part => part.trim())) {
+const parseCargoInstallConfig = (configString, isBInstall) => {
+    for (const config of configString.split(",").map(part => part.trim())) {
+        // format: ,-seprated, cli-tool[(crate)][=user/repo]
         const [crate, repo] = config.split("=", 2);
-        let cliToolName;
+        const installConfig = {
+            git: repo?.trim() || "",
+            cli: "",
+        };
         let crateName;
         if (crate.includes("(")) {
             const parts = crate.split("(");
-            cliToolName = parts[0].trim();
             crateName = parts[1].replace(")", "").trim();
+            installConfig.cli = parts[0].trim();
         } else {
-            cliToolName = crate.trim();
-            crateName = cliToolName;
+            crateName = crate.trim();
         }
-        if (repo) {
-            cargoInstallConfigs.set(crateName, { git: repo, cli: cliToolName });
+        if (isBInstall) {
+            cargoBinaryInstallConfigs.set(crateName, installConfig);
         } else {
-            cargoInstallConfigs.set(crateName, { cli: cliToolName });
+            cargoInstallConfigs.set(crateName, installConfig);
         }
     }
 }
-const setup_cargo_binstall = cargoInstallConfigs.size > 0;
-const cargo_binstall_config = JSON.stringify(Array.from(cargoInstallConfigs.entries()));
-const setup_rust = rust_toolchain ? runnerType : false;
-const cargo_binstall_cache = setup_cargo_binstall ? runnerType : false;
-let cargo_binstall_cache_key = "";
-if (cargo_binstall_cache) {
-    const hash = crypto.createHash("sha256");
-    for (const [crate, config] of cargoInstallConfigs) {
-        hash.update(`${crate}:git=${config.git || ""},cli=${config.cli || ""}`);
+if (MONODEV_TOOL_CARGO_BINSTALL) {
+    parseCargoInstallConfig(MONODEV_TOOL_CARGO_BINSTALL, true);
+}
+if (MONODEV_TOOL_CARGO_INSTALL) {
+    parseCargoInstallConfig(MONODEV_TOOL_CARGO_INSTALL, false);
+}
+let setup_cargo_binstall = cargoBinaryInstallConfigs.size > 0;
+let need_cargo_install = cargoInstallConfigs.size > 0;
+const cargo_install_config = JSON.stringify(Array.from(cargoInstallConfigs.entries()));
+const cargo_binstall_config = JSON.stringify(Array.from(cargoBinaryInstallConfigs.entries()));
+
+const rust_targets = new Set();
+const addNativeRustTarget = (arch) => {
+    if (arch === "x64" || arch === "X64") {
+        if (isWindows) {
+            rust_targets.add("x86_64-pc-windows-msvc");
+        } else if (isLinux) {
+            rust_targets.add("x86_64-unknown-linux-gnu");
+        } else if (isMacOS) {
+            rust_targets.add("x86_64-apple-darwin");
+        }
+        return;
     }
-    cargo_binstall_cache_key = `${MONODEV_RUNNER_OS}-${MONODEV_RUNNER_ARCH}-${hash.digest("hex")}`;
+    if (arch === "arm64" || arch === "ARM64") {
+        if (isWindows) {
+            rust_targets.add("aarch64-pc-windows-msvc");
+        } else if (isLinux) {
+            rust_targets.add("aarch64-unknown-linux-gnu");
+        } else if (isMacOS) {
+            rust_targets.add("aarch64-apple-darwin");
+        }
+        return;
+    }
+    throw new Error(`Unsupported architecture for native Rust target: ${arch}`);
+}
+if (need_cargo_install && !rust_toolchain) {
+    console.log("adding rust toolchain because cargo install is needed");
+    rust_toolchain = "stable";
+    addNativeRustTarget(MONODEV_RUNNER_ARCH);
+}
+
+const setup_rust = rust_toolchain ? runnerType : false;
+
+if (monodev_rust_wasm) {
+    rust_targets.add("wasm32-unknown-unknown");
+}
+if (monodev_rust_native) {
+    const nativeTargets = monodev_rust_native.split(",").map(t => t.trim().toLowerCase());
+    for (const arch of nativeTargets) {
+        addNativeRustTarget(arch);
+    }
 }
 
 // GCloud
@@ -154,11 +179,11 @@ const output = {
     setup_rust,
     rust_toolchain,
     rust_components,
-    rust_targets: rust_targets.join(","),
+    rust_targets: Array.from(rust_targets).join(","),
     setup_cargo_binstall,
+    need_cargo_install,
+    cargo_install_config,
     cargo_binstall_config,
-    cargo_binstall_cache,
-    cargo_binstall_cache_key,
 
     setup_gcloud,
     gcloud_project_id,

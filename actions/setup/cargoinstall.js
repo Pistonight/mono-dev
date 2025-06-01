@@ -3,22 +3,30 @@ import child_process from "node:child_process";
 import os from "node:os";
 
 const {
-    MONODEV_CARGO_BINSTALL_CONFIG,
-    MONODEV_CARGO_BINSTALL_CACHE_RESTORED_KEY
+    MONODEV_CARGO_IS_BINSTALL,
+    MONODEV_CARGO_INSTALL_CONFIG,
 } = process.env;
 
 // [crate, { cli, git?: string }][]
-const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_BINSTALL_CONFIG);
+const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_INSTALL_CONFIG);
 console.log(cargoInstallConfigs);
+const isBinstall = `${MONODEV_CARGO_IS_BINSTALL}`.toLowerCase() === "true";
+console.log("is binstall?", isBinstall);
 
 const HOME = os.homedir();
 
 const isWindows = process.platform === "win32";
-const runCargobinstall = (crate, config) => {
+const doInstall = (crate, config) => {
     const { git, cli } = (config || {});
     console.log(`installing ${crate}`);
-    const args = ["install", crate];
-    // const args = ["install", crate, "--no-confirm", "--no-discover-github-token"];
+    const args = isBinstall
+      ? [
+            "binstall", crate, 
+            "--no-confirm", 
+            "--no-discover-github-token", 
+            "--disable-strategies", "compile"
+        ]
+      : ["install", crate];
     if (git) {
         args.push("--git", git);
     }
@@ -44,5 +52,5 @@ const runCargobinstall = (crate, config) => {
     }
 };
 for (const [crate, config] of cargoInstallConfigs) {
-    runCargobinstall(crate, config);
+    doInstall(crate, config);
 }

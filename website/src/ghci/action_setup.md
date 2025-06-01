@@ -62,11 +62,19 @@ jobs:
           tool-mdbook: true
 
           # install extra tools with cargo-binstall
-          # installed tools are cached by rust-cache
+          # installed tools here are not cached and falling
+          # back to compile from source is banned
+          #
           # format: crate to use crates.io or crate=user/repo to use github
           # if the crate name is different from CLI tool name,
           # use `cli-tool(crate)=user/repo`
           tool-cargo-binstall: ripgrep,workex=Pistonite/workex
+
+          # same format as above, but uses cargo install
+          # this is cached by rust-cache
+          # note specifying anything here will also
+          # setup rust for the current OS/Arch if not already done
+          tool-cargo-install: ...
 
           # TODO: python support not here yet
           # setup latest version of python
