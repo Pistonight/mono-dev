@@ -24,7 +24,11 @@ import child_process from "child_process";
 import path from "path";
 import { run as prettierCli } from "@prettier/cli";
 
-const TSC = "tsgo"; // use native preview
+// TSGO issues:
+// - doesn't support project references right now
+// and seem to have some inconsistent behavior with naming inferred type
+// ("The inferred type of 'x' cannot be named without a reference to 'y'")
+const TSC = "tsc";
 
 const pathCurrent = path.resolve(".");
 
