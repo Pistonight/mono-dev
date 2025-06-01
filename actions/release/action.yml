@@ -57,6 +57,7 @@ runs:
         MONODEV_RELEASE_HAS_MINISIGN_KEY: ${{ inputs.minisign-key != ''}}
         MONODEV_RELEASE_PACK: ${{ inputs.pack }}
         MONODEV_RELEASE_ARTIFACTS_PATH: ${{ inputs.artifacts-path }}
+        MONODEV_RELEASE_WORKSPACE: ${{ github.workspace }}
         MONODEV_RELEASE_APPEND_VERSION: ${{ inputs.append-version }}
         MONODEV_RELEASE_VERSION: ${{ inputs.tag }}
       shell: bash

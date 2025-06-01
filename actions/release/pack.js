@@ -7,6 +7,7 @@ const {
     MONODEV_RELEASE_PACK,
     MONODEV_RELEASE_HAS_MINISIGN_KEY,
     MONODEV_RELEASE_ARTIFACTS_PATH,
+    MONODEV_RELEASE_WORKSPACE,
     MONODEV_RELEASE_APPEND_VERSION,
     MONODEV_RELEASE_VERSION,
 } = process.env;
@@ -41,6 +42,7 @@ const appendVersion = `${MONODEV_RELEASE_APPEND_VERSION}`.toLowerCase() === "tru
 const hasMinisignKey = `${MONODEV_RELEASE_HAS_MINISIGN_KEY}`.toLowerCase() === "true";
 const outputFiles = (MONODEV_RELEASE_FILES || "").split(" ").filter(file => file.trim()); 
 
+const artifactsPath = path.join(MONODEV_RELEASE_WORKSPACE, MONODEV_RELEASE_ARTIFACTS_PATH);
 const BIN = "7z";
 const packDir = (dir_name) => {
     if (!packPatternMatcher(dir_name)) {
@@ -53,16 +55,16 @@ const packDir = (dir_name) => {
     let outputFile;
     if (useZip) {
         if (appendVersion) {
-            outputFile = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}-${MONODEV_RELEASE_VERSION}.zip`;
+            outputFile = `${artifactsPath}/${dir_name}-${MONODEV_RELEASE_VERSION}.zip`;
         } else {
-            outputFile = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}.zip`;
+            outputFile = `${artifactsPath}/${dir_name}.zip`;
         }
         const child = child_process.spawnSync(
             BIN, 
             [
                 "a", "-tzip", 
                 outputFile,
-                `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}/*`
+                `${artifactsPath}/${dir_name}/*`
             ],
             { stdio: "inherit" }
         );
@@ -72,17 +74,17 @@ const packDir = (dir_name) => {
         }
     } else {
         if (appendVersion) {
-            outputFile = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}-${MONODEV_RELEASE_VERSION}.tar.gz`;
+            outputFile = `${artifactsPath}/${dir_name}-${MONODEV_RELEASE_VERSION}.tar.gz`;
         } else {
-            outputFile = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}.tar.gz`;
+            outputFile = `${artifactsPath}/${dir_name}.tar.gz`;
         }
-        const intermediateTar = `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}.tar`;
+        const intermediateTar = `${artifactsPath}/${dir_name}.tar`;
         let child = child_process.spawnSync(
             BIN, 
             [
                 "a", "-ttar", 
                 intermediateTar,
-                `${MONODEV_RELEASE_ARTIFACTS_PATH}/${dir_name}/*`
+                `${artifactsPath}/${dir_name}/*`
             ],
             { stdio: "inherit" }
         );
@@ -104,14 +106,14 @@ const packDir = (dir_name) => {
     console.log(`Output file: ${outputFile}`);
     return outputFile;
 }
-const files = fs.readdirSync(MONODEV_RELEASE_ARTIFACTS_PATH);
+const files = fs.readdirSync(artifactsPath);
 for (const file of files) {
     // check if the file is a directory
-    const filePath = path.join(MONODEV_RELEASE_ARTIFACTS_PATH, file);
+    const filePath = path.join(artifactsPath, file);
     if (!fs.statSync(filePath).isDirectory()) {
         continue;
     }
-    const outputFile = packDir(MONODEV_RELEASE_ARTIFACTS_PATH, file);
+    const outputFile = packDir(file);
     if (!outputFile) {
         continue;
     }
