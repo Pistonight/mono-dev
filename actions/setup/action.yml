@@ -21,7 +21,7 @@ inputs:
   rust-wasm:
     default: false
   rust-native:
-    default: false
+    default: ""
   rust-src:
     default: false
   tool-mdbook:
@@ -53,7 +53,7 @@ runs:
         repo-token: ${{ github.token }}
     - run: node --version
       shell: bash
-    - run: node ${{ github.action_path }}/env.js
+    - run: node env.js
       id: envjs
       shell: bash
       env:
@@ -100,7 +100,7 @@ runs:
       uses: cargo-bins/cargo-binstall@main
       # cargo-binstall needs to be run before the cache step
     - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
-      run: node ${{ github.action_path }}/cargoinstall.js
+      run: node cargoinstall.js
       shell: bash
       env:
         MONODEV_CARGO_IS_BINSTALL: true
@@ -110,7 +110,7 @@ runs:
     - if: ${{ steps.envjs.outputs.setup_rust == 'blacksmith' }}
       uses: useblacksmith/rust-cache@v3
     - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' }}
-      run: node ${{ github.action_path }}/cargoinstall.js
+      run: node cargoinstall.js
       shell: bash
       env:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_install_config }}

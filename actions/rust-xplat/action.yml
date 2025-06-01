@@ -32,7 +32,7 @@ runs:
   steps:
     - run: node --version
       shell: bash
-    - run: node ${{ github.action_path }}/env.js
+    - run: node env.js
       id: envjs
       env:
         MONODEV_RUST_XPLAT_RUNNER_OS: ${{ runner.os }}
