@@ -17,7 +17,10 @@ const HOME = os.homedir();
 
 const isWindows = process.platform === "win32";
 const doInstall = (crate, config) => {
-    const { git, cli } = (config || {});
+    let { git, cli } = (config || {});
+    if (!cli) {
+        cli = crate;
+    }
     console.log(`installing ${crate}`);
     const args = isBinstall
       ? [
