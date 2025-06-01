@@ -63,12 +63,18 @@ runs:
       shell: bash
 
     - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.packed_files != '' }}
-      uses: thomasdesr/minisign-action@v1
+      uses: robinraju/release-downloader@v1
       with:
-        minisign_key: ${{ inputs.minisign-key }}
-        args: -Sm ${{ steps.pack.outputs.packed_files }}
+        repository: jedisct1/minisign
+        latest: true
+        fileName: "*-linux.tar.gz"
+        out-file-path: .minisign
+        extract: true
     - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.packed_files != '' }}
       run: |
+        printf "%s" "${{ inputs.minisign-key }}" > .minisign/minisign.key
+        chmod +x .minisign/minisign-linux/x86_64/minisign
+        ./.minisign/minisign-linux/x86_64/minisign -SWm ${{ steps.pack.outputs.packed_files }} -s .minisign/minisign.key
         for f in "${{ inputs.artifacts-path }}/*.minisig" ; do
           mv -- "$f" "${f%.minisig}.sig"
         done
