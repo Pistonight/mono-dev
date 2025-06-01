@@ -56,6 +56,7 @@ runs:
       shell: bash
       env:
         MONODEV_RUNNER_OS: ${{ runner.os }}
+        MONODEV_RUNNER_ARCH: ${{ runner.arch }}
         MONODEV_RUNNER: ${{ inputs.runner }}
         MONODEV_ECMA_NODE: ${{ inputs.ecma-node }}
         MONODEV_ECMA_PNPM: ${{ inputs.ecma-pnpm }}
@@ -92,27 +93,36 @@ runs:
         toolchain: ${{ steps.envjs.outputs.rust_toolchain }}
         targets: ${{ steps.envjs.outputs.rust_targets }}
         components: ${{ steps.envjs.outputs.rust_components }}
-    - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
-      uses: cargo-bins/cargo-binstall@main
+    # - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
+    #   uses: cargo-bins/cargo-binstall@main
     - if: ${{ steps.envjs.outputs.setup_rust == 'github' }}
       uses: Swatinem/rust-cache@v2
     - if: ${{ steps.envjs.outputs.setup_rust == 'blacksmith' }}
       uses: useblacksmith/rust-cache@v3
-    - if: ${{ steps.envjs.outputs.cargo_binstall_cache == 'github' }}
-      uses: actions/cache@v4
-      with:
-        path: ~/.cargo/bin
-        key: cargo-binstall-${{ steps.envjs.outputs.cargo_binstall_cache_key }}
-    - if: ${{ steps.envjs.outputs.cargo_binstall_cache == 'blacksmith' }}
-      uses: useblacksmith/cache@v5
-      with:
-        path: ~/.cargo/bin
-        key: cargo-binstall-${{ steps.envjs.outputs.cargo_binstall_cache_key }}
+    # - if: ${{ steps.envjs.outputs.cargo_binstall_cache == 'github' }}
+    #   uses: actions/cache/restore@v4
+    #   id: cargo-binstall-cache-github
+    #   with:
+    #     path: ~/.cargo/bin
+    #     restore-keys: cargo-binstall-${{ steps.envjs.outputs.cargo_binstall_cache_key }}
+    # - if: ${{ steps.envjs.outputs.cargo_binstall_cache == 'blacksmith' }}
+    #   id: cargo-binstall-cache-blacksmith
+    #   uses: useblacksmith/cache/restore@v5
+    #   with:
+    #     path: ~/.cargo/bin
+    #     restore-keys: cargo-binstall-${{ steps.envjs.outputs.cargo_binstall_cache_key }}
     - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
       run: node ${{ github.action_path }}/binstall.js
       shell: bash
       env:
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
+        # MONODEV_CARGO_BINSTALL_CACHE_RESTORED_KEY: ${{ steps.cargo-binstall-cache-github.outputs.cache-matched-key }}
+    # - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' && steps.envjs.outputs.cargo_binstall_cache == 'blacksmith' }}
+    #   run: node ${{ github.action_path }}/binstall.js
+    #   shell: bash
+    #   env:
+    #     MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
+    #     MONODEV_CARGO_BINSTALL_CACHE_RESTORED_KEY: ${{ steps.cargo-binstall-cache-blacksmith.outputs.cache-matched-key }}
 
 
     - if: ${{ steps.envjs.outputs.setup_gcloud == 'true' }}

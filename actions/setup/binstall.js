@@ -1,23 +1,28 @@
 import fs from "node:fs";
 import child_process from "node:child_process";
+import os from "node:os";
 
 const {
     MONODEV_CARGO_BINSTALL_CONFIG,
+    MONODEV_CARGO_BINSTALL_CACHE_RESTORED_KEY
 } = process.env;
 
 // [crate, { cli, git?: string }][]
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_BINSTALL_CONFIG);
 console.log(cargoInstallConfigs);
 
+const HOME = os.homedir();
+
 const isWindows = process.platform === "win32";
 const runCargobinstall = (crate, config) => {
     const { git, cli } = (config || {});
     console.log(`installing ${crate}`);
-    const args = ["binstall", crate, "--no-confirm", "--no-discover-github-token"];
+    const args = ["install", crate];
+    // const args = ["install", crate, "--no-confirm", "--no-discover-github-token"];
     if (git) {
         args.push("--git", git);
     }
-    const cliReal = `~/.cargo/bin/${isWindows ? cli + ".exe" : cli}`;
+    const cliReal = `${HOME}/.cargo/bin/${isWindows ? cli + ".exe" : cli}`;
     if (!fs.existsSync(cliReal)) {
         console.log(`${cliReal} not found, forcing the install`);
         args.push("--force");

@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 
 const {
     MONODEV_RUNNER_OS,
+    MONODEV_RUNNER_ARCH,
     MONODEV_RUNNER,
     MONODEV_ECMA_NODE,
     MONODEV_ECMA_PNPM,
@@ -122,7 +123,7 @@ if (cargo_binstall_cache) {
     for (const [crate, config] of cargoInstallConfigs) {
         hash.update(`${crate}:git=${config.git || ""},cli=${config.cli || ""}`);
     }
-    cargo_binstall_cache_key = hash.digest("hex");
+    cargo_binstall_cache_key = `${MONODEV_RUNNER_OS}-${MONODEV_RUNNER_ARCH}-${hash.digest("hex")}`;
 }
 
 // GCloud
