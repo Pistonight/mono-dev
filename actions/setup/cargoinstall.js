@@ -11,7 +11,6 @@ const {
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_INSTALL_CONFIG);
 console.log(cargoInstallConfigs);
 const isBinstall = `${MONODEV_CARGO_IS_BINSTALL}`.toLowerCase() === "true";
-console.log("is binstall?", isBinstall);
 
 const HOME = os.homedir();
 
@@ -31,7 +30,8 @@ const doInstall = (crate, config) => {
         ]
       : ["install", crate];
     if (git) {
-        args.push("--git", git);
+        const [user, repo] = git.split("/" ,2);
+        args.push("--git", `https://github.com/${user}/${repo}`);
     }
     const cliReal = `${HOME}/.cargo/bin/${isWindows ? cli + ".exe" : cli}`;
     if (!fs.existsSync(cliReal)) {
