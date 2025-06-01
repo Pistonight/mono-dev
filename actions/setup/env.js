@@ -135,6 +135,10 @@ if (need_cargo_install && !rust_toolchain) {
     rust_toolchain = "stable";
     addNativeRustTarget(MONODEV_RUNNER_ARCH);
 }
+if (monodev_rust_src) {
+    console.log("adding native Rust target to build standard library source (rust-src)");
+    addNativeRustTarget(MONODEV_RUNNER_ARCH);
+}
 
 const setup_rust = rust_toolchain ? runnerType : false;
 
