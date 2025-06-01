@@ -44,7 +44,7 @@ jobs:
           #   --bin <binary>
           #   --release
           #   --target <triple> (for apple only)
-          build_args: "--feature too"
+          build-args: "--feature too"
 
           # optional: target directory for the build (default is `target`)
           target-dir: my-target-dir

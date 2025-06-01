@@ -14,8 +14,8 @@ Uses `RELEASE_NOTES_HEADER.md` and `RELEASE_NOTES_FOOTER.md` in the `.github` di
       - uses: Pistonight/mono-dev/actions/release@main
         with:
           # optional: download artifacts from a previous workflow
-          artifacts_workflow: build.yml
-          artifacts_name: packages/server/dist
+          artifacts-workflow: build.yml
+          artifacts-name: packages/server/dist
 
           # optional: run a task after downloading artifacts
           task: server:package-assets
