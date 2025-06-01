@@ -77,7 +77,7 @@ runs:
       run: |
         printf "%s" "${{ inputs.minisign-key }}" > .minisign/minisign.key
         chmod +x .minisign/minisign-linux/x86_64/minisign
-        ./.minisign/minisign-linux/x86_64/minisign -S -W -s .minisign/minisign.key -m ${{ steps.pack.outputs.packed_files }} -t "${{ inputs.signing-comment }}"
+        ./.minisign/minisign-linux/x86_64/minisign -S -W -s .minisign/minisign.key -t "${{ inputs.signing-comment }}" -m ${{ steps.pack.outputs.packed_files }} 
         for f in "${{ inputs.artifacts-path }}/*.minisig" ; do
           mv -- "$f" "${f%.minisig}.sig"
         done
