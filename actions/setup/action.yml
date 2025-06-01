@@ -109,8 +109,12 @@ runs:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
     - if: ${{ steps.envjs.outputs.setup_rust == 'github' }}
       uses: Swatinem/rust-cache@v2
+      with:
+        key: ${{ steps.envjs.outputs.rust_cache_key }}
     - if: ${{ steps.envjs.outputs.setup_rust == 'blacksmith' }}
       uses: useblacksmith/rust-cache@v3
+      with:
+        key: ${{ steps.envjs.outputs.rust_cache_key }}
     - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' }}
       run: node cargoinstall.js
       working-directory: ${{ github.action_path}}

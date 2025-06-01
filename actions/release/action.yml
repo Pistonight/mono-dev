@@ -9,7 +9,10 @@ inputs:
     description: "Path to download artifacts to"
     default: ""
   pack:
-    description: "Automatically pack downloaded artifacts as .zip or .tar.gz, per artifact"
+    description: >
+      Automatically pack downloaded artifacts as .zip or .tar.gz, per artifact. 
+      Could be a pattern with * to match beginning or end of the artifact name. 
+      false disables packing. ** or true packs everything"
     default: true
   append-version:
     description: "Append version tag to packed artifacts"
@@ -58,12 +61,12 @@ runs:
         MONODEV_RELEASE_VERSION: ${{ inputs.tag }}
       shell: bash
 
-    - if: ${{ inputs.minisign-key != '' }}
+    - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.packed_files != '' }}
       uses: thomasdesr/minisign-action@v1
       with:
         minisign_key: ${{ inputs.minisign-key }}
         args: -Sm ${{ steps.pack.outputs.packed_files }}
-    - if: ${{ pack == 'true' && inputs.minisign-key != '' }}
+    - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.packed_files != '' }}
       run: |
         for f in "${{ inputs.artifacts-path }}/*.minisig" ; do
           mv -- "$f" "${f%.minisig}.sig"

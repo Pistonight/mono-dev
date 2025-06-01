@@ -142,11 +142,13 @@ const setup_rust = rust_toolchain ? runnerType : false;
 if (monodev_rust_wasm) {
     rust_targets.add("wasm32-unknown-unknown");
 }
+let rust_cache_key = "";
 if (MONODEV_RUST_NATIVE) {
-    const nativeTargets = MONODEV_RUST_NATIVE.split(",").map(t => t.trim().toLowerCase());
-    for (const arch of nativeTargets) {
+    const nativeArgs = MONODEV_RUST_NATIVE.split(",").map(t => t.trim().toLowerCase());
+    for (const arch of nativeArgs) {
         addNativeRustTarget(arch);
     }
+    rust_cache_key = nativeArgs.join(",");
 }
 
 // GCloud
@@ -178,6 +180,7 @@ const output = {
     rust_toolchain,
     rust_components,
     rust_targets: Array.from(rust_targets).join(","),
+    rust_cache_key,
     setup_cargo_binstall,
     need_cargo_install,
     cargo_install_config,
