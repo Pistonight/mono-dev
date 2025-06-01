@@ -1,6 +1,6 @@
 # Action: Docker
 
-[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/acitons/docker-image/action.yml)
+[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/actions/docker-image/action.yml)
 
 Use this action to download artifacts from a previous workflow,
 build a docker image, and publish it to GitHub Packages.

@@ -1,6 +1,6 @@
 # Action: Release
 
-[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/acitons/release/action.yml)
+[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/actions/release/action.yml)
 
 Use this action to create release notes automatically and draft a release with artifacts
 

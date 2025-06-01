@@ -13,7 +13,6 @@ const {
     MONODEV_TOOL_MDBOOK,
     MONODEV_TOOL_CARGO_BINSTALL,
     MONODEV_TOOL_CARGO_INSTALL,
-    MONODEV_GCLOUD,
 } = process.env;
 
 const bool = (value) => {
@@ -151,27 +150,6 @@ if (MONODEV_RUST_NATIVE) {
     rust_cache_key = nativeArgs.join(",");
 }
 
-// GCloud
-let setup_gcloud = false;
-let gcloud_project_id = "";
-let gcloud_workload_identity_provider = "";
-if (MONODEV_GCLOUD) {
-    setup_gcloud = true;
-    for (const part of MONODEV_GCLOUD.split(",").map(part => part.trim())) {
-        const [key, value] = part.split("=", 2);
-        switch (key.toLowerCase()) {
-            case "project_id": {
-                gcloud_project_id = value.trim();
-                break;
-            }
-            case "workload_identity_provider": {
-                gcloud_workload_identity_provider = value.trim();
-                break;
-            }
-        }
-    }
-}
-
 const output = {
     setup_node,
     node_cache,
@@ -185,10 +163,6 @@ const output = {
     need_cargo_install,
     cargo_install_config,
     cargo_binstall_config,
-
-    setup_gcloud,
-    gcloud_project_id,
-    gcloud_workload_identity_provider,
 };
 
 const outputString = Object.entries(output).map(([key, value]) => `${key}=${value}`).join("\n");

@@ -1,18 +1,12 @@
 # Action: Setup
 
-[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/acitons/setup/action.yml)
+[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/actions/setup/action.yml)
 
 ```yaml
 jobs:
   change-me:
-    name: change-me
     runs-on: ubuntu-latest
     # runs-on: blacksmith-4vcpu-ubuntu-2404
-
-    # permissions for gcloud
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - uses: Pistonight/mono-dev/actions/setup@main
@@ -80,9 +74,6 @@ jobs:
           # setup latest version of python
           # python: true
           # python_pip: package1,package2
-
-          # setup gcloud (default false)
-          gcloud: project_id=xxx,workload_identity_provider=projects/xxx/locations/global/workloadIdentityPools/xxx/providers/xxx
 
       # repo-specific setup
       - uses: ./.github/steps/setup

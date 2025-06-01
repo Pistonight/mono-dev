@@ -1,6 +1,6 @@
 # Action: Rust
 
-[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/acitons/rust-xplat/action.yml)
+[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/actions/rust-xplat/action.yml)
 
 Use the first action to build Rust CLI tool and upload it to CI artifacts,
 then use the second action to download the artifacts, sign them, and create a release

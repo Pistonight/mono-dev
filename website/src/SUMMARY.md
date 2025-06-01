@@ -23,4 +23,5 @@
   - [Action: Rust](./ghci/action_rust.md)
   - [Action: Docker](./ghci/action_docker.md)
   - [Action: Release](./ghci/action_release.md)
+  - [Action: GCloud](./ghci/action_gcloud.md)
   - [Workflow Templates](./ghci/workflow_template.md)

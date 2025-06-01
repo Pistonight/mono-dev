@@ -1,6 +1,6 @@
 # Action: Permanent Cache
 
-[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/acitons/permanent-cache/action.yml)
+[Workflow file](https://github.com/Pistonight/mono-dev/tree/main/actions/permanent-cache/action.yml)
 
 Use this action to permanently cache a directory until manually busted,
 with a task to generate the data to cache if miss
