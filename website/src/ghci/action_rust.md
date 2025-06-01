@@ -68,6 +68,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
+      contents: write
     steps:
       - if: startsWith(github.ref, 'refs/tags/v')
         uses: Pistonight/mono-dev/actions/release@main
