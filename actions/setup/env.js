@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import crypto from "node:crypto";
 
 const {
     MONODEV_RUNNER_OS,
@@ -34,7 +33,6 @@ const runnerType = isGitHub ? "github" : "blacksmith";
 const monodev_ecma_node = bool(MONODEV_ECMA_NODE);
 const monodev_ecma_pnpm = bool(MONODEV_ECMA_PNPM);
 const monodev_rust_wasm = bool(MONODEV_RUST_WASM);
-const monodev_rust_native = bool(MONODEV_RUST_NATIVE);
 const monodev_rust_src = bool(MONODEV_RUST_SRC);
 
 
@@ -144,8 +142,8 @@ const setup_rust = rust_toolchain ? runnerType : false;
 if (monodev_rust_wasm) {
     rust_targets.add("wasm32-unknown-unknown");
 }
-if (monodev_rust_native) {
-    const nativeTargets = monodev_rust_native.split(",").map(t => t.trim().toLowerCase());
+if (MONODEV_RUST_NATIVE) {
+    const nativeTargets = MONODEV_RUST_NATIVE.split(",").map(t => t.trim().toLowerCase());
     for (const arch of nativeTargets) {
         addNativeRustTarget(arch);
     }
