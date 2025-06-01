@@ -82,7 +82,7 @@ runs:
           mv -- "$f" "${f%.minisig}.sig"
         done
       shell: bash
-    - if: ${{ inputs.minisign-key != '' }}
+    - if: ${{ inputs.minisign-key != '' && inputs.files != '' }}
       run: |
         for f in "${{ inputs.files }}"; do
           mv -- "$f.minisig" "$f.sig"
