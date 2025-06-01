@@ -99,7 +99,7 @@ runs:
         if [ -f .github/RELEASE_NOTES_HEADR.md ]; then
           cat .github/RELEASE_NOTES_HEADER.md >> .github/RELEASE_NOTES.md
         fi
-        echo "${{ steps.release-notes.outputs.release_notes }}" > .github/RELEASE_NOTES.md
+        echo "${{ steps.release-notes.outputs.release-notes }}" > .github/RELEASE_NOTES.md
         if [ -f .github/RELEASE_NOTES_FOOTER.md ]; then
           cat .github/RELEASE_NOTES_FOOTER.md >> .github/RELEASE_NOTES.md
         fi
