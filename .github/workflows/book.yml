@@ -18,7 +18,6 @@ jobs:
       - uses: ./actions/setup
         with:
           skip-checkout: true
-          rust: stable
           tool-mdbook: true
 
       # run the thing
