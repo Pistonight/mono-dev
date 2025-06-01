@@ -21,8 +21,11 @@ inputs:
     description: "Task to run after downloading artifacts but before packing or signing"
     default: ""
   minisign-key:
-    description: "Minisign secret key to sign the packed artifacts (requires pack = true)"
+    description: "Minisign secret key to sign the packed artifacts"
     default: ""
+  signing-comment:
+    description: "Comment to use when signing the packed artifacts"
+    default: "Signed by mono-dev release GitHub action"
 
   files:
     description: "Paths to files to upload to the release"
@@ -74,7 +77,7 @@ runs:
       run: |
         printf "%s" "${{ inputs.minisign-key }}" > .minisign/minisign.key
         chmod +x .minisign/minisign-linux/x86_64/minisign
-        ./.minisign/minisign-linux/x86_64/minisign -SWm ${{ steps.pack.outputs.packed_files }} -s .minisign/minisign.key
+        ./.minisign/minisign-linux/x86_64/minisign -S -W -s .minisign/minisign.key -m ${{ steps.pack.outputs.packed_files }} -t "${{ inputs.signing-comment }}"
         for f in "${{ inputs.artifacts-path }}/*.minisig" ; do
           mv -- "$f" "${f%.minisig}.sig"
         done
