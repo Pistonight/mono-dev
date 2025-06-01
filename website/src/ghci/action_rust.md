@@ -29,8 +29,8 @@ jobs:
       - uses: Pistonight/mono-dev/actions/setup@main
         with:
           rust: stable
-          rust_native: ${{ matrix.target }}
-          rust_src: true
+          rust-native: ${{ matrix.target }}
+          rust-src: true
       - uses: Pistonight/mono-dev/actions/rust-xplat@main
         with:
           arch: ${{ matrix.target }}
