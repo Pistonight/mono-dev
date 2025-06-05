@@ -61,15 +61,15 @@ tasks:
           if stat {{.OUTPUT}};
           then
             cp -p {{.OUTPUT}} {{.OUTPUT}}.old;
-            cargo build --lib --target wasm32-unknown-unknown --release
+            cargo build --lib --target wasm32-unknown-unknown --release {{.CARGO_ARGS}}
             if test {{.OUTPUT}} -nt {{.OUTPUT}}.old;
             then
-              wasm-pack build {{.WASM_PACK_ARGS}}
+              wasm-pack build {{.WASM_PACK_ARGS}} {{.CARGO_ARGS}}
             else
               echo 'skipping wasm-pack because cargo output did not change'
             fi
           else
-            wasm-pack build {{.WASM_PACK_ARGS}}
+            wasm-pack build {{.WASM_PACK_ARGS}} {{.CARGO_ARGS}}
           fi
         silent: true
 
