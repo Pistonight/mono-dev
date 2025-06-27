@@ -28,7 +28,6 @@ tasks:
         -D warnings
         -D clippy::todo
         -A clippy::manual_range_contains
-        -A clippy::collapsible_if
     env:
       RUSTDOCFLAGS: -D warnings
     cmds:
