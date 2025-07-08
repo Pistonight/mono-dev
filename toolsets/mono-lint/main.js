@@ -551,8 +551,12 @@ function runPrettier(fix) {
         stdinFilepath: undefined,
         /* CONTEXT OPTIONS */
         contextOptions: {},
-        // /* FORMAT OPTIONS */
-        formatOptions: { endOfLine: "auto", tabWidth: 4 },
+        /* FORMAT OPTIONS */
+        formatOptions: {
+            endOfLine: "auto",
+            tabWidth: 4,
+            objectWrap: "collapse",
+        },
     };
 
     return prettierCli(options, {}, {});
