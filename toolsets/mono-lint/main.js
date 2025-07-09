@@ -555,7 +555,6 @@ function runPrettier(fix) {
         formatOptions: {
             endOfLine: "auto",
             tabWidth: 4,
-            objectWrap: "collapse",
         },
     };
 
