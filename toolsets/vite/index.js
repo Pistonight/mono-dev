@@ -185,26 +185,29 @@ export default function monodev(monoConfig) {
                     "[mono-dev] not searching for HTTPS config because it is already specified",
                 );
             } else {
-                const { key, cert, hostname } = findHttps();
-                config.server.https = { key, cert };
-                if (hostname) {
-                    if (config.server.host) {
+                const https = findHttps();
+                if (https) {
+                    const { key, cert, hostname } = https;
+                    config.server.https = { key, cert };
+                    if (hostname) {
+                        if (config.server.host) {
+                            console.warn(
+                                `[mono-dev] not setting server.host to because it is already specified`,
+                            );
+                        } else {
+                            config.server.host = hostname;
+                        }
+                    }
+                    if (!config.server.hmr) {
+                        config.server.hmr = {};
+                    }
+                    if (config.server.hmr.host) {
                         console.warn(
-                            `[mono-dev] not setting server.host to because it is already specified`,
+                            `[mono-dev] not setting server.hmr.host to because it is already specified`,
                         );
                     } else {
-                        config.server.host = hostname;
+                        config.server.hmr.host = hostname;
                     }
-                }
-                if (!config.server.hmr) {
-                    config.server.hmr = {};
-                }
-                if (config.server.hmr.host) {
-                    console.warn(
-                        `[mono-dev] not setting server.hmr.host to because it is already specified`,
-                    );
-                } else {
-                    config.server.hmr.host = hostname;
                 }
             }
         }
