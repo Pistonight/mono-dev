@@ -1,7 +1,6 @@
 [book]
 authors = ["CHANGE--ME"]
 language = "en"
-multilingual = false
 src = "src"
 title = "CHANGE--ME"
 
