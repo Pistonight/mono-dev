@@ -12,7 +12,9 @@ jobs:
       - uses: Pistonight/mono-dev/actions/setup@main
         with:
           # ALL VALUES BELOW ARE OPTIONAL
-          # setup mono-dev in the root of the repo
+          # clone mono-dev in the repo
+          # Use `true` for root of the repo (/mono-dev)
+          # Use a path will clone to that path (`packages` -> /packages/mono-dev)
           # default is false
           mono-dev: true
 

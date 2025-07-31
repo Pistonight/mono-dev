@@ -11,6 +11,15 @@ external dependencies are integrated.
 magoo install https://github.com/Pistonight/mono-dev packages/mono-dev --name mono-dev --branch main
 ```
 
+```admonish important
+If the monorepo is meant to be a Rust crate that's cargo-installable/cargo-addable
+directly from git, don't use the submodule approach, as cargo will clone the submodules
+as well, but mono-dev should only be needed during development. The downside is that
+the version won't be tracked by the `.gitsubmodules` file.
+
+Use the `common:setup-mono-dev-at-packages` task to install mono-dev locally to `packages`
+```
+
 A typical monorepo should look like:
 ```
 - .github/
@@ -126,8 +135,7 @@ magoo install https://github.com/Pistonight/mono-dev mono-dev --name mono-dev --
 tasks:
   install:
     cmds:
-      - rm -rf mono-dev
-      - git clone https://github.com/Pistonight/mono-dev --depth 1
+      - task: common:setup-mono-dev-at-root
 ```
 
 The second option is better for rust projects that meant to be

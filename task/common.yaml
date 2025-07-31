@@ -20,3 +20,14 @@ tasks:
     cmds:
       - which cargo-binstall || cargo install cargo-binstall
       - cargo binstall {{.PACKAGES}} -y
+
+  setup-mono-dev-at-root:
+    cmds:
+      - rm -rf mono-dev
+      - git clone https://github.com/Pistonight/mono-dev --depth 1
+
+  setup-mono-dev-at-packages:
+    cmds:
+      - rm -rf packages/mono-dev
+      - $(which mkdir) -p packages
+      - git clone https://github.com/Pistonight/mono-dev --depth 1 packages/mono-dev

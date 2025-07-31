@@ -45,6 +45,12 @@ runs:
         repository: Pistonight/mono-dev
         path: mono-dev
         persist-credentials: false
+    - if: ${{ inputs.mono-dev != 'false' }}
+      uses: actions/checkout@v4
+      with:
+        repository: Pistonight/mono-dev
+        path: ${{ inputs.mono-dev }}/mono-dev
+        persist-credentials: false
     - uses: arduino/setup-task@v2
       with:
         version: 3.x
