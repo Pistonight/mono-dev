@@ -44,8 +44,8 @@ tasks:
 
   watch-serve-doc:
     cmds:
-      - cargo doc --target-dir target
-      - cmd: cargo watch -s "cargo doc --target-dir target" &
+      - cargo doc --target-dir target {{.CARGO_DOC_ARGS}}
+      - cmd: cargo watch -s "cargo doc --target-dir target {{.CARGO_DOC_ARGS}}" &
         ignore_error: true
       - cmd: live-server -p 8081 target/doc
         ignore_error: true
