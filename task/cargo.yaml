@@ -29,6 +29,7 @@ tasks:
         -D clippy::todo
         -A clippy::manual_range_contains
         -A clippy::collapsible_if
+        -A clippy::collapsible_else_if
     env:
       RUSTDOCFLAGS: -D warnings
     cmds:
@@ -44,8 +45,8 @@ tasks:
 
   watch-serve-doc:
     cmds:
-      - cargo doc --target-dir target {{.CARGO_DOC_ARGS}}
-      - cmd: cargo watch -s "cargo doc --target-dir target {{.CARGO_DOC_ARGS}}" &
+      - cargo {{.TOOLCHAIN}} doc --target-dir target --no-deps {{.CARGO_ARGS}}
+      - cmd: cargo watch -s "cargo {{.TOOLCHAIN}} doc --target-dir target --no-deps {{.CARGO_ARGS}}" &
         ignore_error: true
       - cmd: live-server -p 8081 target/doc
         ignore_error: true
