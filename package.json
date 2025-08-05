@@ -1,28 +1,28 @@
 {
     "name": "mono-dev",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
     "dependencies": {
-        "@eslint/js": "^9.29.0",
+        "@eslint/js": "^9.32.0",
         "@modyfi/vite-plugin-yaml": "^1.1.1",
         "@prettier/cli": "^0.9.0",
         "@typescript/native-preview": "7.0.0-dev.20250530.1",
-        "@vitejs/plugin-react": "^4.5.2",
-        "eslint": "^9.29.0",
+        "@vitejs/plugin-react": "^4.7.0",
+        "eslint": "^9.32.0",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-refresh": "^0.4.20",
-        "globals": "^16.2.0",
+        "globals": "^16.3.0",
         "js-yaml": "^4.1.0",
-        "typescript": "=5.8.3",
-        "typescript-eslint": "^8.34.0",
-        "vite-plugin-wasm": "^3.4.1",
-        "vite-tsconfig-paths": "^5.1.4"
+        "typescript": "=5.9.2",
+        "typescript-eslint": "^8.39.0",
+        "vite-plugin-wasm": "^3.5.0",
+        "vite-tsconfig-paths": "6.0.0-beta.4"
     },
     "devDependencies": {
-        "@types/bun": "^1.2.16"
+        "@types/bun": "^1.2.19"
     },
     "bin": {
         "mono-lint": "./toolsets/mono-lint/main.js",
