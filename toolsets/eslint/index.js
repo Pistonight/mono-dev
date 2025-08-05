@@ -28,10 +28,7 @@ const defaultOverrides = {
         "warn",
         { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
     ],
-    "@typescript-eslint/restrict-template-expressions": [
-        "warn",
-        { allowNumber: true },
-    ],
+    "@typescript-eslint/restrict-template-expressions": ["warn", { allowNumber: true }],
     // we have TypeScript
     "react/prop-types": "off",
 };

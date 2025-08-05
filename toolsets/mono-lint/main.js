@@ -133,9 +133,7 @@ async function createConfigs(clean) {
         if (!clean) {
             // check if mono-dev version was bumped
             try {
-                const version = fsSync
-                    .readFileSync(`${pathCache}/version`, "utf-8")
-                    .trim();
+                const version = fsSync.readFileSync(`${pathCache}/version`, "utf-8").trim();
                 if (version !== currentVersion) {
                     console.log(
                         `[mono-lint] generating clean configs because of version update: ${version} -> ${currentVersion}`,
@@ -153,15 +151,11 @@ async function createConfigs(clean) {
             try {
                 fsSync.writeFileSync(`${pathCache}/version`, currentVersion);
             } catch {
-                console.error(
-                    "[mono-lint] failed to write version file, will retry next time",
-                );
+                console.error("[mono-lint] failed to write version file, will retry next time");
             }
         }
     }
-    const packageJson = JSON.parse(
-        await fs.readFile(pathCurrProjPackageJson, "utf-8"),
-    );
+    const packageJson = JSON.parse(await fs.readFile(pathCurrProjPackageJson, "utf-8"));
     let checkIgnoreLines = [];
     try {
         const gitignore = await fs.readFile(".gitignore", "utf-8");
@@ -180,11 +174,7 @@ async function createConfigs(clean) {
         createPrettierIgnore(checkIgnoreLines),
     ]);
     if (ts.projectCount) {
-        await createEslintConfig(
-            checkIgnoreLines,
-            packageJson,
-            ts.nonTsDirectories,
-        );
+        await createEslintConfig(checkIgnoreLines, packageJson, ts.nonTsDirectories);
     }
     return ts.projectCount;
 }
@@ -227,11 +217,7 @@ async function createTsConfigs(clean, packageJson) {
             }
             return;
         }
-        if (
-            p !== "tsconfig.json" &&
-            p.startsWith("tsconfig.") &&
-            p.endsWith(".json")
-        ) {
+        if (p !== "tsconfig.json" && p.startsWith("tsconfig.") && p.endsWith(".json")) {
             existingTsConfigs.add(p);
             return;
         }
@@ -254,11 +240,7 @@ async function createTsConfigs(clean, packageJson) {
     let changed = false;
 
     let tsPathMappings = {};
-    if (
-        !("name" in packageJson) &&
-        !("exports" in packageJson) &&
-        !("file" in packageJson)
-    ) {
+    if (!("name" in packageJson) && !("exports" in packageJson) && !("file" in packageJson)) {
         tsPathMappings = await createTsPathMappings();
     }
     const hasTsPathMappings = Object.keys(tsPathMappings).length > 0;
@@ -267,11 +249,7 @@ async function createTsConfigs(clean, packageJson) {
         const tsconfig = `tsconfig.${dir}.json`;
         // the tsconfig only depends on the dir name,
         // we should never need to regenerate it
-        if (
-            !(dir === "src" && hasTsPathMappings) &&
-            !clean &&
-            existingTsConfigs.has(tsconfig)
-        ) {
+        if (!(dir === "src" && hasTsPathMappings) && !clean && existingTsConfigs.has(tsconfig)) {
             return;
         }
         const tsconfigContent = {
@@ -306,10 +284,7 @@ async function createTsConfigs(clean, packageJson) {
                 },
                 include: rootFiles,
             };
-            await fs.writeFile(
-                tsconfig,
-                JSON.stringify(tsconfigContent, null, 4),
-            );
+            await fs.writeFile(tsconfig, JSON.stringify(tsconfigContent, null, 4));
             changed = true;
         }
     }
@@ -340,10 +315,7 @@ async function createTsConfigs(clean, packageJson) {
             if (hasTsPathMappings) {
                 tsconfigContent.compilerOptions.paths = tsPathMappings;
             }
-            await fs.writeFile(
-                tsconfig,
-                JSON.stringify(tsconfigContent, null, 4),
-            );
+            await fs.writeFile(tsconfig, JSON.stringify(tsconfigContent, null, 4));
         }
     } else {
         if (await exists("tsconfig.json")) {
@@ -382,9 +354,7 @@ async function createTsPathMappings() {
             for (const f of files) {
                 const srcPath = `${next}/${f}`;
                 if (f.match(/index\.(c|m)?tsx?$/)) {
-                    tsPathMappings[next.replace(/^src\//, "self::")] = [
-                        `./${srcPath}`,
-                    ];
+                    tsPathMappings[next.replace(/^src\//, "self::")] = [`./${srcPath}`];
                     dirs = [];
                     break;
                 }
@@ -410,11 +380,7 @@ async function createTsPathMappings() {
  * are loaded, otherwise they are not.
  */
 
-async function createEslintConfig(
-    checkIgnoreLines,
-    packageJson,
-    nonTsDirectories,
-) {
+async function createEslintConfig(checkIgnoreLines, packageJson, nonTsDirectories) {
     let react = false;
     if (packageJson.dependencies) {
         react = "react" in packageJson.dependencies;
@@ -555,6 +521,7 @@ function runPrettier(fix) {
         formatOptions: {
             endOfLine: "auto",
             tabWidth: 4,
+            printWidth: 100,
         },
     };
 
@@ -583,9 +550,7 @@ function execute(bin, args) {
     // for some reason node doesn't throw here...
     // so we have to check the error manually
     if (child.error) {
-        console.error(
-            `[mono-lint] failed to spawn ${bin} with args ${args.join(" ")}`,
-        );
+        console.error(`[mono-lint] failed to spawn ${bin} with args ${args.join(" ")}`);
         console.error(child.error);
         child.status = 1;
     }

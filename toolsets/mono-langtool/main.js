@@ -78,12 +78,7 @@ const main = async (inputDirectory, inputFile) => {
     const otherLangContent = await Promise.all(
         otherLangs.map(async (lang) => {
             return (
-                YAML.load(
-                    await readFile(
-                        path.join(inputDirectory, `${lang}.yaml`),
-                        "utf-8",
-                    ),
-                ) ?? {}
+                YAML.load(await readFile(path.join(inputDirectory, `${lang}.yaml`), "utf-8")) ?? {}
             ); // empty object if file is empty
         }),
     );
@@ -136,11 +131,7 @@ const main = async (inputDirectory, inputFile) => {
         const toDelete = new Set();
         for (const key in langContent) {
             if (!(key in baseLangContent)) {
-                await confirm(
-                    "delete",
-                    [`Delete key: "${key}" in "${language}"?`],
-                    "",
-                );
+                await confirm("delete", [`Delete key: "${key}" in "${language}"?`], "");
                 toDelete.add(key);
             }
         }
@@ -156,10 +147,7 @@ const main = async (inputDirectory, inputFile) => {
     await saveLangFile(baseFile, baseLangFile);
     for (let i = 0; i < otherLangs.length; i++) {
         const newFile = makeLangFile(baseLangFile, otherLangContent[i]);
-        await saveLangFile(
-            path.join(inputDirectory, `${otherLangs[i]}.yaml`),
-            newFile,
-        );
+        await saveLangFile(path.join(inputDirectory, `${otherLangs[i]}.yaml`), newFile);
     }
 };
 
@@ -252,10 +240,7 @@ const parseLangFile = async (file /*: string*/) /*: Promise<LangFile>*/ => {
     return blocks;
 };
 /** Make sure the content and blocks are the same in the lang file to fix */
-const makeLangFile = (
-    basedOnLang /*: LangFile*/,
-    content /*: Record<string, string>*/,
-) => {
+const makeLangFile = (basedOnLang /*: LangFile*/, content /*: Record<string, string>*/) => {
     const newBlocks /*: LangFile*/ = [];
     for (const block of basedOnLang) {
         const newBlock /*: LangBlock*/ = {

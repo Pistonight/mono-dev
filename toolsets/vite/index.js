@@ -11,21 +11,14 @@ const ChunkSizeWarningLimit = 4096;
 const ManualChunks = {
     react: ["react", "react-dom", "@fluentui/react-components"],
 };
-const Dedupe = [
-    "@pistonite/pure",
-    "@pistonite/workex",
-    "i18next",
-    "react-i18next",
-];
+const Dedupe = ["@pistonite/pure", "@pistonite/workex", "i18next", "react-i18next"];
 
 const PackageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
 
 const filterDependencies = (input) => {
     const dependencies = PackageJson.dependencies || {};
     const devDependencies = PackageJson.devDependencies || {};
-    return input.filter(
-        (dependency) => dependencies[dependency] || devDependencies[dependency],
-    );
+    return input.filter((dependency) => dependencies[dependency] || devDependencies[dependency]);
 };
 
 const findHttps = () => {
@@ -57,9 +50,7 @@ const findHttps = () => {
             } catch (e) {
                 console.warn(`[mono-dev] failed to read cert.pem: ${e}`);
             }
-            console.log(
-                `[mono-dev] using HTTPS key and cert from "${directory}"`,
-            );
+            console.log(`[mono-dev] using HTTPS key and cert from "${directory}"`);
             return { key, cert, hostname };
         } catch {
             // ignore
@@ -108,9 +99,7 @@ export default function monodev(monoConfig) {
             }
             const originWorkerPlugins = config.worker.plugins;
             config.worker.plugins = () => {
-                const plugins = originWorkerPlugins
-                    ? originWorkerPlugins()
-                    : [];
+                const plugins = originWorkerPlugins ? originWorkerPlugins() : [];
                 plugins.push(...makePlugins());
                 return plugins;
             };
@@ -135,9 +124,7 @@ export default function monodev(monoConfig) {
             config.build = {};
         }
         if (config.build.target) {
-            console.warn(
-                "[mono-dev] not injecting build target because it is already specified",
-            );
+            console.warn("[mono-dev] not injecting build target because it is already specified");
         } else {
             config.build.target = BuildTargets;
         }
@@ -156,12 +143,8 @@ export default function monodev(monoConfig) {
         }
         if (!config.build.rollupOptions.output.manualChunks) {
             config.build.rollupOptions.output.manualChunks = {};
-        } else if (
-            typeof config.build.rollupOptions.output.manualChunks === "function"
-        ) {
-            console.warn(
-                "[mono-dev] not injecting manual chunks because a function is specified.",
-            );
+        } else if (typeof config.build.rollupOptions.output.manualChunks === "function") {
+            console.warn("[mono-dev] not injecting manual chunks because a function is specified.");
         } else {
             for (const key in ManualChunks) {
                 if (config.build.rollupOptions.output.manualChunks[key]) {
@@ -169,8 +152,7 @@ export default function monodev(monoConfig) {
                         `[mono-dev] not injecting manual chunk ${key} because it is already specified`,
                     );
                 } else {
-                    config.build.rollupOptions.output.manualChunks[key] =
-                        ManualChunks[key];
+                    config.build.rollupOptions.output.manualChunks[key] = ManualChunks[key];
                 }
             }
         }
