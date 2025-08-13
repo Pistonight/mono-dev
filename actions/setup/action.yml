@@ -45,7 +45,7 @@ runs:
         repository: Pistonight/mono-dev
         path: mono-dev
         persist-credentials: false
-    - if: ${{ inputs.mono-dev != 'false' }}
+    - if: ${{ inputs.mono-dev != 'false' && inputs.mono-dev != 'true' }}
       uses: actions/checkout@v4
       with:
         repository: Pistonight/mono-dev
