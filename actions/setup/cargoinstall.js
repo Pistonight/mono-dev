@@ -7,7 +7,19 @@ const {
     MONODEV_CARGO_INSTALL_CONFIG,
 } = process.env;
 
-// [crate, { cli, git?: string }][]
+// type Config = {
+//     // binary name
+//     bin: string,
+//     // crate name, default is the same as the binary name
+//     crate?: string,
+//     // git source
+//     git?: string,
+//     // specific git rev to use, ignored if git not present
+//     rev?: string,
+//     // specific version to use
+//     version?: string
+// }
+// Config[]
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_INSTALL_CONFIG);
 console.log(cargoInstallConfigs);
 const isBinstall = `${MONODEV_CARGO_IS_BINSTALL}`.toLowerCase() === "true";
@@ -15,23 +27,31 @@ const isBinstall = `${MONODEV_CARGO_IS_BINSTALL}`.toLowerCase() === "true";
 const HOME = os.homedir();
 
 const isWindows = process.platform === "win32";
-const doInstall = (crate, config) => {
-    let { git, cli } = (config || {});
-    if (!cli) {
-        cli = crate;
+const doInstall = (config) => {
+    let { bin, crate, git, rev, version } = (config || {});
+    if (isBinstall && rev) {
+        throw new Error("binstall does not supported --git --rev, please, specify a package version instead");
     }
-    console.log(`installing ${crate}`);
+    if (!crate) {
+        crate = bin;
+    }
+    const crateArg = version ? `${crate}@${version}` : crate;
+    console.log(`installing ${crateArg}`);
     const args = isBinstall
       ? [
-            "binstall", crate, 
+            "binstall", crateArg, 
+            "--bin", bin,
             "--no-confirm", 
             "--no-discover-github-token", 
             "--disable-strategies", "compile"
         ]
-      : ["install", crate];
+      : ["install", crateArg, "--bin", bin];
     if (git) {
         const [user, repo] = git.split("/" ,2);
         args.push("--git", `https://github.com/${user}/${repo}`);
+        if (rev) {
+            args.push("--rev", rev);
+        }
     }
     const cliReal = `${HOME}/.cargo/bin/${isWindows ? cli + ".exe" : cli}`;
     if (!fs.existsSync(cliReal)) {
@@ -54,6 +74,6 @@ const doInstall = (crate, config) => {
         throw new Error(`cargo exited with code ${child.status}`);
     }
 };
-for (const [crate, config] of cargoInstallConfigs) {
-    doInstall(crate, config);
+for (const config of cargoInstallConfigs) {
+    doInstall(config);
 }

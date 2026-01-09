@@ -69,25 +69,40 @@ if (monodev_rust_wasm) {
     cargoBinaryInstallConfigs.set("wasm-pack", { });
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoBinaryInstallConfigs.set("mdbook", { });
-    cargoBinaryInstallConfigs.set("mdbook-admonish", { });
+    cargoBinaryInstallConfigs.set("mdbook", { version: "0.4.52" });
+    cargoBinaryInstallConfigs.set("mdbook-admonish", { version: "1.20.0" });
+}
+const parseCargoInstallConfigOne = (configString) => {
+    // format:
+    //   CONFIG  := BINARY[=<user>/<repo>[#<rev>]]
+    //   BINARY  := CRATE | <binary>(CRATE)
+    //   CRATE   := <crate>[@<version>]
+
+    const [binarySpec, repoSpec] = configString.split("=", 2);
+    let git = repoSpec?.trim();
+    let rev = "";
+    if (git) {
+        const [userRepoSpec, revSpec] = git.split("#", 2);
+        rev = revSpec?.trim() || "";
+        git = userRepoSpec;
+    }
+    let bin = binarySpec;
+    let crateSpec = binarySpec;
+    if (binarySpec.endsWith(")")) {
+        // <binary>(CRATE)
+        const [binarySpec2, crateSpec2] = binarySpec.substring(0, binarySpec.length-1).split("(", 2);
+        bin = binarySpec2;
+        crateSpec = crateSpec2?.trim() || binarySpec2;
+    }
+    const [crate, versionSpec] = crateSpec.split("@", 2);
+    const version = versionSpec?.trim() || "";
+    return { bin, crate, git, rev, version };
+    
 }
 const parseCargoInstallConfig = (configString, isBInstall) => {
     for (const config of configString.split(",").map(part => part.trim())) {
-        // format: ,-seprated, cli-tool[(crate)][=user/repo]
-        const [crate, repo] = config.split("=", 2);
-        const installConfig = {
-            git: repo?.trim() || "",
-            cli: "",
-        };
-        let crateName;
-        if (crate.includes("(")) {
-            const parts = crate.split("(");
-            crateName = parts[1].replace(")", "").trim();
-            installConfig.cli = parts[0].trim();
-        } else {
-            crateName = crate.trim();
-        }
+        const installConfig = parseCargoInstallConfigOne(config);
+        const crateName = installConfig.crate;
         if (isBInstall) {
             cargoBinaryInstallConfigs.set(crateName, installConfig);
         } else {
@@ -103,8 +118,8 @@ if (MONODEV_TOOL_CARGO_INSTALL) {
 }
 let setup_cargo_binstall = cargoBinaryInstallConfigs.size > 0;
 let need_cargo_install = cargoInstallConfigs.size > 0;
-const cargo_install_config = JSON.stringify(Array.from(cargoInstallConfigs.entries()));
-const cargo_binstall_config = JSON.stringify(Array.from(cargoBinaryInstallConfigs.entries()));
+const cargo_install_config = JSON.stringify(Array.from(cargoInstallConfigs.values()));
+const cargo_binstall_config = JSON.stringify(Array.from(cargoBinaryInstallConfigs.values()));
 
 const rust_targets = new Set();
 const addNativeRustTarget = (arch) => {

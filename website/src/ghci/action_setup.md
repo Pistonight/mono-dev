@@ -61,9 +61,11 @@ jobs:
           # installed tools here are not cached and falling
           # back to compile from source is banned
           #
-          # format: crate to use crates.io or crate=user/repo to use github
-          # if the crate name is different from CLI tool name,
-          # use `cli-tool(crate)=user/repo`
+          # formats:
+          # - crates.io: <crate>
+          # - github: <crate>=<user>/<repo>[#<rev>]
+          # - specific binary: <binary>(<crate>)[=<user>/<repo>[#<rev>]]
+          # - specific version: replace <crate> with <crate>@<version>
           tool-cargo-binstall: ripgrep,workex=Pistonite/workex
 
           # same format as above, but uses cargo install
