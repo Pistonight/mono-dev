@@ -69,8 +69,8 @@ if (monodev_rust_wasm) {
     cargoBinaryInstallConfigs.set("wasm-pack", { });
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoBinaryInstallConfigs.set("mdbook", { version: "0.4.52" });
-    cargoBinaryInstallConfigs.set("mdbook-admonish", { version: "1.20.0" });
+    cargoBinaryInstallConfigs.set("mdbook", { bin: "mdbook", version: "0.4.52" });
+    cargoBinaryInstallConfigs.set("mdbook-admonish", { bin: "mdbook-admonish", version: "1.20.0" });
 }
 const parseCargoInstallConfigOne = (configString) => {
     // format:

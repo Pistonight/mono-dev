@@ -29,6 +29,9 @@ const HOME = os.homedir();
 const isWindows = process.platform === "win32";
 const doInstall = (config) => {
     let { bin, crate, git, rev, version } = (config || {});
+    if (!bin) {
+        throw new Error("binary not specified");
+    }
     if (isBinstall && rev) {
         throw new Error("binstall does not supported --git --rev, please, specify a package version instead");
     }
