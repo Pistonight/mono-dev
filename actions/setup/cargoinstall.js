@@ -53,9 +53,9 @@ const doInstall = (config) => {
             args.push("--rev", rev);
         }
     }
-    const cliReal = `${HOME}/.cargo/bin/${isWindows ? cli + ".exe" : cli}`;
-    if (!fs.existsSync(cliReal)) {
-        console.log(`${cliReal} not found, forcing the install`);
+    const binReal = `${HOME}/.cargo/bin/${isWindows ? bin + ".exe" : bin}`;
+    if (!fs.existsSync(binReal)) {
+        console.log(`${binReal} not found, forcing the install`);
         args.push("--force");
     }
 
