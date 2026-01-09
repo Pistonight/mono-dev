@@ -16,8 +16,6 @@ If the monorepo is meant to be a Rust crate that's cargo-installable/cargo-addab
 directly from git, don't use the submodule approach, as cargo will clone the submodules
 as well, but mono-dev should only be needed during development. The downside is that
 the version won't be tracked by the `.gitsubmodules` file.
-
-Use the `common:setup-mono-dev-at-packages` task to install mono-dev locally to `packages`
 ```
 
 A typical monorepo should look like:
@@ -48,24 +46,27 @@ A typical monorepo should look like:
 ```
 
 The guidelines:
-- All meaningful code and config (including build scripts) should be
-  divided into packages in `packages` directory.
-- Each package should have a `Taskfile.yml` that defines tasks for the package
-- Package can depend on other's tasks by including their `Taskfile.yml`
+- All meaningful code and config (including build scripts) should be divided into packages in `packages` directory.
+- Each package should have a `Taskfile.yml` that defines tasks for that package. For example, `check`, `fix` and `test`.
+- The package structure should be flat. i.e. if `foo` has 2 parts, prefer `packages/foo-part1` and `packages/foo-part2`,
+  instead of `packages/foo/part1` and `packages/foo/part2`.
+  - There can be exceptions if the other part is very small, for example, a single build script.
 - It's preferred for a package to depend on another package through the ecosystem,
   rather than copying files into other packages. For example, if a Rust package
   generates TypeScript code. It's preferred for the TypeScript code be generated inside the Rust package's
   directory. The Rust package can make a package.json to double as a Node package
   and be installed via `package.json`
-- The root `Taskfile.yml` should include all packages's Taskfile.yml under the namespace
+- The root `Taskfile.yml` should include all packages' `Taskfile.yml` under the namespace
   *identical* to the directory name. Note that the directory name doesn't have to be
   the same as the package name. This is to save typing common prefixes. Aliasing the package
-  is not recommended for projects with a lot of packages.
-- The root `Taskfile.yml` should define `check`, `test` and `build` for checking, testing
-  and building all packages. These tasks can be used in CI to simplify the setup
-- Additionally, the root `Taskfile.yml` should declare an `install` task for installing
-  node modules, along with running post-install tasks. Declaring post-install in `Taskfile.yml`
-  is recommended compared to using lifecycle scripts with NPM, as those are NPM specific.
+  is not recommended for projects with a lot of packages. An example for this is the [`botw-ist`](https://github.com/Pistonite/botw-ist/blob/main/Taskfile.yml) repo.
+- The root `Taskfile.yml` can define additional tasks such as `check`, `test` and `build` for checking, testing
+  and building all packages for centralizing and simplifying the CI setup.
+- Additionally, the root `Taskfile.yml` should declare an `install` task for setting up
+  the development environment, such as installing `node_modules`, generating necessarily files (such as `mono-dev`),
+  and running post-install tasks. Declaring post-install in `Taskfile.yml` is recommended compared to using lifecycle scripts with NPM, as those are NPM specific.
+  However, the `install` task should NOT install additional tools globally on the system,
+  as those are machine-specific one-time setup, and not repo-specific.
 
 The root `Cargo.toml` should declare a Cargo Workspace like:
 ```toml
@@ -134,8 +135,8 @@ magoo install https://github.com/Pistonight/mono-dev mono-dev --name mono-dev --
 ```yaml
 tasks:
   install:
-    cmds:
-      - task: common:setup-mono-dev-at-root
+    - rm -rf ./mono-dev
+    - git clone https://github.com/Pistonight/mono-dev
 ```
 
 The second option is better for rust projects that meant to be
