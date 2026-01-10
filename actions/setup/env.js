@@ -62,19 +62,19 @@ if (monodev_rust_src) {
 }
 
 if (monodev_rust_wasm) {
-    cargoBinaryInstallConfigs.push({ bin: "wasm-pack" });
+    cargoBinaryInstallConfigs.push({ crate: "wasm-pack" });
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoBinaryInstallConfigs.push({ bin: "mdbook", version: "0.4.52" });
-    cargoBinaryInstallConfigs.push({ bin: "mdbook-admonish", version: "1.20.0" });
+    cargoBinaryInstallConfigs.push({ crate: "mdbook", version: "0.4.52" });
+    cargoBinaryInstallConfigs.push({ crate: "mdbook-admonish", version: "1.20.0" });
 }
 const parseCargoInstallConfigOne = (configString) => {
     // format:
-    //   CONFIG  := BINARY[=<user>/<repo>[#<rev>]]
-    //   BINARY  := CRATE | <binary>(CRATE)
-    //   CRATE   := <crate>[@<version>]
+    //   CONFIG       := BINARY[=<user>/<repo>[#<rev>]]
+    //   BINARYCRATE  := CRATE | <binary>(CRATE)
+    //   CRATE        := <crate>[@<version>]
 
-    const [binarySpec, repoSpec] = configString.split("=", 2);
+    const [binaryCrateSpec, repoSpec] = configString.split("=", 2);
     let git = repoSpec?.trim();
     let rev = "";
     if (git) {
@@ -82,13 +82,13 @@ const parseCargoInstallConfigOne = (configString) => {
         rev = revSpec?.trim() || "";
         git = userRepoSpec;
     }
-    let bin = binarySpec;
-    let crateSpec = binarySpec;
-    if (binarySpec.endsWith(")")) {
+    let bin = "";
+    let crateSpec = binaryCrateSpec;
+    if (binaryCrateSpec.endsWith(")")) {
         // <binary>(CRATE)
-        const [binarySpec2, crateSpec2] = binarySpec.substring(0, binarySpec.length-1).split("(", 2);
-        bin = binarySpec2;
-        crateSpec = crateSpec2?.trim() || binarySpec2;
+        const [binarySpec, crateSpec2] = binaryCrateSpec.substring(0, binaryCrateSpec.length-1).split("(", 2);
+        bin = binarySpec;
+        crateSpec = crateSpec2?.trim() || binarySpec;
     }
     const [crate, versionSpec] = crateSpec.split("@", 2);
     const version = versionSpec?.trim() || "";

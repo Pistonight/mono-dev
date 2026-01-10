@@ -8,16 +8,16 @@ const {
 } = process.env;
 
 // type Config = {
-//     // binary name
-//     bin: string,
-//     // crate name, default is the same as the binary name
-//     crate?: string,
+//     // binary name (for --bin, default is empty, no --bin)
+//     bin?: string,
+//     // crate name
+//     crate: string,
+//     // specific version to use
+//     version?: string
 //     // git source
 //     git?: string,
 //     // specific git rev to use, ignored if git not present
 //     rev?: string,
-//     // specific version to use
-//     version?: string
 // }
 // Config[]
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_INSTALL_CONFIG);
@@ -29,26 +29,25 @@ const HOME = os.homedir();
 const isWindows = process.platform === "win32";
 const doInstall = (config) => {
     let { bin, crate, git, rev, version } = (config || {});
-    if (!bin) {
-        throw new Error("binary not specified");
+    if (!crate) {
+        throw new Error("crate not specified");
     }
     if (isBinstall && rev) {
         throw new Error("binstall does not supported --git --rev, please, specify a package version instead");
-    }
-    if (!crate) {
-        crate = bin;
     }
     const crateArg = version ? `${crate}@${version}` : crate;
     console.log(`installing ${crateArg}`);
     const args = isBinstall
       ? [
             "binstall", crateArg, 
-            "--bin", bin,
             "--no-confirm", 
             "--no-discover-github-token", 
             "--disable-strategies", "compile"
         ]
-      : ["install", crateArg, "--bin", bin];
+      : ["install", crateArg];
+    if (bin) {
+        args.push("--bin", bin);
+    }
     if (git) {
         const [user, repo] = git.split("/" ,2);
         args.push("--git", `https://github.com/${user}/${repo}`);
