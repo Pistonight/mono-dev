@@ -43,12 +43,8 @@ const node_cache = monodev_ecma_pnpm ? "pnpm" : "";
 
 
 // Rust
-const cargoInstallConfigs = new Map();
-const cargoBinaryInstallConfigs = new Map();
-// ^ format: crate: 
-// { cli?: string, git?: string, b?: boolean }
-// cli = name of the CLI tool if different from crate name
-// git = git repository to install from, if not specified, will use crates.io
+const cargoInstallConfigs = []
+const cargoBinaryInstallConfigs = [];
 
 let rust_toolchain = "";
 if (MONODEV_RUST === "nightly") {
@@ -66,11 +62,11 @@ if (monodev_rust_src) {
 }
 
 if (monodev_rust_wasm) {
-    cargoBinaryInstallConfigs.set("wasm-pack", { });
+    cargoBinaryInstallConfigs.push({ bin: "wasm-pack" });
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoBinaryInstallConfigs.set("mdbook", { bin: "mdbook", version: "0.4.52" });
-    cargoBinaryInstallConfigs.set("mdbook-admonish", { bin: "mdbook-admonish", version: "1.20.0" });
+    cargoBinaryInstallConfigs.push({ bin: "mdbook", version: "0.4.52" });
+    cargoBinaryInstallConfigs.push({ bin: "mdbook-admonish", version: "1.20.0" });
 }
 const parseCargoInstallConfigOne = (configString) => {
     // format:
@@ -102,11 +98,10 @@ const parseCargoInstallConfigOne = (configString) => {
 const parseCargoInstallConfig = (configString, isBInstall) => {
     for (const config of configString.split(",").map(part => part.trim())) {
         const installConfig = parseCargoInstallConfigOne(config);
-        const crateName = installConfig.crate;
         if (isBInstall) {
-            cargoBinaryInstallConfigs.set(crateName, installConfig);
+            cargoBinaryInstallConfigs.push(installConfig);
         } else {
-            cargoInstallConfigs.set(crateName, installConfig);
+            cargoInstallConfigs.push(installConfig);
         }
     }
 }
@@ -118,8 +113,8 @@ if (MONODEV_TOOL_CARGO_INSTALL) {
 }
 let setup_cargo_binstall = cargoBinaryInstallConfigs.size > 0;
 let need_cargo_install = cargoInstallConfigs.size > 0;
-const cargo_install_config = JSON.stringify(Array.from(cargoInstallConfigs.values()));
-const cargo_binstall_config = JSON.stringify(Array.from(cargoBinaryInstallConfigs.values()));
+const cargo_install_config = JSON.stringify(cargoInstallConfigs.values());
+const cargo_binstall_config = JSON.stringify(cargoBinaryInstallConfigs.values());
 
 const rust_targets = new Set();
 const addNativeRustTarget = (arch) => {
