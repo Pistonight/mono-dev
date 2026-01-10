@@ -111,10 +111,10 @@ if (MONODEV_TOOL_CARGO_BINSTALL) {
 if (MONODEV_TOOL_CARGO_INSTALL) {
     parseCargoInstallConfig(MONODEV_TOOL_CARGO_INSTALL, false);
 }
-let setup_cargo_binstall = cargoBinaryInstallConfigs.size > 0;
-let need_cargo_install = cargoInstallConfigs.size > 0;
-const cargo_install_config = JSON.stringify(cargoInstallConfigs.values());
-const cargo_binstall_config = JSON.stringify(cargoBinaryInstallConfigs.values());
+let setup_cargo_binstall = cargoBinaryInstallConfigs.length > 0;
+let need_cargo_install = cargoInstallConfigs.length > 0;
+const cargo_install_config = JSON.stringify(cargoInstallConfigs);
+const cargo_binstall_config = JSON.stringify(cargoBinaryInstallConfigs);
 
 const rust_targets = new Set();
 const addNativeRustTarget = (arch) => {
