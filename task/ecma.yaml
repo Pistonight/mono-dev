@@ -4,37 +4,39 @@
 version: '3'
 
 tasks:
-  mono-config:
-    cmds:
-      - pnpm exec mono-lint --config
-  mono-check-clean:
-    cmds:
-      - pnpm exec mono-lint --clean
-  mono-check:
-    cmds:
-      - pnpm exec mono-lint
-  mono-fix:
-    cmds:
-      - pnpm exec mono-lint --fix
+  config:
+    - pnpm exec monolint --config
+  check-clean:
+    - pnpm exec monolint --clean
+  check:
+    - pnpm exec monolint
+  fix:
+    - pnpm exec monolint --fix
 
-  vite-dev:
-    deps: [mono-config]
-    cmds:
-      - cmd: pnpm exec vite dev --host
-        ignore_error: true
-
-  vite-build:
-    deps: [mono-config]
-    cmds:
-      - pnpm exec vite build
-
-  vitest-watch:
-    deps: [mono-config]
+  vitest-dev:
+    deps: [config]
     cmds:
       - cmd: pnpm exec vitest --watch
         ignore_error: true
 
   vitest:
-    deps: [mono-config]
+    deps: [config]
     cmds:
       - pnpm exec vitest run
+
+  lib-build:
+    - pnpm exec monolibbuild
+     
+
+
+  vite-dev:
+    deps: [config]
+    cmds:
+      - cmd: pnpm exec vite dev --host
+        ignore_error: true
+
+  vite-build:
+    deps: [config]
+    cmds:
+      - pnpm exec vite build
+

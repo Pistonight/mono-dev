@@ -11,13 +11,14 @@ tasks:
       - pnpm install
       - task: install-deps
 
-  pull-book-update:
-    desc: Update the book assets using newer mdbook version
-    cmds:
-      # can comment this out for efficiency,
-      # but --force is needed so mdbook-admonish is built with latest mdbook
-      - cargo install mdbook mdbook-admonish --force 
-      - bun toolsets/mdbook/update.ts
+        # blocker: mdbook-admonish does not support mdbook 0.5
+  # pull-book-update:
+  #   desc: Update the book assets using newer mdbook version
+  #   cmds:
+  #     # can comment this out for efficiency,
+  #     # but --force is needed so mdbook-admonish is built with latest mdbook
+  #     - cargo install mdbook mdbook-admonish --force 
+  #     - bun toolsets/mdbook/update.ts
 
   install-deps:
     cmds:
@@ -52,3 +53,21 @@ tasks:
     cmds:
       - git remote set-url origin git@github.com:Pistonight/mono-dev
       - git push
+
+  upgrade:
+    - >-
+      pnpm up
+      @types/bun @types/node
+      vite @babel/core @rolldown/plugin-babel @types/babel__core babel-plugin-react-compiler
+      react react-dom @types/react @types/react-dom
+      @vitejs/plugin-react
+      vite-plugin-wasm
+      vite-tsconfig-paths
+      @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh
+      globals
+      @modyfi/vite-plugin-yaml
+      typescript
+      typescript-eslint
+      js-yaml
+    - pnpm dedupe
+    - pnpm dedupe --check
