@@ -3,7 +3,6 @@ import fs from "node:fs";
 const {
     MONODEV_RUNNER_OS,
     MONODEV_RUNNER_ARCH,
-    MONODEV_RUNNER,
     MONODEV_ECMA_NODE,
     MONODEV_ECMA_PNPM,
     MONODEV_RUST,
@@ -22,12 +21,9 @@ const bool = (value) => {
     return Boolean(value);
 };
 
-const isGitHub = MONODEV_RUNNER === "github";
 const isWindows = MONODEV_RUNNER_OS === "Windows";
 const isLinux = MONODEV_RUNNER_OS === "Linux";
 const isMacOS = MONODEV_RUNNER_OS === "macOS";
-const runnerType = isGitHub ? "github" : "blacksmith";
-
 
 const monodev_ecma_node = bool(MONODEV_ECMA_NODE);
 const monodev_ecma_pnpm = bool(MONODEV_ECMA_PNPM);
@@ -36,9 +32,7 @@ const monodev_rust_src = bool(MONODEV_RUST_SRC);
 
 
 // NodeJS
-const setup_node = (monodev_ecma_node || monodev_ecma_pnpm)
-  ? runnerType
-  : false;
+const setup_node = !!(monodev_ecma_node || monodev_ecma_pnpm);
 const node_cache = monodev_ecma_pnpm ? "pnpm" : "";
 
 
@@ -150,7 +144,7 @@ if (monodev_rust_src) {
     addNativeRustTarget(MONODEV_RUNNER_ARCH);
 }
 
-const setup_rust = rust_toolchain ? runnerType : false;
+const setup_rust = !!rust_toolchain;
 
 if (monodev_rust_wasm) {
     rust_targets.add("wasm32-unknown-unknown");
