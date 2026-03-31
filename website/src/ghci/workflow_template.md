@@ -31,7 +31,7 @@ jobs:
         with:
           tool-mdbook: true
       - run: task build-pages
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: packages/manual/book
           retention-days: 3
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 ```
 
 ## Full Job > Rust CLI Build & Release
