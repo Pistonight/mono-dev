@@ -14,15 +14,11 @@ tasks:
     - pnpm exec monolint --fix
 
   vitest-dev:
-    deps: [config]
-    cmds:
-      - cmd: pnpm exec vitest --watch
-        ignore_error: true
+    - cmd: pnpm exec vitest --watch
+      ignore_error: true
 
   vitest:
-    deps: [config]
-    cmds:
-      - pnpm exec vitest run
+    - pnpm exec vitest run
 
   lib-build:
     - pnpm exec monolibbuild
