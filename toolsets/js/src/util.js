@@ -25,3 +25,18 @@ export const has_dependency = (package_json, dep) => {
 export const normalize_lineend = (content) => {
     return content.split("\r").map((x) => x.trimEnd()).join("\n");
 }
+
+export const DTS = "_dts_";
+
+/** 
+ * @param {string} input
+ * @param {string} sep
+ * @return {[string, string | undefined]}
+ */
+export const split_once = (input, sep) => {
+    const i = input.indexOf(sep);
+    if (i === -1) {
+        return [input, undefined];
+    }
+    return [input.substring(0, i), input.substring(i+1)];
+};

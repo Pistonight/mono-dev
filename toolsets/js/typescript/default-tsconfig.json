@@ -73,6 +73,11 @@
         // "noPropertyAccessFromIndexSignature": true,       /* Enforces using indexed accessors for keys declared using an indexed type. */
 
         /* === Section: Completeness */
-        "skipLibCheck": true
+        "skipLibCheck": true,
+
+        /* === Lib Build Options */
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": true
     }
 }

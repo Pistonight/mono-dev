@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -8,7 +8,7 @@
         "@babel/core": "^7.29.0",
         "@eslint/js": "^9.39.4",
         "@modyfi/vite-plugin-yaml": "^1.1.1",
-        "@prettier/cli": "^0.9.0",
+        "@prettier/cli": "^0.10.0",
         "@rolldown/plugin-babel": "^0.2.2",
         "@typescript/native-preview": "7.0.0-dev.20250530.1",
         "@vitejs/plugin-react": "^6.0.1",
@@ -19,6 +19,9 @@
         "js-yaml": "^4.1.1",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
+        "serve": "^14.2.6",
+        "typedoc": "^0.28.18",
+        "typedoc-theme-oxide": "^0.2.5",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.57.2",
         "vite": "^8.0.3",
@@ -38,15 +41,16 @@
         "vite": "./toolsets/js/src/vite_main.js",
         "vitest": "./toolsets/js/src/vitest_main.js",
         "monolint": "./toolsets/js/src/monolint_main.js",
-        "monolibbuild": "./toolsets/js/src/monolibbuild_main.js",
-        "mono-langtool": "./toolsets/mono-langtool/main.js"
+        "monolibbuild": "./toolsets/js/src/libbuild_main.js",
+        "monotypedoc": "./toolsets/js/src/monotypedoc_main.js"
     },
     "exports": {
         "./vite": "./toolsets/js/src/vite.js",
         "./vite-config": "./toolsets/js/src/vite_config.js",
         "./vite-types": "./toolsets/js/typedev/vite_client.d.ts",
         "./vitest": "./toolsets/js/src/vitest.js",
-        "./eslint": "./toolsets/js/eslint/index.js"
+        "./lib-build": "./toolsets/js/src/lib_build.js",
+        "./eslint": "./toolsets/js/src/eslint_config.js"
     },
     "nocheck": [
         "/mdbook/css",

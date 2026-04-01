@@ -16,6 +16,7 @@ export const stringify_sorted_indented = (value, indent) => {
     switch(typeof value) {
         case "string":
         case "number":
+        case "boolean":
             return JSON.stringify(value);
         case "object": {
             if (Array.isArray(value)) {
@@ -41,6 +42,8 @@ export const stringify_sorted_indented = (value, indent) => {
                     output += inner;
                     if (i !== value.length - 1) {
                         output += ",\n";
+                    } else {
+                        output += "\n";
                     }
                 }
                 output += prefix;
@@ -70,6 +73,8 @@ export const stringify_sorted_indented = (value, indent) => {
         output += inner;
         if (i !== value.length - 1) {
             output += ",\n";
+        } else {
+            output += "\n";
         }
     }
     output += prefix;

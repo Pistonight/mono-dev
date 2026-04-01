@@ -69,5 +69,8 @@ tasks:
       typescript
       typescript-eslint
       js-yaml
+      vitest
+      typedoc
+      serve
     - pnpm dedupe
     - pnpm dedupe --check

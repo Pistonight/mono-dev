@@ -1,6 +1,6 @@
 import path from "node:path";
 import child_process from "node:child_process";
-import { pathMonodevBin } from "./location.js";
+import { monodev_bin_path } from "./location.js";
 
 /**
  * @param {string}   bin
@@ -11,7 +11,7 @@ export const execute = (bin, args) => {
         bin += ".cmd";
     }
 
-    const binPath = path.join(pathMonodevBin, bin);
+    const binPath = path.join(monodev_bin_path, bin);
 
     // execution is not parallel because:
     // 1. it's very annoying to do that in node
