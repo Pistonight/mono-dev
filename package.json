@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -19,7 +19,6 @@
         "js-yaml": "^4.1.1",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
-        "serve": "^14.2.6",
         "typedoc": "^0.28.18",
         "typedoc-theme-oxide": "^0.2.5",
         "typescript": "^5.9.3",
@@ -39,16 +38,18 @@
     },
     "bin": {
         "vite": "./toolsets/js/src/vite_main.js",
-        "vitest": "./toolsets/js/src/vitest_main.js",
         "monolint": "./toolsets/js/src/monolint_main.js",
         "monolibbuild": "./toolsets/js/src/libbuild_main.js",
+        "monotest": "./toolsets/js/src/monotest_main.js",
         "monotypedoc": "./toolsets/js/src/monotypedoc_main.js"
     },
     "exports": {
         "./vite": "./toolsets/js/src/vite.js",
         "./vite-config": "./toolsets/js/src/vite_config.js",
-        "./vite-types": "./toolsets/js/typedev/vite_client.d.ts",
+        "./vite-types": "./toolsets/js/typedef/vite_client.d.ts",
         "./vitest": "./toolsets/js/src/vitest.js",
+        "./vitest-config": "./toolsets/js/src/vitest_config.js",
+        "./vitest-types": "./toolsets/js/typedef/vitest.d.ts",
         "./lib-build": "./toolsets/js/src/lib_build.js",
         "./eslint": "./toolsets/js/src/eslint_config.js"
     },

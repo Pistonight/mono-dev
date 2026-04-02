@@ -6,9 +6,10 @@ The Standard defines 3 possible project structure.
 This is common for large projects, where multiple small projects and
 external dependencies are integrated.
 
-`mono-dev` is installed into a monorepo as a git submodule:
+`mono-dev` can either be installed into a monorepo as a git submodule,
+or cloned directly into it during setup
 ```
-magoo install https://github.com/Pistonight/mono-dev packages/mono-dev --name mono-dev --branch main
+magoo install https://github.com/Pistonight/mono-dev mono-dev --name mono-dev --branch main
 ```
 
 ```admonish important
@@ -21,6 +22,7 @@ the version won't be tracked by the `.gitsubmodules` file.
 A typical monorepo should look like:
 ```
 - .github/
+- mono-dev/ -> https://github.com/Pistonight/mono-dev
 - packages/
   - some-js-package/
     - src/
@@ -32,7 +34,6 @@ A typical monorepo should look like:
     - .gitignore
     - Cargo.toml
     - Taskfile.yml
-  - mono-dev/ -> https://github.com/Pistonight/mono-dev
 - .gitignore
 - .gitmodules
 - LICENSE
@@ -107,9 +108,13 @@ Dependencies should also be installed into the monorepo. This friction helps ens
 chain doesn't grow out of control.
 
 Also since an atomrepo is inside a monorepo, it can reference `mono-dev` in the same
-repo with the path `../mono-dev`, or `./node_modules/mono-dev` if PNPM is used.
+repo with the path `../../mono-dev`, or `./node_modules/mono-dev` if PNPM is used.
 
 ## Singlerepo
+
+```admonish todo
+this section needs update with new_setup
+```
 This is also a term I made up. This basically refers to simple projects
 that only have to deal with one ecosystem or one language, such as a CLI tool.
 Because the project structure is very simple, it doesn't justify creating

@@ -1,5 +1,9 @@
 # TypeScript/ECMA
 
+```admonish todo
+this section needs updating after everything works
+```
+
 `mono-dev` packages itself as a node module. In TypeScript/ECMAScript
 projects, the package needs to be declared in `package.json` to be
 managed by the package manager. The recommended setup is to link it with `pnpm`

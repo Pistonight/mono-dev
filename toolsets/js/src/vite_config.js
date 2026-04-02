@@ -47,6 +47,14 @@ const monodev = (mono_config) => {
             }
         }
 
+        // === Defines ===
+        if (!config.define) {
+            config.define = {};
+        }
+        if (!("import.meta.vitest" in config.define)) {
+            config.define["import.meta.vitest"] = "undefined";
+        }
+
         // === Package Dependencies ===
         if (!config.resolve) {
             config.resolve = {};

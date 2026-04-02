@@ -39,6 +39,9 @@ export const configure = () => {
     );
 
     return viteDefineConfig({
+        define: {
+            "import.meta.vitest": "undefined",
+        },
         build: {
             sourcemap: true,
             lib: {

@@ -13,12 +13,12 @@ tasks:
   fix:
     - pnpm exec monolint --fix
 
-  vitest-dev:
-    - cmd: pnpm exec vitest --watch
+  test-dev:
+    - cmd: pnpm exec monotest --watch
       ignore_error: true
 
-  vitest:
-    - pnpm exec vitest run
+  test:
+    - pnpm exec monotest run
 
   lib-build:
     - pnpm exec monolibbuild

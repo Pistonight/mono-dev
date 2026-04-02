@@ -39,16 +39,6 @@ tasks:
       - rm -rf website/book
       - mdbook build website
 
-  check:
-    dir: toolsets
-    cmds:
-      - node mono-lint/main.js
-
-  fix:
-    dir: toolsets
-    cmds:
-      - node mono-lint/main.js --fix
-
   git-push:
     cmds:
       - git remote set-url origin git@github.com:Pistonight/mono-dev
@@ -63,14 +53,13 @@ tasks:
       @vitejs/plugin-react
       vite-plugin-wasm
       vite-tsconfig-paths
+      @modyfi/vite-plugin-yaml
       @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh
       globals
-      @modyfi/vite-plugin-yaml
       typescript
       typescript-eslint
       js-yaml
       vitest
-      typedoc
-      serve
+      typedoc typedoc-theme-oxide
     - pnpm dedupe
     - pnpm dedupe --check

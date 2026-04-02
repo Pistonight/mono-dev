@@ -23,7 +23,7 @@ import path from "node:path";
 import { run as prettierCli } from "@prettier/cli";
 
 import { get_monodev_version, get_package_json_path, monodev_path } from "./location.js";
-import { has_dependency, normalize_lineend } from "./util.js";
+import { DTS, has_dependency, normalize_lineend } from "./util.js";
 import { execute } from "./execute.js";
 import { stringify_sorted } from "./json.js";
 
@@ -243,6 +243,7 @@ const create_ts_configs = async (clean, packageJson) => {
     }
     tsDirectories.forEach((dir) => {
         existingTsConfigsToRemove.delete(`tsconfig.${dir}.json`);
+        existingTsConfigsToRemove.delete(`tsconfig.${dir}__${DTS}.json`);
     });
 
     let changed = false;
