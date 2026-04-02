@@ -44,8 +44,6 @@ const run_monotypedoc = async () => {
     };
 
 
-    console.log(options);
-    console.log("[monotypedoc] initializing...");
     const app = await Application.bootstrapWithPlugins(options);
 
     if (watch) {
