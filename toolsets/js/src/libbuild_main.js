@@ -44,10 +44,17 @@ export default configure();
         }
     }
 
+    const tsbuildinfo = `${cache_path}/tsconfig.${src}__${DTS}.tsbuildinfo`;
+    // if we don't delete the incremental build file, tsc will not emit the output
+    // if no rebuild is needed (even if the output is gone because we clean it before building)
+    // -- truly amazing behavior
+    if (fs.existsSync(tsbuildinfo)) {
+        fs.unlinkSync(tsbuildinfo);
+    }
     const tsconfig_modified = {
         extends: `${monodev_path}/toolsets/js/typescript/default-tsconfig.json`,
         compilerOptions: {
-            tsBuildInfoFile: `${cache_path}/tsconfig.${src}__${DTS}.tsbuildinfo`,
+            tsBuildInfoFile: tsbuildinfo,
             noEmit: false,
             outDir: dist+"/"+DTS,
         },
