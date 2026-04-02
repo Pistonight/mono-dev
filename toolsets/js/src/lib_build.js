@@ -17,15 +17,20 @@ export const configure = () => {
         process.exit(1);
     }
     const { exports } = lib_exports;
-    /** @type {string[]} */
-    const external_deps = [];
+    /** @type {Set<string>} */
+    const external_deps = new Set();
 
     if (package_json.dependencies) {
-        external_deps.push(...Object.keys(package_json.dependencies));
+        for (const dep in package_json.dependencies) {
+            add_external_modules(root_path, dep, external_deps);
+        }
     }
     if (package_json.peerDependencies) {
-        external_deps.push(...Object.keys(package_json.peerDependencies));
+        for (const dep in package_json.peerDependencies) {
+            add_external_modules(root_path, dep, external_deps);
+        }
     }
+    // console.log(external_deps);
 
     const entry_config = Object.fromEntries(
         exports.map(({entry_name, source_path_abs}) => {
@@ -55,8 +60,38 @@ export const configure = () => {
                 formats: ["es"],
             },
             rolldownOptions: {
-                external: external_deps
+                external: Array.from(external_deps)
             },
         }
     });
+}
+
+/**
+ * Collect exports from the package and mark them as external (adding to out)
+ *
+ * @param {string} root_path
+ * @param {string} package_name
+ * @param {Set<string>} out
+ */
+const add_external_modules = (root_path, package_name, out) => {
+    // add the default output no matter what
+    out.add(package_name);
+
+    const package_path = path.join(root_path, "node_modules", package_name);
+    const package_json_path = path.join(package_path, "package.json");
+    /** @type {import("./types.ts").PackageJson} */
+    const package_json = JSON.parse(fs.readFileSync(package_json_path, "utf-8"));
+    if (!package_json.exports || typeof package_json.exports === "string") {
+        return;
+    }
+    for (const export_name in package_json.exports) {
+        if (export_name === ".") {
+            continue; // already added above
+        }
+        if (!export_name.startsWith("./")) {
+            console.error(`[monolibbuild] unconventional package exports found for package '${package_name}'`);
+            process.exit(1);
+        }
+        out.add(package_name+export_name.substring(1));
+    }
 }
