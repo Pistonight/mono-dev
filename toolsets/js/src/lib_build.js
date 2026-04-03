@@ -1,7 +1,6 @@
 import path from "node:path";
 import fs from "node:fs";
 import { defineConfig as viteDefineConfig } from "vite";
-import vitePluginTsConfigPaths from "vite-tsconfig-paths";
 
 import { get_package_json_path } from "./location.js";
 import { parse_exports } from "./lib_parse_exports.js";
