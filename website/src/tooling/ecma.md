@@ -1,5 +1,15 @@
 # TypeScript/ECMA
 
+## Tools
+TypeScript projects use:
+- `prettier` for formatting
+- `eslint` for checking code style and issues
+- `tsc` for type checking and generating `d.ts` files for libraries
+- `vitest` for testing
+- `vite` for bundling library or app
+
+#### Template: `mono-dev` dependency
+
 ```admonish todo
 this section needs updating after everything works
 ```
@@ -17,12 +27,7 @@ with `/mono-dev` at the root of the repo.
 }
 ```
 
-```admonish warning
-`pnpm` currently does't support the `link` protocol in catalog, so it has to specified
-in each package.
-```
-
-The build scripts can be included in `Taskfile.yml`
+#### Template: `Taskfile.yml`
 ```yaml
 version: '3'
 
@@ -30,92 +35,89 @@ includes:
   ecma:
     taskfile: ./node_modules/mono-dev/task/ecma.yaml
     internal: true
+    optional: true
 ```
 
-```admonish note
-`./node_modules` can also be `../..` (monorepo package) or `./` (single repo)
-```
+#### Template: `.gitignore`
 
-## Check and Fix
-`mono-dev` ships with its own "zero config" linter `monolint` that wraps
-`tsc`, `eslint` and `prettier` with pre-defined rules.
-
-```yaml
-tasks:
-  check:
-    - task: ecma:check
-  fix:
-    - task: ecma:fix
 ```
-
-It scans the project and generates config files on the fly.
-However, for other tools like `tsserver` to work properly, these config files need to be in the project
-rather than hidden away in some place already ignored by VCS.
-So, you have to add these entries to your `.gitignore`:
-```
+# mono-dev: ecma gitignores
+node_modules
+package-lock.json
 .prettierignore
-/tsconfig*.json
+.eslintcache
 /eslint.config.js
+/tsconfig*.json
+/mono-dev
+/dist
 ```
 
-This is behavior of `mono-lint`:
-- TypeScript projects are directory-based. Each directory is type-checked separately
+## Type Checking
+`mono-dev` automatically generates type checking configs based on directory structure:
+- Each directory is type-checked separately
   and allow for different env config (for example, `src` vs `scripts`)
 - no DOM and no types exist by default. They need to be manually included in `env.d.ts`
   in each directory. Only directories with `env.d.ts` will be checked.
 - If root directory contain any TypeScript stuff, it will be checked as well
 - ESLint only checks the TypeScript projects. If you use ECMAScript, you opt-out of safety anyway
 
+## `package.json > "nocheck"`
 For code that should be involved with type-checking, but ignored for other checks (usually generated code),
 a `"nocheck"` array in top-level of `package.json` can be provided using the same syntax as `.gitignore`,
 for example:
 ```json
 {
-    "devDependencies": {
-        "mono-dev": "link:../../mono-dev"
-    },
     "nocheck": ["/src/generated"]
 }
 ```
-Paths in `nocheck` will not be processed by `eslint` or `prettier`
+Paths in `nocheck` will not be processed by `eslint` or `prettier`.
+If the path is in the form of `/foo` or `foo`, the `foo` directory
+will also not be type-checked.
 
-### Remapping TS Import Path
+## TS Import Path remapping
+
 TS import paths can be remapped in bundled apps to avoid the "relative parent import hell".
-`mono-lint` automatically detects suitable scenarios to generate these import maps using a `self::`
-prefix.
+The only scenario where this is bad is when the package exports raw TypeScript source,
+and therefore downstream cannot resolve the imports correctly because they don't have access
+to the mapping in `tsconfig.json`.
 
-The conditions for import map to be generated are:
-- `package.json` must NOT contain `"name"`, `"file"` or `"exports"` key,
-  AND there is no `src/index.(c|m)?tsx?` file.
-  These suggest the package is a library instead of bundled app
-- The import paths can only be generated for the `src` directory
-- One import path for the first `index.(c|m)?tsx?` found for each
-  directory in `src`.
-    ```admonish example
-    The following directory structure:
-       
-        - src/
-          - app/
-          - util/
-            - image/
-              - index.ts
-            - data/
-              - index.ts
-          - lib/
-            - foo/
-              - index.ts
-            - index.ts
+The mapping is automatically generated if `package.json` doesn't have `exports` or
+if any path in `exports` ends with `.(c|m)?tsx?` and does not end with `.d.ts`.
 
-    generates:
-    
-        self::lib -> ./src/lib/index.ts
-        self::util/image -> ./src/util/image/index.ts
-        self::util/data -> ./src/util/data/index.ts
+Currently, the `src` directory is hardcoded to be the source directory and path mapping
+is only generated for that directory as `self::`. One import path is generated for the first `index.(c|m)?tsx?`
+file found for each nested directory in `src.
 
-    ```
+~~~admonish example
+The following directory structure:
+   
+```
+    - src/
+      - app/
+      - util/
+        - image/
+          - index.ts
+        - data/
+          - index.ts
+      - lib/
+        - foo/
+          - index.ts
+        - index.ts
+```
+
+generates:
+
+```
+    self::lib -> ./src/lib/index.ts
+    self::util/image -> ./src/util/image/index.ts
+    self::util/data -> ./src/util/data/index.ts
+```
+
+~~~
 
 For max interop with tools such as `bun`, the same import map
 will appear in `tsconfig.json` and `tsconfig.src.json`.
+
 
 ## Test
 `mono-dev` re-exports `vitest` for testing. This ensures the version of `vitest`

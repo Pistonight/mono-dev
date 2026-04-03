@@ -52,7 +52,6 @@ tasks:
       react react-dom @types/react @types/react-dom
       @vitejs/plugin-react
       vite-plugin-wasm
-      vite-tsconfig-paths
       @modyfi/vite-plugin-yaml
       @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh
       globals

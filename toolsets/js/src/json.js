@@ -31,21 +31,22 @@ export const stringify_sorted_indented = (value, indent) => {
                     return "[]";
                 }
                 let output = "[\n";
+                let has_value=false;
                 const prefix = " ".repeat(indent);
                 for (let i = 0;i<value.length;i++) {
                     const inner = stringify_sorted_indented(value[i], indent + INDENT);
                     if (inner === undefined) {
                         continue;
                     }
+                    if (has_value) {
+                        output += ",\n";
+                    }
+                    has_value = true;
                     output += prefix;
                     output += " ".repeat(INDENT);
                     output += inner;
-                    if (i !== value.length - 1) {
-                        output += ",\n";
-                    } else {
-                        output += "\n";
-                    }
                 }
+                output += "\n";
                 output += prefix;
                 output += "]";
                 return output;
@@ -61,22 +62,23 @@ export const stringify_sorted_indented = (value, indent) => {
     }
     let output = "{\n";
     const prefix = " ".repeat(indent);
+    let has_value=false;
     for (let i = 0;i<keys.length;i++) {
         const inner = stringify_sorted_indented(value[keys[i]], indent + INDENT);
         if (inner === undefined) {
             continue;
         }
+        if (has_value) {
+            output += ",\n";
+        }
+        has_value = true;
         output += prefix;
         output += " ".repeat(INDENT);
         output += JSON.stringify(keys[i]);
         output += ": ";
         output += inner;
-        if (i !== value.length - 1) {
-            output += ",\n";
-        } else {
-            output += "\n";
-        }
     }
+    output += "\n";
     output += prefix;
     output += "}";
     return output;

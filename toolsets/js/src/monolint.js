@@ -249,7 +249,7 @@ const create_ts_configs = async (clean, packageJson) => {
     let changed = false;
 
     let tsPathMappings = {};
-    if (!("name" in packageJson) && !("exports" in packageJson) && !("file" in packageJson)) {
+    if (should_create_ts_path_mappings(packageJson)) {
         tsPathMappings = await create_ts_path_mappings();
     }
     const hasTsPathMappings = Object.keys(tsPathMappings).length > 0;
@@ -335,6 +335,47 @@ const create_ts_configs = async (clean, packageJson) => {
     }
     return { projectCount, nonTsDirectories };
 }
+/** @param {import("./types.ts").PackageJson} package_json */
+const should_create_ts_path_mappings = (package_json) => {
+    if (!("exports" in package_json)) {
+        return true;
+    }
+    /** @type {string[]} */
+    const all_paths = [];
+    const exports = package_json.exports;
+    if (typeof exports === "string") {
+        all_paths.push(exports);
+    } else {
+        for (const e of Object.values(exports)) {
+            if (typeof e === "string") {
+                all_paths.push(e);
+            } else {
+                if (e.types) {
+                    all_paths.push(e.types);
+                }
+                if (e.import) {
+                    all_paths.push(e.import);
+                }
+            }
+        }
+    }
+
+    for (const p of all_paths) {
+        if (!p) {
+            continue;
+        }
+        if (p.endsWith(".d.ts")) {
+            continue;
+        }
+        if (p.endsWith(".ts") || p.endsWith(".tsx")
+            || p.endsWith(".cts") || p.endsWith(".mts")
+            || p.endsWith(".ctsx") || p.endsWith(".mtsx")
+        ) {
+            return false;
+        }
+    }
+    return true;
+}
 
 /** Create import mapping from `self::` */
 const create_ts_path_mappings = async () => {
@@ -342,9 +383,6 @@ const create_ts_path_mappings = async () => {
     try {
         const top = await fs_promises.readdir("./src");
         for (const p of top) {
-            if (p.match(/index\.(c|m)?tsx?$/)) {
-                return {};
-            }
             const srcPath = `src/${p}`;
             if (fs.statSync(srcPath).isDirectory()) {
                 rest.push(srcPath.replace(/\/+$/, ""));

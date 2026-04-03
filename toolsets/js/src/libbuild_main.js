@@ -43,6 +43,7 @@ export default configure();
             process.exit(1);
         }
     }
+    const the_config = JSON.parse(fs.readFileSync(tsconfig_path, "utf-8"));
 
     const tsbuildinfo = `${cache_path}/tsconfig.${src}__${DTS}.tsbuildinfo`;
     // if we don't delete the incremental build file, tsc will not emit the output
@@ -51,18 +52,13 @@ export default configure();
     if (fs.existsSync(tsbuildinfo)) {
         fs.unlinkSync(tsbuildinfo);
     }
-    const tsconfig_modified = {
-        extends: `${monodev_path}/toolsets/js/typescript/default-tsconfig.json`,
-        compilerOptions: {
-            tsBuildInfoFile: tsbuildinfo,
-            noEmit: false,
-            outDir: dist+"/"+DTS,
-        },
-        include: [ src ],
-        exclude: ["**/*.test.ts","**/*.test.mts","**/*.test.cts","**/*.test.tsx"]
-    };
+
+    the_config.compilerOptions.tsBuildInfoFile = tsbuildinfo;
+    the_config.compilerOptions.noEmit = false;
+    the_config.compilerOptions.outDir = path.join(dist, DTS);
+    the_config.exclude = ["**/*.test.ts","**/*.test.mts","**/*.test.cts","**/*.test.tsx"];
     const tsconfig_modified_path = path.join(root_path, "tsconfig."+src+"__"+DTS+".json");
-    fs.writeFileSync(tsconfig_modified_path, stringify_sorted(tsconfig_modified));
+    fs.writeFileSync(tsconfig_modified_path, stringify_sorted(the_config));
 
     const tsc_child = execute("tsc", ["-p",tsconfig_modified_path]);
     if (tsc_child.status) {
