@@ -1,9 +1,14 @@
 import path from "node:path";
 import fs from "node:fs";
 import { defineConfig as viteDefineConfig } from "vite";
+import vitePluginReact, { reactCompilerPreset as viteBabelReactCompilerPreset } from "@vitejs/plugin-react";
+import vitePluginBabel from "@rolldown/plugin-babel";
+import vitePluginYaml from "@modyfi/vite-plugin-yaml";
+import babelReactCompiler from "babel-plugin-react-compiler";
 
 import { get_package_json_path } from "./location.js";
 import { parse_exports } from "./lib_parse_exports.js";
+import { has_dependency } from "./util.js";
 
 
 export const configure = () => {
@@ -44,8 +49,24 @@ export const configure = () => {
         })
     );
 
+    const plugins = [];
+    plugins.push(vitePluginYaml());
+    if (has_dependency(package_json, "react")) {
+        plugins.push(vitePluginReact());
+        const reactCompilerPreset = viteBabelReactCompilerPreset();
+        reactCompilerPreset.preset = () => {
+            return {
+                plugins: [[babelReactCompiler, {}]]
+            }
+        };
+
+        plugins.push(vitePluginBabel({
+            presets: [reactCompilerPreset]
+        }));
+    }
+
     return viteDefineConfig({
-        // plugins: [ vitePluginTsConfigPaths() ],
+        plugins,
         resolve: {
             tsconfigPaths: true,
         },

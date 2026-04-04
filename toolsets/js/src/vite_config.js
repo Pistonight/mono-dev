@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import vitePluginReact, { reactCompilerPreset as viteBabelReactCompilerPreset } from "@vitejs/plugin-react";
 import vitePluginBabel from "@rolldown/plugin-babel";
-import vitePluginTsConfigPaths from "vite-tsconfig-paths";
 import vitePluginYaml from "@modyfi/vite-plugin-yaml";
 import vitePluginWasm from "vite-plugin-wasm";
 import { has_dependency } from "./util.js";

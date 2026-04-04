@@ -53,7 +53,7 @@ tasks:
       @vitejs/plugin-react
       vite-plugin-wasm
       @modyfi/vite-plugin-yaml
-      @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh
+      @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh eslint-plugin-react-compiler
       globals
       typescript
       typescript-eslint
