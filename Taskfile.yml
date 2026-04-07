@@ -44,6 +44,14 @@ tasks:
       - git remote set-url origin git@github.com:Pistonight/mono-dev
       - git push
 
+  publish:
+    vars:
+      VERSION:
+        sh: jq '.version' package.json | tr -d '"'
+    cmds:
+      - git tag v{{.VERSION}}
+      - git push origin v{{.VERSION}}
+
   upgrade:
     - >-
       pnpm up
