@@ -32,6 +32,9 @@ importers:
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
+      cheerio:
+        specifier: ^1.1.2
+        version: 1.2.0
       eslint:
         specifier: ^9.39.4
         version: 9.39.4
@@ -44,6 +47,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.5.2
         version: 0.5.2(eslint@9.39.4)
+      flexsearch:
+        specifier: ^0.8.212
+        version: 0.8.212
       globals:
         specifier: ^17.4.0
         version: 17.4.0
@@ -56,6 +62,9 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
+      slug:
+        specifier: ^11.0.1
+        version: 11.0.1
       typedoc:
         specifier: ^0.28.18
         version: 0.28.18(typescript@5.9.3)

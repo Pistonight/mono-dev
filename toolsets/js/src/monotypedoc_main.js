@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Application } from "typedoc";
-import { load as typedocThemeOxidePlugin } from "typedoc-theme-oxide";
+import { load as typedocThemeOxidePlugin } from "./typedoc-theme-oxide/plugin/index.js";
 import { get_package_json_path } from "./location.js";
 import { parse_exports } from "./lib_parse_exports.js";
 import { run_monolint } from "./monolint.js";
