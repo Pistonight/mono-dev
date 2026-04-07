@@ -10,6 +10,7 @@ import { run_monolint } from "./monolint.js";
 const run_monotypedoc = async () => {
     const args = process.argv.slice(2);
     const watch = args.includes("--watch") || args.includes("-w");
+    const json = args.includes("--json");
 
     const package_json_path = get_package_json_path();
     const root_path = path.dirname(package_json_path);
@@ -36,7 +37,7 @@ const run_monotypedoc = async () => {
     const options = {
         entryPoints: exports.map(({ source_path_abs }) => source_path_abs),
         entryPointStrategy: "resolve",
-        out: path.join(root_path, "docs"),
+        out: path.join(root_path, json ? "docs.json" : "docs"),
         theme: "oxide",
         plugin: [typedocThemeOxidePlugin],
         tsconfig: tsconfig_path,
@@ -50,13 +51,17 @@ const run_monotypedoc = async () => {
         await app.convertAndWatch(async (project) => {
             await app.generateDocs(project, /** @type {string} */ (options.out));
         });
-    } else {
+    } else  {
         const project = await app.convert();
         if (!project) {
             console.error("[monotypedoc] failed to convert project");
             process.exit(1);
         }
-        await app.generateDocs(project, /** @type {string} */ (options.out));
+        if (json) {
+            await app.generateJson(project, /** @type {string} */ (options.out));
+        } else {
+            await app.generateDocs(project, /** @type {string} */ (options.out));
+        }
     }
 };
 
