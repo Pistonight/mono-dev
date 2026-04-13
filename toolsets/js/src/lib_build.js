@@ -16,6 +16,8 @@ export const configure = () => {
     const root_path = path.dirname(package_json_path);
     /** @type {import("./types.ts").PackageJson} */
     const package_json = JSON.parse(fs.readFileSync(package_json_path, "utf-8"));
+    const options = package_json.monolibbuild || {};
+    const sourcemap_option = "sourcemap" in options ? options.sourcemap : true;
 
     const [lib_exports, error] = parse_exports(root_path, package_json);
     if (error) {
@@ -74,7 +76,7 @@ export const configure = () => {
             "import.meta.vitest": "undefined",
         },
         build: {
-            sourcemap: true,
+            sourcemap: sourcemap_option,
             lib: {
                 entry: entry_config,
                 fileName: (_format, entry_name) => {

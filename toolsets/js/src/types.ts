@@ -9,6 +9,11 @@ export type PackageJson = {
     bundledDependencies?: Record<string, string>,
     nocheck?: string[],
     tsconfig?: any,
+    monolibbuild?: BuildOptions,
+}
+
+export type BuildOptions = {
+    sourcemap?: boolean | "inline" | "hidden"
 }
 
 export type PackageExport = {
