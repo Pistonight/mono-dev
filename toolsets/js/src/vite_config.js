@@ -5,9 +5,8 @@ import vitePluginBabel from "@rolldown/plugin-babel";
 import vitePluginYaml from "@modyfi/vite-plugin-yaml";
 import vitePluginWasm from "vite-plugin-wasm";
 import { has_dependency } from "./util.js";
+import { get_package_json_path } from "./location.js";
 
-// 2025-03-01: Support top level await natively
-const BuildTargets = ["es2022", "edge89", "chrome89", "firefox89", "safari15"];
 const ChunkSizeWarningLimit = 4096;
 // const ManualChunks = {
 //     react: ["react", "react-dom", "@fluentui/react-components"],
@@ -23,12 +22,23 @@ const Dedupe = ["@pistonite/pure", "@pistonite/workex", "i18next", "react-i18nex
 const monodev = (mono_config) => {
     /** @param {import("vite").UserConfig} config */
     return (config) => {
+        const package_json_path = get_package_json_path();
+        /** @type {import("./types.ts").PackageJson} */
+        const packageJson = JSON.parse(fs.readFileSync(package_json_path, "utf-8"));
+        for (const packageToDedupe of filterDependencies(packageJson, Dedupe)) {
+            config.resolve.dedupe.push(packageToDedupe);
+        }
+        const options = packageJson.monolibbuild || {};
+        const sourcemap_option = "sourcemap" in options ? options.sourcemap : true;
+
+        const has_react = has_dependency(packageJson, "react");
+
         console.log("[mono-dev] injecting mono-dev configuration");
         // === Plugins ===
         if (!config.plugins) {
             config.plugins = [];
         }
-        config.plugins.push(...make_plugins(mono_config));
+        config.plugins.push(...make_plugins(mono_config, has_react));
 
         // === Worker Plugins ===
         if ("worker" in mono_config) {
@@ -38,7 +48,7 @@ const monodev = (mono_config) => {
             const original = config.worker.plugins;
             config.worker.plugins = () => {
                 const plugins = original ? original() : [];
-                plugins.push(...make_plugins(mono_config));
+                plugins.push(...make_plugins(mono_config, has_react));
                 return plugins;
             };
             if (mono_config.worker !== "default") {
@@ -58,22 +68,20 @@ const monodev = (mono_config) => {
         if (!config.resolve) {
             config.resolve = {};
         }
+        // tsconfig resolve
+        if (!("tsconfigPaths" in config.resolve)) {
+            config.resolve.tsconfigPaths = true;
+        }
         if (!config.resolve.dedupe) {
             config.resolve.dedupe = [];
-        }
-        const packageJson = JSON.parse(fs.readFileSync("package.json", "utf-8"));
-        for (const packageToDedupe of filterDependencies(packageJson, Dedupe)) {
-            config.resolve.dedupe.push(packageToDedupe);
         }
 
         // === Build Config ===
         if (!config.build) {
             config.build = {};
         }
-        if (config.build.target) {
-            console.warn("[mono-dev] not injecting build target because it is already specified");
-        } else {
-            config.build.target = BuildTargets;
+        if (!("sourcemap" in config.build)) {
+            config.build.sourcemap = sourcemap_option;
         }
         if (config.build.chunkSizeWarningLimit) {
             console.warn(
@@ -146,16 +154,19 @@ export default monodev;
 
 /**
  * @param {import("./vite_config.d.ts").MonodevViteConfig} mono_config
+ * @param {boolean} has_react
  */
-const make_plugins = (mono_config) => {
+const make_plugins = (mono_config, has_react) => {
     const plugins = [];
-    plugins.push(vitePluginTsConfigPaths());
     plugins.push(vitePluginYaml());
-    plugins.push(vitePluginReact());
-    plugins.push(vitePluginBabel({
-        presets: [viteBabelReactCompilerPreset()]
-    }));
+    if (has_react) {
+        plugins.push(vitePluginReact());
+        plugins.push(vitePluginBabel({
+            presets: [viteBabelReactCompilerPreset()]
+        }));
+    }
     if (mono_config.wasm) {
+        // @ts-ignore
         plugins.push(vitePluginWasm());
     }
     return plugins;

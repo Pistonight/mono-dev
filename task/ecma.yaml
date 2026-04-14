@@ -29,17 +29,17 @@ tasks:
     - pnpm exec monotypedoc -w &
     - cmd: live-server -p 8081 docs --poll
       ignore_error: true
+
+  app-build:
+    deps: [config] # needed for tsconfig for path mapping
+    cmds:
+      - pnpm exec vite build
      
 
 
-  vite-dev:
+  app-dev:
     deps: [config]
     cmds:
       - cmd: pnpm exec vite dev --host
         ignore_error: true
-
-  vite-build:
-    deps: [config]
-    cmds:
-      - pnpm exec vite build
 
