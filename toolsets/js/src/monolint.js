@@ -262,9 +262,9 @@ const create_ts_configs = async (clean, packageJson) => {
             return;
         }
         const tsconfigContent = {
-            extends: `${monodev_path}/toolsets/js/typescript/default-tsconfig.json`,
+            extends: path.join(monodev_path, "toolsets", "js", "typescript", "default-tsconfig.json"),
             compilerOptions: {
-                tsBuildInfoFile: `${pathCache}/tsconfig.${dir}.tsbuildinfo`,
+                tsBuildInfoFile: path.join(pathCache, `tsconfig.${dir}.tsbuildinfo`),
             },
             include: [dir],
         };
@@ -287,9 +287,9 @@ const create_ts_configs = async (clean, packageJson) => {
         const tsconfig = "tsconfig._.json";
         if (clean || !existingTsConfigs.has(tsconfig)) {
             const tsconfigContent = {
-                extends: `${monodev_path}/toolsets/js/typescript/default-tsconfig.json`,
+                extends: path.join(monodev_path, "toolsets", "js", "typescript", "default-tsconfig.json"),
                 compilerOptions: {
-                    tsBuildInfoFile: `${pathCache}/tsconfig._.tsbuildinfo`,
+                    tsBuildInfoFile: path.join(pathCache, `tsconfig._.tsbuildinfo`),
                 },
                 include: rootFiles,
             };

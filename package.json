@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.3.8",
+    "version": "0.3.9",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -55,7 +55,8 @@
         "./vitest-config": "./toolsets/js/src/vitest_config.js",
         "./vitest-types": "./toolsets/js/typedef/vitest.d.ts",
         "./lib-build": "./toolsets/js/src/lib_build.js",
-        "./eslint": "./toolsets/js/src/eslint_config.js"
+        "./eslint": "./toolsets/js/src/eslint_config.js",
+        "./toolsets/js/typescript/default-tsconfig.json": "./toolsets/js/typescript/default-tsconfig.json"
     },
     "nocheck": [
         "/mdbook/css",
