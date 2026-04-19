@@ -7,11 +7,10 @@ tasks:
   check-modification:
     cmds:
       - cmd: >
-          if ! [ -z "$(git status --porcelain=v1 | rg '{{.CHECK_PATH}}')" ];
+          status="$(git status --porcelain=v1 | rg '{{.CHECK_PATH}}')";
+          if ! [ -z "$status" ];
           then 
-            for file in $(git ls-files -dmo --exclude-standard); do
-              git diff $file;
-            done;
+            echo "$status";
             echo '{{.CHECK_MESSAGE}} (Make sure the changes are commited)';
             exit 2;
           fi
