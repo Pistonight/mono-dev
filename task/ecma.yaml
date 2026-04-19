@@ -21,21 +21,25 @@ tasks:
     - pnpm exec monotest run
 
   lib-build:
-    - pnpm exec monolibbuild
+    deps: [config]
+    cmds:
+      - pnpm exec monolibbuild
 
   doc-build:
-    - pnpm exec monotypedoc
+    deps: [config]
+    cmds:
+      - pnpm exec monotypedoc
   doc-dev:
-    - pnpm exec monotypedoc -w &
-    - cmd: live-server -p 8081 docs --poll
-      ignore_error: true
+    deps: [config]
+    cmds:
+      - pnpm exec monotypedoc -w &
+      - cmd: live-server -p 8081 docs --poll
+        ignore_error: true
 
   app-build:
     deps: [config] # needed for tsconfig for path mapping
     cmds:
       - pnpm exec vite build
-     
-
 
   app-dev:
     deps: [config]
