@@ -30,6 +30,7 @@ tasks:
         -A clippy::manual_range_contains
         -A clippy::collapsible_if
         -A clippy::collapsible_else_if
+        -A clippy::collapsible_match
     env:
       RUSTDOCFLAGS: -D warnings
     cmds:
