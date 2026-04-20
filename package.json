@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.3.10",
+    "version": "0.3.11",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -61,6 +61,7 @@
     },
     "nocheck": [
         "/mdbook/css",
-        "/mdbook/theme"
+        "/mdbook/theme",
+        "/toolsets/mdbook"
     ]
 }

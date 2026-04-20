@@ -1,4 +1,3 @@
-
 /**
  * "zero config" linting for ECMAScript projects
  *
@@ -33,7 +32,6 @@ import { stringify_sorted } from "./json.js";
 // ("The inferred type of 'x' cannot be named without a reference to 'y'")
 const TSC = "tsc";
 
-
 // the prettierignore file must be here, because paths are resolved
 // relative to where the ignore file is (like .gitignore) and cannot
 // reference outside of the directory
@@ -43,7 +41,6 @@ const pathDotPrettierIgnore = path.join(pathRoot, ".prettierignore");
 const pathCache = path.join(pathRoot, "node_modules/.monolint");
 const pathPrettierCache = path.join(pathCache, ".prettier-cache");
 const pathEslintCache = path.join(pathCache, ".eslint-cache");
-
 
 /** @param {string[]} argv */
 export const run_monolint = async (argv) => {
@@ -90,7 +87,7 @@ export const run_monolint = async (argv) => {
             process.exit(1);
         }
     }
-}
+};
 
 /**
  * Create the configs based on "zero config" rules
@@ -160,7 +157,7 @@ const create_configs = async (clean) => {
         await create_eslint_config(checkIgnoreLines, packageJson, ts.nonTsDirectories);
     }
     return ts.projectCount;
-}
+};
 
 /**
  * Type-Checking
@@ -262,7 +259,13 @@ const create_ts_configs = async (clean, packageJson) => {
             return;
         }
         const tsconfigContent = {
-            extends: path.join(monodev_path, "toolsets", "js", "typescript", "default-tsconfig.json"),
+            extends: path.join(
+                monodev_path,
+                "toolsets",
+                "js",
+                "typescript",
+                "default-tsconfig.json",
+            ),
             compilerOptions: {
                 tsBuildInfoFile: path.join(pathCache, `tsconfig.${dir}.tsbuildinfo`),
             },
@@ -287,13 +290,22 @@ const create_ts_configs = async (clean, packageJson) => {
         const tsconfig = "tsconfig._.json";
         if (clean || !existingTsConfigs.has(tsconfig)) {
             const tsconfigContent = {
-                extends: path.join(monodev_path, "toolsets", "js", "typescript", "default-tsconfig.json"),
+                extends: path.join(
+                    monodev_path,
+                    "toolsets",
+                    "js",
+                    "typescript",
+                    "default-tsconfig.json",
+                ),
                 compilerOptions: {
                     tsBuildInfoFile: path.join(pathCache, `tsconfig._.tsbuildinfo`),
                 },
                 include: rootFiles,
             };
-            await fs_promises.writeFile(tsconfig, normalize_lineend(stringify_sorted(tsconfigContent)));
+            await fs_promises.writeFile(
+                tsconfig,
+                normalize_lineend(stringify_sorted(tsconfigContent)),
+            );
             changed = true;
         }
     }
@@ -325,7 +337,10 @@ const create_ts_configs = async (clean, packageJson) => {
             if (hasTsPathMappings) {
                 tsconfigContent.compilerOptions.paths = tsPathMappings;
             }
-            await fs_promises.writeFile(tsconfig, normalize_lineend(stringify_sorted(tsconfigContent)));
+            await fs_promises.writeFile(
+                tsconfig,
+                normalize_lineend(stringify_sorted(tsconfigContent)),
+            );
         }
     } else {
         if (fs.existsSync("tsconfig.json")) {
@@ -334,7 +349,7 @@ const create_ts_configs = async (clean, packageJson) => {
         }
     }
     return { projectCount, nonTsDirectories };
-}
+};
 /** @param {import("./types.ts").PackageJson} package_json */
 const should_create_ts_path_mappings = (package_json) => {
     if (!("exports" in package_json)) {
@@ -367,15 +382,19 @@ const should_create_ts_path_mappings = (package_json) => {
         if (p.endsWith(".d.ts")) {
             continue;
         }
-        if (p.endsWith(".ts") || p.endsWith(".tsx")
-            || p.endsWith(".cts") || p.endsWith(".mts")
-            || p.endsWith(".ctsx") || p.endsWith(".mtsx")
+        if (
+            p.endsWith(".ts") ||
+            p.endsWith(".tsx") ||
+            p.endsWith(".cts") ||
+            p.endsWith(".mts") ||
+            p.endsWith(".ctsx") ||
+            p.endsWith(".mtsx")
         ) {
             return false;
         }
     }
     return true;
-}
+};
 
 /** Create import mapping from `self::` */
 const create_ts_path_mappings = async () => {
@@ -417,7 +436,7 @@ const create_ts_path_mappings = async () => {
     }
 
     return tsPathMappings;
-}
+};
 
 /**
  * ESLint config
@@ -462,7 +481,6 @@ const create_eslint_config = async (ignore_config_lines, package_json, non_ts_di
         }
     }
 
-
     const config = `import { config } from "mono-dev/eslint";
 export default config({
     ignores: ${stringify_sorted(ignore)},
@@ -471,7 +489,7 @@ export default config({
     tsconfigRootDir: import.meta.dirname
 });`;
     await fs_promises.writeFile("eslint.config.js", normalize_lineend(config));
-}
+};
 
 /** @param {string[]} ignore_config_lines */
 const create_prettier_ignore = async (ignore_config_lines) => {
@@ -492,7 +510,7 @@ const create_prettier_ignore = async (ignore_config_lines) => {
         ignore.push(line);
     }
     await fs_promises.writeFile(pathDotPrettierIgnore, ignore.join("\n"));
-}
+};
 
 const run_tsc = async () => {
     if (TSC === "tsc") {
@@ -517,7 +535,7 @@ const run_tsc = async () => {
         }
     }
     return tsc;
-}
+};
 
 /** @param {boolean} fix */
 const run_eslint = async (fix) => {
@@ -534,7 +552,7 @@ const run_eslint = async (fix) => {
         args.push("--fix");
     }
     return execute("eslint", args);
-}
+};
 
 /** @param {boolean} fix */
 const run_prettier = (fix) => {
@@ -579,4 +597,4 @@ const run_prettier = (fix) => {
     };
 
     return prettierCli(options, {}, {});
-}
+};

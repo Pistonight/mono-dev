@@ -15,11 +15,14 @@ const run_libbuild = async () => {
     if (!fs.existsSync(cache_path)) {
         fs.mkdirSync(cache_path, { recursive: true });
     }
-    const vite_config_path = path.join(cache_path,"vite.config.ts");
-    fs.writeFileSync(vite_config_path, `
+    const vite_config_path = path.join(cache_path, "vite.config.ts");
+    fs.writeFileSync(
+        vite_config_path,
+        `
 import { configure } from "mono-dev/lib-build";
 export default configure();
-`);
+`,
+    );
 
     const vite_child = execute("vite", ["build", "--config", vite_config_path]);
     if (vite_child.status) {
@@ -56,17 +59,16 @@ export default configure();
     the_config.compilerOptions.tsBuildInfoFile = tsbuildinfo;
     the_config.compilerOptions.noEmit = false;
     the_config.compilerOptions.outDir = path.join(dist, DTS);
-    the_config.exclude = ["**/*.test.ts","**/*.test.mts","**/*.test.cts","**/*.test.tsx"];
-    const tsconfig_modified_path = path.join(root_path, "tsconfig."+src+"__"+DTS+".json");
+    the_config.exclude = ["**/*.test.ts", "**/*.test.mts", "**/*.test.cts", "**/*.test.tsx"];
+    const tsconfig_modified_path = path.join(root_path, "tsconfig." + src + "__" + DTS + ".json");
     fs.writeFileSync(tsconfig_modified_path, stringify_sorted(the_config));
 
-    const tsc_child = execute("tsc", ["-p",tsconfig_modified_path]);
+    const tsc_child = execute("tsc", ["-p", tsconfig_modified_path]);
     if (tsc_child.status) {
         console.error("[monolibbuild] dts generation with tsc failed, please see error above");
         process.exit(tsc_child.status || 1);
     }
-    console.log("[monolibbuild] dts generated at "+dist+"/"+DTS);
-}
+    console.log("[monolibbuild] dts generated at " + dist + "/" + DTS);
+};
 
 void run_libbuild();
-

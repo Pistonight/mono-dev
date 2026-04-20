@@ -35,4 +35,4 @@ export const execute = (bin, args) => {
         }
     }
     return child;
-}
+};

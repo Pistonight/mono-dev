@@ -16,16 +16,24 @@ export const parse_exports = (root_path, package_json) => {
     let exports;
     if (typeof package_json.exports === "string") {
         if (!package_json.types) {
-            return [undefined, "'types' field must be specified in package.json when 'exports' is a string"];
+            return [
+                undefined,
+                "'types' field must be specified in package.json when 'exports' is a string",
+            ];
         }
-        exports = { ".": {
-            "import": package_json.exports,
-            "types": package_json.types,
-        }};
+        exports = {
+            ".": {
+                import: package_json.exports,
+                types: package_json.types,
+            },
+        };
     } else {
         exports = package_json.exports;
         if (package_json.types) {
-            return [undefined, "'types' field can only be specified in package.json when 'exports' is a string; use exports.<entry>.types"];
+            return [
+                undefined,
+                "'types' field can only be specified in package.json when 'exports' is a string; use exports.<entry>.types",
+            ];
         }
     }
 
@@ -74,7 +82,10 @@ export const parse_exports = (root_path, package_json) => {
         import_path = import_path.substring(2);
         if (dist) {
             if (!import_path.startsWith(`${dist}/`)) {
-                return [undefined, `dist path must be the same for each entry point, the first is "${dist}"; found import path "${import_path}"`];
+                return [
+                    undefined,
+                    `dist path must be the same for each entry point, the first is "${dist}"; found import path "${import_path}"`,
+                ];
             }
             import_path = import_path.substring(dist.length + 1);
         } else {
@@ -86,29 +97,44 @@ export const parse_exports = (root_path, package_json) => {
             import_path = rest;
         }
         if (!import_path.endsWith(".js")) {
-            return [undefined, `import path must end with ".js": ${import_path} (for entry point '${name}')`];
+            return [
+                undefined,
+                `import path must end with ".js": ${import_path} (for entry point '${name}')`,
+            ];
         }
-        import_path = import_path.substring(0, import_path.length-3);
+        import_path = import_path.substring(0, import_path.length - 3);
 
         if (!type_path.startsWith(`./${dist}/${DTS}/`)) {
-            return [undefined, `types path must be in the format of "./${dist}/${DTS}/<src>/<file>.d.ts"`];
+            return [
+                undefined,
+                `types path must be in the format of "./${dist}/${DTS}/<src>/<file>.d.ts"`,
+            ];
         }
         type_path = type_path.substring(dist.length + DTS.length + 4);
         if (src) {
             if (!type_path.startsWith(`${src}/`)) {
-                return [undefined, `src path must be the same for each entry point, the first is "${src}"; found type path "${type_path}"`];
+                return [
+                    undefined,
+                    `src path must be the same for each entry point, the first is "${src}"; found type path "${type_path}"`,
+                ];
             }
-            type_path = type_path.substring(src.length+1);
+            type_path = type_path.substring(src.length + 1);
         } else {
             const [src_part, rest] = split_once(type_path, "/");
             if (!rest) {
-                return [undefined, `types path must be in the format of "./${dist}/${DTS}/<src>/<file>.d.ts"`];
+                return [
+                    undefined,
+                    `types path must be in the format of "./${dist}/${DTS}/<src>/<file>.d.ts"`,
+                ];
             }
             src = src_part.trim();
             type_path = rest;
         }
         if (type_path !== `${import_path}.d.ts`) {
-            return [undefined, `types path for "./${dist}/${import_path}.js" must be "./${dist}/${DTS}/${src}/${import_path}.d.ts", found "./${dist}/${DTS}/${src}/${type_path}"`];
+            return [
+                undefined,
+                `types path for "./${dist}/${import_path}.js" must be "./${dist}/${DTS}/${src}/${import_path}.d.ts", found "./${dist}/${DTS}/${src}/${type_path}"`,
+            ];
         }
 
         let source_path = path.join(root_path, src, import_path + ".ts");
@@ -117,15 +143,20 @@ export const parse_exports = (root_path, package_json) => {
             source_path += "x";
             is_tsx = true;
             if (!fs.existsSync(source_path)) {
-                return [undefined, `couldn't find source for export path ./dist/${import_path}.js, which should be ./${src}/${import_path}.ts{x}`];
+                return [
+                    undefined,
+                    `couldn't find source for export path ./dist/${import_path}.js, which should be ./${src}/${import_path}.ts{x}`,
+                ];
             }
         }
-        console.log(`[monolibbuild] configured entry "${name}": ${src}/${import_path}.ts${is_tsx ? "x" : ""}`);
+        console.log(
+            `[monolibbuild] configured entry "${name}": ${src}/${import_path}.ts${is_tsx ? "x" : ""}`,
+        );
         parsed_exports.push({
             entry_name: name,
             source_path_abs: source_path,
-            dist_path_rel: import_path + ".js"
-        })
+            dist_path_rel: import_path + ".js",
+        });
     }
 
     if (!parsed_exports.length) {
@@ -133,14 +164,19 @@ export const parse_exports = (root_path, package_json) => {
     }
 
     if (!dist) {
-        return [undefined, "dist directory cannot be \"\""];
+        return [undefined, 'dist directory cannot be ""'];
     }
 
     if (!src) {
-        return [undefined, "src directory cannot be \"\""];
+        return [undefined, 'src directory cannot be ""'];
     }
 
-    return [{
-        dist, src, exports: parsed_exports
-    }, undefined];
-}
+    return [
+        {
+            dist,
+            src,
+            exports: parsed_exports,
+        },
+        undefined,
+    ];
+};

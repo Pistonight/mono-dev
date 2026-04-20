@@ -6,35 +6,33 @@ import YAML from "js-yaml";
 
 /** @type {Record<string, string>} */
 const COMMON_DESCRIPTIONS = {
-    "install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
-    setup:   "One-time setup for the project",
+    "install-cargo-extra-tools":
+        "Install or upgrade extra tools needed for development using cargo onto the system",
+    setup: "One-time setup for the project",
     install: "Install or sync project dependencies",
 
-    clean:   "Remove temporary outputs",
+    clean: "Remove temporary outputs",
     upgrade: "Upgrade tools and/or dependencies",
 
-    check:   "Run linters to check the code",
-    fix:     "Fix style issues",
-    build:   "Build the project",
-    dev:     "Start development server",
-    test:    "Run tests",
+    check: "Run linters to check the code",
+    fix: "Fix style issues",
+    build: "Build the project",
+    dev: "Start development server",
+    test: "Run tests",
 
     release: "Publish a release",
     publish: "Publish a release",
 };
 
-/** 
+/**
  * Find all non-gitignored Taskfile.yml paths under cwd
  * @returns {string[]}
  */
 function find_taskfiles() {
-    const output = execSync(
-        "git ls-files --cached --others --exclude-standard",
-        { encoding: "utf8" },
-    );
-    return output
-        .split("\n")
-        .filter((f) => f === "Taskfile.yml" || f.endsWith("/Taskfile.yml"));
+    const output = execSync("git ls-files --cached --others --exclude-standard", {
+        encoding: "utf8",
+    });
+    return output.split("\n").filter((f) => f === "Taskfile.yml" || f.endsWith("/Taskfile.yml"));
 }
 
 /**
@@ -122,7 +120,9 @@ function process_file(filepath) {
 
         const desc = COMMON_DESCRIPTIONS[name];
         if (!desc) {
-            console.warn(`[monotaskfile] ${filepath}: unknown task "${name}" — add a desc manually`);
+            console.warn(
+                `[monotaskfile] ${filepath}: unknown task "${name}" — add a desc manually`,
+            );
             had_warning = true;
         }
 
@@ -135,7 +135,9 @@ function process_file(filepath) {
                 had_warning = true;
                 continue;
             }
-            console.log(`[monotaskfile] ${filepath}: converted shorthand for "${name}"${desc ? ` and added desc` : ""}`);
+            console.log(
+                `[monotaskfile] ${filepath}: converted shorthand for "${name}"${desc ? ` and added desc` : ""}`,
+            );
             current_text = updated;
         } else if (desc) {
             const updated = insert_desc(current_text, name, desc);

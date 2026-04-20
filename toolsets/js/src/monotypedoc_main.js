@@ -42,9 +42,8 @@ const run_monotypedoc = async () => {
         theme: "oxide",
         plugin: [typedocThemeOxidePlugin],
         tsconfig: tsconfig_path,
-        highlightLanguages: ["typescript", "css", "rust", "bash"]
+        highlightLanguages: ["typescript", "css", "rust", "bash"],
     };
-
 
     const app = await Application.bootstrapWithPlugins(options);
 
@@ -52,7 +51,7 @@ const run_monotypedoc = async () => {
         await app.convertAndWatch(async (project) => {
             await app.generateDocs(project, /** @type {string} */ (options.out));
         });
-    } else  {
+    } else {
         const project = await app.convert();
         if (!project) {
             console.error("[monotypedoc] failed to convert project");

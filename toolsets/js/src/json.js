@@ -3,7 +3,7 @@ const INDENT = 4;
 /** @param {any} value */
 export const stringify_sorted = (value) => {
     return stringify_sorted_indented(value, 0);
-}
+};
 
 /**
  * @param {any} value
@@ -13,7 +13,7 @@ export const stringify_sorted_indented = (value, indent) => {
     if (value === null || value === undefined) {
         return "null";
     }
-    switch(typeof value) {
+    switch (typeof value) {
         case "string":
         case "number":
         case "boolean":
@@ -31,9 +31,9 @@ export const stringify_sorted_indented = (value, indent) => {
                     return "[]";
                 }
                 let output = "[\n";
-                let has_value=false;
+                let has_value = false;
                 const prefix = " ".repeat(indent);
-                for (let i = 0;i<value.length;i++) {
+                for (let i = 0; i < value.length; i++) {
                     const inner = stringify_sorted_indented(value[i], indent + INDENT);
                     if (inner === undefined) {
                         continue;
@@ -62,8 +62,8 @@ export const stringify_sorted_indented = (value, indent) => {
     }
     let output = "{\n";
     const prefix = " ".repeat(indent);
-    let has_value=false;
-    for (let i = 0;i<keys.length;i++) {
+    let has_value = false;
+    for (let i = 0; i < keys.length; i++) {
         const inner = stringify_sorted_indented(value[keys[i]], indent + INDENT);
         if (inner === undefined) {
             continue;
@@ -82,4 +82,4 @@ export const stringify_sorted_indented = (value, indent) => {
     output += prefix;
     output += "}";
     return output;
-}
+};

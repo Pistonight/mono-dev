@@ -6,8 +6,6 @@ import reactCompiler from "eslint-plugin-react-compiler";
 import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 
-
-
 /** @type {import("eslint").ESLint.Plugin} */
 const localPlugin = {
     rules: {
@@ -15,7 +13,8 @@ const localPlugin = {
             meta: {
                 type: "suggestion",
                 messages: {
-                    noKeyofTypeofAlias: "Avoid exporting type aliases of the form 'keyof typeof X'. Inline the type so it shows up in the documentation more precisely.",
+                    noKeyofTypeofAlias:
+                        "Avoid exporting type aliases of the form 'keyof typeof X'. Inline the type so it shows up in the documentation more precisely.",
                 },
             },
             /** @param {import("eslint").Rule.RuleContext} context */
@@ -24,7 +23,11 @@ const localPlugin = {
                     /** @param {any} node */
                     "ExportNamedDeclaration > TSTypeAliasDeclaration"(node) {
                         const t = node.typeAnnotation;
-                        if (t.type === "TSTypeOperator" && t.operator === "keyof" && t.typeAnnotation?.type === "TSTypeQuery") {
+                        if (
+                            t.type === "TSTypeOperator" &&
+                            t.operator === "keyof" &&
+                            t.typeAnnotation?.type === "TSTypeQuery"
+                        ) {
                             context.report({ node, messageId: "noKeyofTypeofAlias" });
                         }
                     },
@@ -35,7 +38,8 @@ const localPlugin = {
             meta: {
                 type: "suggestion",
                 messages: {
-                    noParamDestructure: "Avoid object destructuring in function parameters in library code. Use a named parameter to ensure it is presented properly in generated documentation.",
+                    noParamDestructure:
+                        "Avoid object destructuring in function parameters in library code. Use a named parameter to ensure it is presented properly in generated documentation.",
                 },
             },
             /** @param {import("eslint").Rule.RuleContext} context */
@@ -52,7 +56,8 @@ const localPlugin = {
                     "ExportNamedDeclaration > FunctionDeclaration": checkParams,
                     "ExportDefaultDeclaration > FunctionDeclaration": checkParams,
                     "ExportDefaultDeclaration > FunctionExpression": checkParams,
-                    "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression": checkParams,
+                    "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression":
+                        checkParams,
                     "ExportDefaultDeclaration > ArrowFunctionExpression": checkParams,
                 };
             },
@@ -63,65 +68,64 @@ const localPlugin = {
 /** @param {import("./eslint_config.js").Config} configObj */
 export function config(configObj) {
     const enableReact = configObj.react ?? true;
-    const config = defineConfig(
-        globalIgnores(configObj.ignores || []),
-        {
-            extends: [
-                js.configs.recommended,
-                ...tseslint.configs.strict,
-                ...(enableReact
-                    ? [
-                        reactHooks.configs.flat.recommended,
-                        reactRefresh.configs.vite,
-                        reactCompiler.configs.recommended
-                    ]
-                    : []),
-            ],
-            files: ["**/*.{ts,mts,cts,tsx}"],
-            languageOptions: {
-                ecmaVersion: 2020,
-                globals: globals.browser,
-                parserOptions: {
-                    projectService: true,
-                    tsconfigRootDir: configObj.tsconfigRootDir || undefined,
-                },
-            },
-            settings: {
-                ...(enableReact
-                    ? {
-                          react: { version: "19" },
-                      }
-                    : {}),
-            },
-            plugins: {
-                ...(configObj.isLib ? { "monodev-eslint": localPlugin } : {}),
-            },
-            rules: {
-                ...(enableReact
-                    ? {
-                          "react-refresh/only-export-components": [
-                              "warn",
-                              { allowConstantExport: true },
-                          ],
-                      }
-                    : {}),
-                "no-unused-vars": "off",
-                // force type to be import as type
-                "@typescript-eslint/consistent-type-imports": "warn",
-                // force you to mark floating promises with `void` (warning for ease with testing)
-                "@typescript-eslint/no-floating-promises": "warn",
-                ...(configObj.isLib ? {
-                    // when writing library, use interface when possible gives better presentation
-                    // in the documentation generated by typedoc
-                    "@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
-                    // avoid object destructuring in function params for clearer library APIs
-                    "monodev-eslint/no-param-destructure": "warn",
-                    // avoid exporting keyof typeof aliases as they produce poor typedoc output
-                    "monodev-eslint/no-keyof-typeof-alias": "warn",
-                } : undefined),
+    const config = defineConfig(globalIgnores(configObj.ignores || []), {
+        extends: [
+            js.configs.recommended,
+            ...tseslint.configs.strict,
+            ...(enableReact
+                ? [
+                      reactHooks.configs.flat.recommended,
+                      reactRefresh.configs.vite,
+                      reactCompiler.configs.recommended,
+                  ]
+                : []),
+        ],
+        files: ["**/*.{ts,mts,cts,tsx}"],
+        languageOptions: {
+            ecmaVersion: 2020,
+            globals: globals.browser,
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: configObj.tsconfigRootDir || undefined,
             },
         },
-    );
+        settings: {
+            ...(enableReact
+                ? {
+                      react: { version: "19" },
+                  }
+                : {}),
+        },
+        plugins: {
+            ...(configObj.isLib ? { "monodev-eslint": localPlugin } : {}),
+        },
+        rules: {
+            ...(enableReact
+                ? {
+                      "react-refresh/only-export-components": [
+                          "warn",
+                          { allowConstantExport: true },
+                      ],
+                  }
+                : {}),
+            "no-unused-vars": "off",
+            // force type to be import as type
+            "@typescript-eslint/consistent-type-imports": "warn",
+            // force you to mark floating promises with `void` (warning for ease with testing)
+            "@typescript-eslint/no-floating-promises": "warn",
+            ...(configObj.isLib
+                ? {
+                      // when writing library, use interface when possible gives better presentation
+                      // in the documentation generated by typedoc
+                      "@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
+                      // avoid object destructuring in function params for clearer library APIs
+                      "monodev-eslint/no-param-destructure": "warn",
+                      // avoid exporting keyof typeof aliases as they produce poor typedoc output
+                      "monodev-eslint/no-keyof-typeof-alias": "warn",
+                  }
+                : undefined),
+        },
+    });
 
     return override(config, getDefaultOverrides(configObj));
 }

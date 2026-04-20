@@ -13,5 +13,7 @@ export type Config = {
     isLib?: boolean;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function config(opts: Config): any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function override(opts: Config, override: any): any;

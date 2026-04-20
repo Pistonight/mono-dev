@@ -4,6 +4,6 @@ export const configure = () => {
         test: {
             // include in-source test with import.meta
             includeSource: ["src/**/*.{ts,mts,cts,tsx}"],
-        }
+        },
     });
-}
+};

@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import vitePluginReact, { reactCompilerPreset as viteBabelReactCompilerPreset } from "@vitejs/plugin-react";
+import vitePluginReact, {
+    reactCompilerPreset as viteBabelReactCompilerPreset,
+} from "@vitejs/plugin-react";
 import vitePluginBabel from "@rolldown/plugin-babel";
 import vitePluginYaml from "@modyfi/vite-plugin-yaml";
 import vitePluginWasm from "vite-plugin-wasm";
@@ -12,9 +14,6 @@ const ChunkSizeWarningLimit = 4096;
 //     react: ["react", "react-dom", "@fluentui/react-components"],
 // };
 const Dedupe = ["@pistonite/pure", "@pistonite/workex", "i18next", "react-i18next"];
-
-
-
 
 /**
  * @param {import("./vite_config.d.ts").MonodevViteConfig} mono_config
@@ -140,7 +139,6 @@ const monodev = (mono_config) => {
                                 ...hmrConfig,
                             };
                         }
-
                     }
                 }
             }
@@ -148,8 +146,7 @@ const monodev = (mono_config) => {
 
         return config;
     };
-}
-;
+};
 export default monodev;
 
 /**
@@ -161,9 +158,11 @@ const make_plugins = (mono_config, has_react) => {
     plugins.push(vitePluginYaml());
     if (has_react) {
         plugins.push(vitePluginReact());
-        plugins.push(vitePluginBabel({
-            presets: [viteBabelReactCompilerPreset()]
-        }));
+        plugins.push(
+            vitePluginBabel({
+                presets: [viteBabelReactCompilerPreset()],
+            }),
+        );
     }
     if (mono_config.wasm) {
         // @ts-ignore
@@ -247,7 +246,9 @@ const transformRolldownOutputOption = (output) => {
         return output;
     }
     if ("codeSplitting" in output && typeof output.codeSplitting !== "object") {
-        console.warn("[mono-dev] not injecting code splitting because 'codeSplitting' is specified and not an object");
+        console.warn(
+            "[mono-dev] not injecting code splitting because 'codeSplitting' is specified and not an object",
+        );
         return output;
     }
     // if (!output.codeSplitting) {
@@ -255,4 +256,4 @@ const transformRolldownOutputOption = (output) => {
     // }
     // TODO: check how code is splitted
     return output;
-}
+};

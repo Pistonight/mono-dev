@@ -12,13 +12,16 @@ const run_test = () => {
         fs.mkdirSync(cache_path, { recursive: true });
     }
     const config_path = path.join(cache_path, "vitest.config.js");
-    fs.writeFileSync(config_path, `
+    fs.writeFileSync(
+        config_path,
+        `
 import { configure } from "mono-dev/vitest-config";
 export default configure();
-`);
+`,
+    );
     const args = ["--config", config_path, ...process.argv.slice(2)];
     const child = execute("vitest", args);
     process.exit(child.status ?? 0);
-}
+};
 
 run_test();

@@ -13,7 +13,7 @@ const {
 } = process.env;
 
 const shouldUseZip = (name) => {
-    return name.toLowerCase().includes("pc-windows-msvc")
+    return name.toLowerCase().includes("pc-windows-msvc");
 };
 
 const packPattern = MONODEV_RELEASE_PACK.trim();
@@ -40,7 +40,7 @@ if (packPattern === "true" || packPattern === "**") {
 
 const appendVersion = `${MONODEV_RELEASE_APPEND_VERSION}`.toLowerCase() === "true";
 const hasMinisignKey = `${MONODEV_RELEASE_HAS_MINISIGN_KEY}`.toLowerCase() === "true";
-const outputFiles = (MONODEV_RELEASE_FILES || "").split(" ").filter(file => file.trim()); 
+const outputFiles = (MONODEV_RELEASE_FILES || "").split(" ").filter((file) => file.trim());
 
 const artifactsPath = path.join(MONODEV_RELEASE_WORKSPACE, MONODEV_RELEASE_ARTIFACTS_PATH);
 const BIN = "7z";
@@ -60,16 +60,15 @@ const packDir = (dir_name) => {
             outputFile = `${artifactsPath}/${dir_name}.zip`;
         }
         const child = child_process.spawnSync(
-            BIN, 
-            [
-                "a", "-tzip", 
-                outputFile,
-                `${artifactsPath}/${dir_name}/*`
-            ],
-            { stdio: "inherit" }
+            BIN,
+            ["a", "-tzip", outputFile, `${artifactsPath}/${dir_name}/*`],
+            { stdio: "inherit" },
         );
         if (child.error || child.status !== 0) {
-            console.error(`Error packing ${dir_name} with zip:`, child.error || `Exited with code ${child.status}`);
+            console.error(
+                `Error packing ${dir_name} with zip:`,
+                child.error || `Exited with code ${child.status}`,
+            );
             throw new Error(`Failed to pack ${dir_name} with zip`);
         }
     } else {
@@ -80,32 +79,32 @@ const packDir = (dir_name) => {
         }
         const intermediateTar = `${artifactsPath}/${dir_name}.tar`;
         let child = child_process.spawnSync(
-            BIN, 
-            [
-                "a", "-ttar", 
-                intermediateTar,
-                `${artifactsPath}/${dir_name}/*`
-            ],
-            { stdio: "inherit" }
+            BIN,
+            ["a", "-ttar", intermediateTar, `${artifactsPath}/${dir_name}/*`],
+            { stdio: "inherit" },
         );
         if (child.error || child.status !== 0) {
-            console.error(`Error packing ${dir_name} with tar:`, child.error || `Exited with code ${child.status}`);
+            console.error(
+                `Error packing ${dir_name} with tar:`,
+                child.error || `Exited with code ${child.status}`,
+            );
             throw new Error(`Failed to pack ${dir_name} with tar`);
         }
-        child = child_process.spawnSync(
-            BIN, 
-            [ "a", "-tgzip", outputFile, intermediateTar ],
-            { stdio: "inherit" }
-        );
+        child = child_process.spawnSync(BIN, ["a", "-tgzip", outputFile, intermediateTar], {
+            stdio: "inherit",
+        });
         if (child.error || child.status !== 0) {
-            console.error(`Error packing ${dir_name} with gzip:`, child.error || `Exited with code ${child.status}`);
+            console.error(
+                `Error packing ${dir_name} with gzip:`,
+                child.error || `Exited with code ${child.status}`,
+            );
             throw new Error(`Failed to pack ${dir_name} with gzip`);
         }
         fs.unlinkSync(intermediateTar);
     }
     console.log(`Output file: ${outputFile}`);
     return outputFile;
-}
+};
 const files = fs.readdirSync(artifactsPath);
 for (const file of files) {
     // check if the file is a directory
@@ -120,17 +119,17 @@ for (const file of files) {
     outputFiles.push(outputFile);
 }
 
-const signatureFiles = hasMinisignKey ? outputFiles.map(file => `${file}.sig`) : [];
+const signatureFiles = hasMinisignKey ? outputFiles.map((file) => `${file}.sig`) : [];
 const uploadFiles = [...outputFiles, ...signatureFiles];
 
-const EOF_DELIMITER = "#[#EOF#]#❌"; 
+const EOF_DELIMITER = "#[#EOF#]#❌";
 fs.appendFileSync(
-    process.env.GITHUB_OUTPUT, 
+    process.env.GITHUB_OUTPUT,
     `packed_files=${outputFiles.join(" ")}
 signature_files=${signatureFiles.join(" ")}
 upload_files<<${EOF_DELIMITER}
 ${uploadFiles.join("\n")}
 ${EOF_DELIMITER}
 `,
-    "utf8"
+    "utf8",
 );

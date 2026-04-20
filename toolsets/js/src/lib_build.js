@@ -1,7 +1,9 @@
 import path from "node:path";
 import fs from "node:fs";
 import { defineConfig as viteDefineConfig } from "vite";
-import vitePluginReact, { reactCompilerPreset as viteBabelReactCompilerPreset } from "@vitejs/plugin-react";
+import vitePluginReact, {
+    reactCompilerPreset as viteBabelReactCompilerPreset,
+} from "@vitejs/plugin-react";
 import vitePluginBabel from "@rolldown/plugin-babel";
 import vitePluginYaml from "@modyfi/vite-plugin-yaml";
 import babelReactCompiler from "babel-plugin-react-compiler";
@@ -9,7 +11,6 @@ import babelReactCompiler from "babel-plugin-react-compiler";
 import { get_package_json_path } from "./location.js";
 import { parse_exports } from "./lib_parse_exports.js";
 import { has_dependency } from "./util.js";
-
 
 export const configure = () => {
     const package_json_path = get_package_json_path();
@@ -41,14 +42,14 @@ export const configure = () => {
     // console.log(external_deps);
 
     const entry_config = Object.fromEntries(
-        exports.map(({entry_name, source_path_abs}) => {
+        exports.map(({ entry_name, source_path_abs }) => {
             return [entry_name === "." ? "index" : entry_name, source_path_abs];
-        })
+        }),
     );
     const file_name_config = Object.fromEntries(
-        exports.map(({entry_name, dist_path_rel}) => {
+        exports.map(({ entry_name, dist_path_rel }) => {
             return [entry_name === "." ? "index" : entry_name, dist_path_rel];
-        })
+        }),
     );
 
     const plugins = [];
@@ -58,13 +59,15 @@ export const configure = () => {
         const reactCompilerPreset = viteBabelReactCompilerPreset();
         reactCompilerPreset.preset = () => {
             return {
-                plugins: [[babelReactCompiler, {}]]
-            }
+                plugins: [[babelReactCompiler, {}]],
+            };
         };
 
-        plugins.push(vitePluginBabel({
-            presets: [reactCompilerPreset]
-        }));
+        plugins.push(
+            vitePluginBabel({
+                presets: [reactCompilerPreset],
+            }),
+        );
     }
 
     return viteDefineConfig({
@@ -88,11 +91,11 @@ export const configure = () => {
                 formats: ["es"],
             },
             rolldownOptions: {
-                external: Array.from(external_deps)
+                external: Array.from(external_deps),
             },
-        }
+        },
     });
-}
+};
 
 /**
  * Collect exports from the package and mark them as external (adding to out)
@@ -117,9 +120,11 @@ const add_external_modules = (root_path, package_name, out) => {
             continue; // already added above
         }
         if (!export_name.startsWith("./")) {
-            console.error(`[monolibbuild] unconventional package exports found for package '${package_name}'`);
+            console.error(
+                `[monolibbuild] unconventional package exports found for package '${package_name}'`,
+            );
             process.exit(1);
         }
-        out.add(package_name+export_name.substring(1));
+        out.add(package_name + export_name.substring(1));
     }
-}
+};
