@@ -21,7 +21,7 @@ jobs:
           mono-dev: false
 
       # run the thing
-      - run: task install-deps
+      - run: task copy-website-theme
       - run: task build-website
       - uses: actions/upload-pages-artifact@v3
         with:

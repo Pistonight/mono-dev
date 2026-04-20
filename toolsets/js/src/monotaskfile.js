@@ -17,7 +17,11 @@ const COMMON_DESCRIPTIONS = {
     check: "Run linters to check the code",
     fix: "Fix style issues",
     build: "Build the project",
+    "build-doc": "Build the documentation",
+    "doc": "Build the documentation",
     dev: "Start development server",
+    "dev-doc": "Watch and serve documentation",
+    "dev-app": "Watch and serve the app",
     test: "Run tests",
 
     release: "Publish a release",

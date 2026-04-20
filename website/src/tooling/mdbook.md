@@ -17,11 +17,10 @@ includes:
 tasks:
   install:
     cmds:
-      - task: mdbook:install-theme-monorepo
-```
-```admonish warning
-Because the task needs to copy theme files from `mono-dev`, it needs to
-know where it is. the `-monorepo` suffix uses `../mono-dev`
+      - task: mdbook:install-theme
+        vars:
+          MONO_DEV: mono-dev # path to mono-dev
+          MDBOOK_TARGET: packages/book # path to the mdbook project
 ```
 
 Also ignore the generated `theme` directory

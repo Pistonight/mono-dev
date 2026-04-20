@@ -33,17 +33,8 @@ tasks:
     - node toolsets/js/src/monolint_main.js
   fix:
     - node toolsets/js/src/monolint_main.js --fix
-    
-
 
   dev:
-    desc: Start development server
-    cmds:
-      - task: build-website
-      - mdbook watch website &
-      - live-server website/book -p 8081
-
-  dev2:
     cmds:
       - rm -rf website/book
       - shwoop website/book -w website --host -- mdbook build website
@@ -53,15 +44,6 @@ tasks:
     cmds:
       - rm -rf website/book
       - mdbook build website
-
-  publish:
-    desc: Publish a release
-    vars:
-      VERSION:
-        sh: jq '.version' package.json | tr -d '"'
-    cmds:
-      - git tag v{{.VERSION}}
-      - git push origin v{{.VERSION}}
 
   upgrade:
     desc: Upgrade dependencies
