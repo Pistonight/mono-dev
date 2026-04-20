@@ -1,5 +1,12 @@
 # System Tools
 
+TLDR - 
+- System tools: GNU, `task`
+- Rust: `cargo`
+- ECMA: `node`, `pnpm` and `bun`
+- Python: `uv`
+- C/C++: `cmake`, `ninja`, `clang`, `clangd`, `clang-format` and `clang-tidy`
+
 ## Operating System
 My projects are usually not OS-specific. I daily drive Windows and do my
 development stuff on Linux, sometimes Windows as well. Therefore,
@@ -10,17 +17,14 @@ that pain to the developer by assuming the System Tools already exists
 in `PATH`. These tools are usually cross-platform, so scripts don't
 need to deal with platform-specific commands.
 
+```admonish tip
 On Windows, the easiest way to meet the requirements is to install WSL,
 then install the tools inside WSL.
+```
 
 ## GNU Utils
-GNU Coreutils like `cp`, `rm`, `mkdir` must be available on the system.
+GNU Coreutils like `cp`, `rm`, `mkdir` should be available on the system.
 The build scripts will almost always use these.
-
-```admonish info
-Because `mkdir` is a builtin command on Windows and cannot be overriden/aliases away,
-`which` is also required, and the build scripts will call `$(which mkdir)`
-```
 
 Other GNU utils like `sed`, `wget` might be needed for some projects.
 
@@ -130,29 +134,9 @@ Other JS ecosystem tools used in development are managed as node dependencies,
 so they will automatically be installed local to the project.
 
 ## Python
-```admonish info
-While TypeScript + Bun has decent DX at being a general purpose
-scripting language, to have proper type checking in the IDE, you still
-need `tsconfig.json`, `eslint`, and all of the bloat. Not to mention,
-you need to install all the tools ECMAScript ecosystem uses.
-
-Therefore, for non-ECMAScript projects, it's far more likely that someone
-has `python` installed, compared to `node+npm+pnpm+bun`. Which is why
-Python is the preferred option in non-ECMAScript projects.
-```
-```admonish note
-We always aim at supporting the latest version of Python.
-Hopefully there won't be Python 4.
-```
-
-You can install Python from [Python.org](https://www.python.org/downloads/), from your distro's package
-manager, or through a version manager.
-
-My projects do not use Python in production, so the dependencies are also
-expected to be installed globally. 2 of the most common ones are `tqdm` and `pyyaml`.
-
-If a project does have a complicated Python setup (typically machine-learning-related),
-it will have a dedicated setup instruction.
+[`uv`](https://docs.astral.sh/uv/) is used for Python management.
+Currently, no production Python project exists. So this part of the Standard
+has not been developped.
 
 ## C/C++
 The Standard for C/C++ tooling is experimental, as it differs a lot

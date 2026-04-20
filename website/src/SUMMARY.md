@@ -9,7 +9,7 @@
   - [Usage of AI](./standard/ai_guidelines.md)
   - [Setup HTTPS for Development](./standard/setup_https.md)
   - [Signing](./standard/signing.md)
-- [Tooling](./tooling.md)
+- [Tooling and Templates](./tooling.md)
   - [Common](./tooling/common.md)
   - [TypeScript](./tooling/ecma.md)
   - [Rust](./tooling/cargo.md)

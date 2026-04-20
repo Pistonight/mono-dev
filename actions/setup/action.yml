@@ -5,9 +5,9 @@ inputs:
   skip-checkout:
     default: false
   mono-dev:
-    default: false
-  runner:
-    default: "github"
+    default: true
+  mono-dev-path:
+    default: mono-dev
   submodules:
     default: false
   ecma-node:
@@ -35,21 +35,22 @@ runs:
   using: composite
   steps:
     - if: ${{ inputs.skip-checkout != 'true' }}
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         persist-credentials: false
         submodules: ${{ inputs.submodules }}
     - if: ${{ inputs.mono-dev == 'true' }}
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: Pistonight/mono-dev
-        path: mono-dev
+        path: ${{ inputs.mono-dev-path }}
         persist-credentials: false
     - if: ${{ inputs.mono-dev != 'false' && inputs.mono-dev != 'true' }}
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: Pistonight/mono-dev
-        path: ${{ inputs.mono-dev }}/mono-dev
+        ref: ${{ inputs.mono-dev }}
+        path: ${{ inputs.mono-dev-path }}
         persist-credentials: false
     - uses: arduino/setup-task@v2
       with:
@@ -77,18 +78,13 @@ runs:
 
 
     - if: ${{ inputs.ecma-pnpm == 'true' }}
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v5
       with:
         version: 10
-    - if: ${{ steps.envjs.outputs.setup_node == 'github' }}
-      uses: actions/setup-node@v4
+    - if: ${{ steps.envjs.outputs.setup_node != 'false' }}
+      uses: actions/setup-node@v6 # blacksmith automatically changes to use its cache
       with:
-        node-version: 22
-        cache: ${{ steps.envjs.outputs.node_cache }}
-    - if: ${{ steps.envjs.outputs.setup_node == 'blacksmith' }}
-      uses: useblacksmith/setup-node@v5
-      with:
-        node-version: 22
+        node-version: 24
         cache: ${{ steps.envjs.outputs.node_cache }}
     - if: ${{ inputs.ecma-bun == 'true' }}
       uses: oven-sh/setup-bun@v2
@@ -105,17 +101,13 @@ runs:
       # cargo-binstall needs to be run before the cache step
     - if: ${{ steps.envjs.outputs.setup_cargo_binstall == 'true' }}
       run: node cargoinstall.js
-      working-directory: ${{ github.action_path}}
+      working-directory: ${{ github.action_path }}
       shell: bash
       env:
         MONODEV_CARGO_IS_BINSTALL: true
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
-    - if: ${{ steps.envjs.outputs.setup_rust == 'github' }}
+    - if: ${{ steps.envjs.outputs.setup_rust != 'false' }}
       uses: Swatinem/rust-cache@v2
-      with:
-        key: ${{ steps.envjs.outputs.rust_cache_key }}
-    - if: ${{ steps.envjs.outputs.setup_rust == 'blacksmith' }}
-      uses: useblacksmith/rust-cache@v3
       with:
         key: ${{ steps.envjs.outputs.rust_cache_key }}
     - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' }}

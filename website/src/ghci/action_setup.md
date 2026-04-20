@@ -5,29 +5,25 @@
 ```yaml
 jobs:
   change-me:
-    runs-on: ubuntu-latest
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - uses: Pistonight/mono-dev/actions/setup@main
         with:
           # ALL VALUES BELOW ARE OPTIONAL
           # clone mono-dev in the repo
-          # Use `true` for root of the repo (/mono-dev)
-          # Use a path will clone to that path (`packages` -> /packages/mono-dev)
-          # default is false
+          # Set to `false` to not clone - `true` is the default.
+          # Set to anything else to use a different reference than the main branch
           mono-dev: true
-
-          # whether to use blacksmith-specific steps
-          # rather than github ones. Default is use github
-          runner: blacksmith
+          # Where to clone mono-dev, /mono-dev is the default
+          mono-dev-path: mono-dev
 
           # whether to glone submodules
           # default is false
           submodules: true
 
           # setup NodeJS/PNPM
-          # default false, ecma_pnpm will also setup NodeJS
+          # default false, ecma-pnpm will also setup NodeJS
           ecma-node: true
           ecma-pnpm: false
 

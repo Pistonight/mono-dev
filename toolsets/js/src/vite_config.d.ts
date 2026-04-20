@@ -1,3 +1,5 @@
+import type { UserConfig } from "vite";
+
 export type MonodevViteConfig = {
     /**
      * Look for .cert/cert.key and .cert/cert.pem 2 levels
@@ -18,6 +20,6 @@ export type MonodevViteConfig = {
      */
     worker?: "default" | "es";
 };
-declare function monodev(config: MonodevViteConfig): <T>(x: T) => T;
+declare function monodev(config: MonodevViteConfig): (x: UserConfig) => UserConfig;
 
 export default monodev;

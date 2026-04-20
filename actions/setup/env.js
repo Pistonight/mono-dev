@@ -3,7 +3,6 @@ import fs from "node:fs";
 const {
     MONODEV_RUNNER_OS,
     MONODEV_RUNNER_ARCH,
-    MONODEV_RUNNER,
     MONODEV_ECMA_NODE,
     MONODEV_ECMA_PNPM,
     MONODEV_RUST,
@@ -22,28 +21,21 @@ const bool = (value) => {
     return Boolean(value);
 };
 
-const isGitHub = MONODEV_RUNNER === "github";
 const isWindows = MONODEV_RUNNER_OS === "Windows";
 const isLinux = MONODEV_RUNNER_OS === "Linux";
 const isMacOS = MONODEV_RUNNER_OS === "macOS";
-const runnerType = isGitHub ? "github" : "blacksmith";
-
 
 const monodev_ecma_node = bool(MONODEV_ECMA_NODE);
 const monodev_ecma_pnpm = bool(MONODEV_ECMA_PNPM);
 const monodev_rust_wasm = bool(MONODEV_RUST_WASM);
 const monodev_rust_src = bool(MONODEV_RUST_SRC);
 
-
 // NodeJS
-const setup_node = (monodev_ecma_node || monodev_ecma_pnpm)
-  ? runnerType
-  : false;
+const setup_node = !!(monodev_ecma_node || monodev_ecma_pnpm);
 const node_cache = monodev_ecma_pnpm ? "pnpm" : "";
 
-
 // Rust
-const cargoInstallConfigs = []
+const cargoInstallConfigs = [];
 const cargoBinaryInstallConfigs = [];
 
 let rust_toolchain = "";
@@ -86,17 +78,18 @@ const parseCargoInstallConfigOne = (configString) => {
     let crateSpec = binaryCrateSpec;
     if (binaryCrateSpec.endsWith(")")) {
         // <binary>(CRATE)
-        const [binarySpec, crateSpec2] = binaryCrateSpec.substring(0, binaryCrateSpec.length-1).split("(", 2);
+        const [binarySpec, crateSpec2] = binaryCrateSpec
+            .substring(0, binaryCrateSpec.length - 1)
+            .split("(", 2);
         bin = binarySpec;
         crateSpec = crateSpec2?.trim() || binarySpec;
     }
     const [crate, versionSpec] = crateSpec.split("@", 2);
     const version = versionSpec?.trim() || "";
     return { bin, crate, git, rev, version };
-    
-}
+};
 const parseCargoInstallConfig = (configString, isBInstall) => {
-    for (const config of configString.split(",").map(part => part.trim())) {
+    for (const config of configString.split(",").map((part) => part.trim())) {
         const installConfig = parseCargoInstallConfigOne(config);
         if (isBInstall) {
             cargoBinaryInstallConfigs.push(installConfig);
@@ -104,7 +97,7 @@ const parseCargoInstallConfig = (configString, isBInstall) => {
             cargoInstallConfigs.push(installConfig);
         }
     }
-}
+};
 if (MONODEV_TOOL_CARGO_BINSTALL) {
     parseCargoInstallConfig(MONODEV_TOOL_CARGO_BINSTALL, true);
 }
@@ -139,7 +132,7 @@ const addNativeRustTarget = (arch) => {
         return;
     }
     throw new Error(`Unsupported architecture for native Rust target: ${arch}`);
-}
+};
 if (need_cargo_install && !rust_toolchain) {
     console.log("adding rust toolchain because cargo install is needed");
     rust_toolchain = "stable";
@@ -150,14 +143,14 @@ if (monodev_rust_src) {
     addNativeRustTarget(MONODEV_RUNNER_ARCH);
 }
 
-const setup_rust = rust_toolchain ? runnerType : false;
+const setup_rust = !!rust_toolchain;
 
 if (monodev_rust_wasm) {
     rust_targets.add("wasm32-unknown-unknown");
 }
 let rust_cache_key = "";
 if (MONODEV_RUST_NATIVE) {
-    const nativeArgs = MONODEV_RUST_NATIVE.split(",").map(t => t.trim().toLowerCase());
+    const nativeArgs = MONODEV_RUST_NATIVE.split(",").map((t) => t.trim().toLowerCase());
     for (const arch of nativeArgs) {
         addNativeRustTarget(arch);
     }
@@ -179,7 +172,9 @@ const output = {
     cargo_binstall_config,
 };
 
-const outputString = Object.entries(output).map(([key, value]) => `${key}=${value}`).join("\n");
+const outputString = Object.entries(output)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("\n");
 console.log("Output:");
 console.log(outputString);
 fs.appendFileSync(process.env.GITHUB_OUTPUT, outputString + "\n", "utf8");

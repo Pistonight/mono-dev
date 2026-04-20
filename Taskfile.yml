@@ -7,30 +7,37 @@ includes:
 
 tasks:
   install:
+    desc: Install or sync project dependencies
     cmds:
       - pnpm install
-      - task: install-deps
+      - task: copy-website-theme
 
-  pull-book-update:
-    desc: Update the book assets using newer mdbook version
-    cmds:
-      # can comment this out for efficiency,
-      # but --force is needed so mdbook-admonish is built with latest mdbook
-      - cargo install mdbook mdbook-admonish --force 
-      - bun toolsets/mdbook/update.ts
+        # blocker: mdbook-admonish does not support mdbook 0.5
+  # pull-book-update:
+  #   desc: Update the book assets using newer mdbook version
+  #   cmds:
+  #     # can comment this out for efficiency,
+  #     # but --force is needed so mdbook-admonish is built with latest mdbook
+  #     - cargo install mdbook mdbook-admonish --force 
+  #     - bun toolsets/mdbook/update.ts
 
-  install-deps:
+  copy-website-theme:
+    desc: Copy mdbook themes from the toolset to the website
     cmds:
       - task: mdbook:install-theme
         vars:
           MDBOOK_TARGET: website
           MONO_DEV: .
 
+  check:
+    - node toolsets/js/src/monolint_main.js
+  fix:
+    - node toolsets/js/src/monolint_main.js --fix
+
   dev:
     cmds:
-      - task: build-website
-      - mdbook watch website &
-      - live-server website/book -p 8081
+      - rm -rf website/book
+      - shwoop website/book -w website --host -- mdbook build website
 
   build-website:
     desc: (Re-)build the book
@@ -38,17 +45,24 @@ tasks:
       - rm -rf website/book
       - mdbook build website
 
-  check:
-    dir: toolsets
+  upgrade:
+    desc: Upgrade dependencies
     cmds:
-      - node mono-lint/main.js
-
-  fix:
-    dir: toolsets
-    cmds:
-      - node mono-lint/main.js --fix
-
-  git-push:
-    cmds:
-      - git remote set-url origin git@github.com:Pistonight/mono-dev
-      - git push
+      - rm -rf node_modules
+      - >-
+        pnpm up
+        @types/bun @types/node
+        vite @babel/core @rolldown/plugin-babel @types/babel__core babel-plugin-react-compiler
+        react react-dom @types/react @types/react-dom
+        @vitejs/plugin-react
+        vite-plugin-wasm
+        @modyfi/vite-plugin-yaml
+        @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh eslint-plugin-react-compiler
+        globals
+        typescript
+        typescript-eslint
+        js-yaml
+        vitest
+        typedoc typedoc-theme-oxide
+      - pnpm dedupe
+      - pnpm dedupe --check

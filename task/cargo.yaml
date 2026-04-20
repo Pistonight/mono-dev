@@ -30,26 +30,29 @@ tasks:
         -A clippy::manual_range_contains
         -A clippy::collapsible_if
         -A clippy::collapsible_else_if
+        -A clippy::collapsible_match
     env:
       RUSTDOCFLAGS: -D warnings
     cmds:
       - cargo clippy {{.FLAGS}} -- {{.CLIPPY_FLAGS}}
 
   fmt-check:
-    cmds:
-      - cargo fmt --check
+    - cargo fmt --check
 
   fmt-fix:
-    cmds:
-      - cargo fmt
+    - cargo fmt
+
+  rustfmt-check:
+    - rustfmt --check -l $(find {{.PATH}} -name '*.rs') --edition 2024
+
+  rustfmt-fix:
+    - rustfmt $(find {{.PATH}} -name '*.rs') --edition 2024
 
   watch-serve-doc:
     cmds:
-      - cargo {{.TOOLCHAIN}} doc --target-dir target --no-deps {{.CARGO_ARGS}}
-      - cmd: cargo watch -s "cargo {{.TOOLCHAIN}} doc --target-dir target --no-deps {{.CARGO_ARGS}}" &
-        ignore_error: true
-      - cmd: live-server -p 8081 target/doc
-        ignore_error: true
+      - >
+        shwoop target/doc -w src {{.SHWOOP_ARGS}} -- 
+        cargo {{.TOOLCHAIN}} doc --target-dir target --no-deps {{.CARGO_ARGS}}
 
   wasm-pack-build:
     vars:

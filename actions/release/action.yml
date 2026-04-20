@@ -41,7 +41,7 @@ runs:
       run: mkdir -p ${{ inputs.artifacts-path }}
       shell: bash
     - if: ${{ inputs.artifacts-workflow != '' && inputs.artifacts-path != '' }}
-      uses: dawidd6/action-download-artifact@v6
+      uses: dawidd6/action-download-artifact@v20
       with:
         github_token: ${{ github.token }}
         workflow: ${{ inputs.artifacts-workflow }}
@@ -105,7 +105,7 @@ runs:
         fi
         cat .github/RELEASE_NOTES.md
       shell: bash
-    - uses: softprops/action-gh-release@v2
+    - uses: softprops/action-gh-release@v3
       with:
         draft: true
         body_path: .github/RELEASE_NOTES.md

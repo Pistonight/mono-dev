@@ -12,23 +12,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: ubuntu-latest
+          - image: blacksmith-4vcpu-ubuntu-2404
             target: x64
-          - image: ubuntu-24.04-arm
+          - image: blacksmith-4vcpu-ubuntu-2404-arm
             target: arm64
-          - image: macos-latest
+          - image: blacksmith-6vcpu-macos-latest
             target: arm64
-          - image: windows-latest
+          - image: blacksmith-4vcpu-windows-2025
             target: x64
-          - image: windows-11-arm
-            target: arm64
+          # if needed: blacksmith currently doesn't have windows runners
+          # - image: windows-11-arm
+          #  target: arm64
     runs-on: ${{ matrix.image }}
     steps:
       - uses: Pistonight/mono-dev/actions/setup@main
         with:
           rust: stable
           rust-native: ${{ matrix.target }}
-          rust-src: true
+          # if needed
+          # rust-src: true
       - uses: Pistonight/mono-dev/actions/rust-xplat@main
         with:
           arch: ${{ matrix.target }}

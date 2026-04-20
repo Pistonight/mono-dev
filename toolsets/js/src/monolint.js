@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * "zero config" linting for ECMAScript projects
  *
@@ -18,11 +16,15 @@
  * i.e. the directory containing package.json
  */
 
-import fs from "fs/promises";
-import fsSync from "fs";
-import child_process from "child_process";
-import path from "path";
+import fs from "node:fs";
+import fs_promises from "node:fs/promises";
+import path from "node:path";
 import { run as prettierCli } from "@prettier/cli";
+
+import { get_monodev_version, get_package_json_path, monodev_path } from "./location.js";
+import { DTS, has_dependency, normalize_lineend } from "./util.js";
+import { execute } from "./execute.js";
+import { stringify_sorted } from "./json.js";
 
 // TSGO issues:
 // - doesn't support project references right now
@@ -30,84 +32,62 @@ import { run as prettierCli } from "@prettier/cli";
 // ("The inferred type of 'x' cannot be named without a reference to 'y'")
 const TSC = "tsc";
 
-const pathCurrent = path.resolve(".");
-
 // the prettierignore file must be here, because paths are resolved
 // relative to where the ignore file is (like .gitignore) and cannot
 // reference outside of the directory
-const pathDotPrettierIgnore = ".prettierignore";
-const pathCache = "./node_modules/.mono-lint";
-const pathPrettierCache = `${pathCache}/.prettier-cache`;
-const pathMonodev =
-    path.basename(pathCurrent) === "toolsets" &&
-    path.basename(path.dirname(pathCurrent)) === "mono-dev"
-        ? path.dirname(pathCurrent)
-        : "./node_modules/mono-dev";
-// use the executable from mono-dev's node_modules, so downstream
-// projects don't need to install them
-// an exception is eslint is needed for eslint-lsp,
-// either installed globally or in the workspace
-const pathMonodevBin = path.join(
-    path.dirname(path.dirname(import.meta.dirname)),
-    "node_modules",
-    ".bin",
-);
+const pathCurrProjPackageJson = get_package_json_path();
+const pathRoot = path.dirname(path.resolve(pathCurrProjPackageJson));
+const pathDotPrettierIgnore = path.join(pathRoot, ".prettierignore");
+const pathCache = path.join(pathRoot, "node_modules/.monolint");
+const pathPrettierCache = path.join(pathCache, ".prettier-cache");
+const pathEslintCache = path.join(pathCache, ".eslint-cache");
 
-const pathCurrProjPackageJson = (() => {
-    let curr = pathCurrent;
-    let currJson = path.join(curr, "package.json");
-    while (!fsSync.existsSync(currJson)) {
-        const nextCurr = path.dirname(curr);
-        if (!nextCurr || nextCurr === curr) {
-            return "."; // no package.json found, assuming current directory
-        }
-        curr = nextCurr;
-        currJson = path.join(curr, "package.json");
-    }
-    return currJson;
-})();
-
-async function main() {
+/** @param {string[]} argv */
+export const run_monolint = async (argv) => {
     // arguments:
     // --fix/-f to fix the files
     // --clean to remove cache and regenerate configs
     // --config to only generate the config
-    const argv = process.argv.slice(2);
     const fix = argv.includes("--fix") || argv.includes("-f");
     const clean = argv.includes("--clean") || argv.includes("-c");
-    const configOnly = argv.includes("--config");
+    const config_only = argv.includes("--config") || argv.includes("-g");
 
-    const hasTs = await createConfigs(clean);
-    if (configOnly) {
-        console.log("[mono-lint] config generated");
+    const ts_proj_count = await create_configs(clean);
+    if (config_only) {
+        console.log("[monolint] config generated");
         return;
     }
-    if (fix) {
-        if (hasTs) {
-            const eslint = runEslint(true);
-            if (eslint.status) {
-                console.error("[mono-lint] eslint fix failed, see above");
-                process.exit(1);
-            }
-        }
-        await runPrettier(true);
-    }
 
-    if (hasTs) {
-        const tsc = await runTsc();
+    if (ts_proj_count && !fix) {
+        // run TSC first if not fixing
+        const tsc = await run_tsc();
         if (tsc.status) {
-            console.error("[mono-lint] tsc failed, see above");
-            process.exit(1);
-        }
-        const eslint = runEslint(false);
-        if (eslint.status) {
-            console.error("[mono-lint] eslint failed, see above");
+            console.error("[monolint] tsc failed, see above");
             process.exit(1);
         }
     }
 
-    await runPrettier(false);
-}
+    const eslint = await run_eslint(fix);
+    if (eslint.status) {
+        if (fix) {
+            console.error("[monolint] eslint fix failed, see above");
+        } else {
+            console.error("[monolint] eslint check failed, see above");
+        }
+        process.exit(1);
+    }
+
+    await run_prettier(fix); // will exit if fail
+
+    if (ts_proj_count && !fix) {
+        // run TSC last to verify when fixing
+        const tsc = await run_tsc();
+        if (tsc.status) {
+            console.error("[monolint] tsc failed, see above");
+            process.exit(1);
+        }
+    }
+};
 
 /**
  * Create the configs based on "zero config" rules
@@ -119,24 +99,24 @@ async function main() {
  *
  * TypeScript configs are created based on the presence of env.d.ts files in directories.
  * See https://mono.pistonite.dev/tool_ecma#check-and-fix
+ *
+ * @param {boolean} clean
  */
-async function createConfigs(clean) {
-    const currentVersion = JSON.parse(
-        await fs.readFile(`${pathMonodev}/package.json`),
-    ).version.trim();
+const create_configs = async (clean) => {
+    const current_version = get_monodev_version();
     // using sync operations here so they are less likely to fail, and when they do,
     // it's possible to catch them
-    if (!(await exists(pathCache))) {
-        fsSync.mkdirSync(pathCache, { recursive: true });
-        fsSync.writeFileSync(`${pathCache}/version`, currentVersion);
+    if (!fs.existsSync(pathCache)) {
+        fs.mkdirSync(pathCache, { recursive: true });
+        fs.writeFileSync(`${pathCache}/version`, current_version);
     } else {
         if (!clean) {
             // check if mono-dev version was bumped
             try {
-                const version = fsSync.readFileSync(`${pathCache}/version`, "utf-8").trim();
-                if (version !== currentVersion) {
+                const version = fs.readFileSync(`${pathCache}/version`, "utf-8").trim();
+                if (version !== current_version) {
                     console.log(
-                        `[mono-lint] generating clean configs because of version update: ${version} -> ${currentVersion}`,
+                        `[monolint] generating clean configs because of version update: ${version} -> ${current_version}`,
                     );
                     clean = true;
                 }
@@ -145,20 +125,20 @@ async function createConfigs(clean) {
             }
         }
         if (clean) {
-            fsSync.rmSync(pathCache, { recursive: true });
-            fsSync.mkdirSync(pathCache, { recursive: true });
+            fs.rmSync(pathCache, { recursive: true });
+            fs.mkdirSync(pathCache, { recursive: true });
             // this can fail for some reason
             try {
-                fsSync.writeFileSync(`${pathCache}/version`, currentVersion);
+                fs.writeFileSync(`${pathCache}/version`, current_version);
             } catch {
-                console.error("[mono-lint] failed to write version file, will retry next time");
+                console.error("[monolint] failed to write version file, will retry next time");
             }
         }
     }
-    const packageJson = JSON.parse(await fs.readFile(pathCurrProjPackageJson, "utf-8"));
+    const packageJson = JSON.parse(fs.readFileSync(pathCurrProjPackageJson, "utf-8"));
     let checkIgnoreLines = [];
     try {
-        const gitignore = await fs.readFile(".gitignore", "utf-8");
+        const gitignore = fs.readFileSync(path.join(pathRoot, ".gitignore"), "utf-8");
         checkIgnoreLines = gitignore
             .split("\n")
             .map((line) => line.trim())
@@ -170,14 +150,14 @@ async function createConfigs(clean) {
         checkIgnoreLines.push(...packageJson.nocheck);
     }
     const [ts] = await Promise.all([
-        createTsConfigs(clean, packageJson),
-        createPrettierIgnore(checkIgnoreLines),
+        create_ts_configs(clean, packageJson),
+        create_prettier_ignore(checkIgnoreLines),
     ]);
     if (ts.projectCount) {
-        await createEslintConfig(checkIgnoreLines, packageJson, ts.nonTsDirectories);
+        await create_eslint_config(checkIgnoreLines, packageJson, ts.nonTsDirectories);
     }
     return ts.projectCount;
-}
+};
 
 /**
  * Type-Checking
@@ -191,26 +171,51 @@ async function createConfigs(clean) {
  * If any ts file is found in the root directory, the root
  * will also be considered a type-checking directory.
  *
- * Also consider adding /tsconfig.*.json to .gitignore
+ * Also please add /tsconfig.*.json to .gitignore
+ *
+ * @param {boolean} clean
+ * @param {import("./types.ts").PackageJson} packageJson
  */
-async function createTsConfigs(clean, packageJson) {
+const create_ts_configs = async (clean, packageJson) => {
     const existingTsConfigs = new Set();
     const tsDirectories = [];
     const rootFiles = [];
     const nonTsDirectories = [];
 
-    const promises = (await fs.readdir(".")).map(async (p) => {
+    /** @type {Set<string>} */
+    const ignore_paths = new Set();
+    if (packageJson.nocheck) {
+        for (const path of packageJson.nocheck) {
+            if (path.startsWith("/") && !path.substring(1).includes("/")) {
+                // /foo
+                ignore_paths.add(path.substring(1));
+                continue;
+            }
+            if (!path.includes("/")) {
+                // foo
+                ignore_paths.add(path);
+                continue;
+            }
+        }
+    }
+
+    const promises = (await fs_promises.readdir(".")).map(async (p) => {
+        const basename = path.basename(p);
+        if (ignore_paths.has(basename)) {
+            nonTsDirectories.push(p);
+            return;
+        }
         let stats;
         try {
-            stats = await fs.stat(p);
+            stats = await fs_promises.stat(p);
         } catch (e) {
             console.error(e);
-            console.warn(`[mono-lint] cannot stat ${p}, skipping`);
+            console.warn(`[monolint] cannot stat ${p}, skipping`);
             return;
         }
         if (stats.isDirectory()) {
             const envFile = path.join(p, "env.d.ts");
-            if (!(await exists(envFile))) {
+            if (!fs.existsSync(envFile)) {
                 nonTsDirectories.push(p);
             } else {
                 tsDirectories.push(p);
@@ -235,13 +240,14 @@ async function createTsConfigs(clean, packageJson) {
     }
     tsDirectories.forEach((dir) => {
         existingTsConfigsToRemove.delete(`tsconfig.${dir}.json`);
+        existingTsConfigsToRemove.delete(`tsconfig.${dir}__${DTS}.json`);
     });
 
     let changed = false;
 
     let tsPathMappings = {};
-    if (!("name" in packageJson) && !("exports" in packageJson) && !("file" in packageJson)) {
-        tsPathMappings = await createTsPathMappings();
+    if (should_create_ts_path_mappings(packageJson)) {
+        tsPathMappings = await create_ts_path_mappings();
     }
     const hasTsPathMappings = Object.keys(tsPathMappings).length > 0;
 
@@ -253,23 +259,29 @@ async function createTsConfigs(clean, packageJson) {
             return;
         }
         const tsconfigContent = {
-            extends: `${pathMonodev}/toolsets/mono-lint/default-tsconfig.json`,
+            extends: path.join(
+                monodev_path,
+                "toolsets",
+                "js",
+                "typescript",
+                "default-tsconfig.json",
+            ),
             compilerOptions: {
-                tsBuildInfoFile: `${pathCache}/tsconfig.${dir}.tsbuildinfo`,
+                tsBuildInfoFile: path.join(pathCache, `tsconfig.${dir}.tsbuildinfo`),
             },
             include: [dir],
         };
         if (dir === "src" && hasTsPathMappings) {
             tsconfigContent.compilerOptions.paths = tsPathMappings;
         }
-        await fs.writeFile(tsconfig, JSON.stringify(tsconfigContent, null, 4));
+        await fs_promises.writeFile(tsconfig, normalize_lineend(stringify_sorted(tsconfigContent)));
         changed = true;
     });
 
     const removeExisting = (async () => {
         for (const tsconfig of existingTsConfigsToRemove) {
-            console.log(`[mono-lint] removing ${tsconfig}`);
-            await fs.unlink(tsconfig);
+            console.log(`[monolint] removing ${tsconfig}`);
+            await fs_promises.unlink(tsconfig);
             changed = true;
         }
     })();
@@ -278,13 +290,22 @@ async function createTsConfigs(clean, packageJson) {
         const tsconfig = "tsconfig._.json";
         if (clean || !existingTsConfigs.has(tsconfig)) {
             const tsconfigContent = {
-                extends: `${pathMonodev}/toolsets/mono-lint/default-tsconfig.json`,
+                extends: path.join(
+                    monodev_path,
+                    "toolsets",
+                    "js",
+                    "typescript",
+                    "default-tsconfig.json",
+                ),
                 compilerOptions: {
-                    tsBuildInfoFile: `${pathCache}/tsconfig._.tsbuildinfo`,
+                    tsBuildInfoFile: path.join(pathCache, `tsconfig._.tsbuildinfo`),
                 },
                 include: rootFiles,
             };
-            await fs.writeFile(tsconfig, JSON.stringify(tsconfigContent, null, 4));
+            await fs_promises.writeFile(
+                tsconfig,
+                normalize_lineend(stringify_sorted(tsconfigContent)),
+            );
             changed = true;
         }
     }
@@ -295,7 +316,7 @@ async function createTsConfigs(clean, packageJson) {
     await Promise.all(directoryPromises);
 
     if (projectCount) {
-        if (changed || clean || !(await exists("tsconfig.json"))) {
+        if (changed || clean || !fs.existsSync("tsconfig.json")) {
             const references = tsDirectories.map((dir) => ({
                 path: `./tsconfig.${dir}.json`,
             }));
@@ -304,6 +325,7 @@ async function createTsConfigs(clean, packageJson) {
             }
             const tsconfig = "tsconfig.json";
 
+            /** @type {any} */
             let packageTsConfig = packageJson.tsconfig || {};
 
             const tsconfigContent = {
@@ -315,32 +337,79 @@ async function createTsConfigs(clean, packageJson) {
             if (hasTsPathMappings) {
                 tsconfigContent.compilerOptions.paths = tsPathMappings;
             }
-            await fs.writeFile(tsconfig, JSON.stringify(tsconfigContent, null, 4));
+            await fs_promises.writeFile(
+                tsconfig,
+                normalize_lineend(stringify_sorted(tsconfigContent)),
+            );
         }
     } else {
-        if (await exists("tsconfig.json")) {
-            console.log("[mono-lint] removing tsconfig.json");
-            await fs.unlink("tsconfig.json");
+        if (fs.existsSync("tsconfig.json")) {
+            console.log("[monolint] removing tsconfig.json");
+            await fs_promises.unlink("tsconfig.json");
         }
     }
     return { projectCount, nonTsDirectories };
-}
+};
+/** @param {import("./types.ts").PackageJson} package_json */
+const should_create_ts_path_mappings = (package_json) => {
+    if (!("exports" in package_json)) {
+        return true;
+    }
+    /** @type {string[]} */
+    const all_paths = [];
+    const exports = package_json.exports;
+    if (typeof exports === "string") {
+        all_paths.push(exports);
+    } else {
+        for (const e of Object.values(exports)) {
+            if (typeof e === "string") {
+                all_paths.push(e);
+            } else {
+                if (e.types) {
+                    all_paths.push(e.types);
+                }
+                if (e.import) {
+                    all_paths.push(e.import);
+                }
+            }
+        }
+    }
 
-async function createTsPathMappings() {
+    for (const p of all_paths) {
+        if (!p) {
+            continue;
+        }
+        if (p.endsWith(".d.ts")) {
+            continue;
+        }
+        if (
+            p.endsWith(".ts") ||
+            p.endsWith(".tsx") ||
+            p.endsWith(".cts") ||
+            p.endsWith(".mts") ||
+            p.endsWith(".ctsx") ||
+            p.endsWith(".mtsx")
+        ) {
+            return false;
+        }
+    }
+    return true;
+};
+
+/** Create import mapping from `self::` */
+const create_ts_path_mappings = async () => {
     let rest = [];
     try {
-        const top = await fs.readdir("./src");
+        const top = await fs_promises.readdir("./src");
         for (const p of top) {
-            if (p.match(/index\.(c|m)?tsx?$/)) {
-                return {};
-            }
             const srcPath = `src/${p}`;
-            if ((await fs.stat(srcPath)).isDirectory()) {
+            if (fs.statSync(srcPath).isDirectory()) {
                 rest.push(srcPath.replace(/\/+$/, ""));
             }
         }
     } catch {}
 
+    /** @type {Record<string, string[]>}*/
     const tsPathMappings = {};
 
     while (rest.length) {
@@ -349,7 +418,7 @@ async function createTsPathMappings() {
             break;
         }
         try {
-            const files = await fs.readdir(next);
+            const files = await fs_promises.readdir(next);
             let dirs = [];
             for (const f of files) {
                 const srcPath = `${next}/${f}`;
@@ -358,7 +427,7 @@ async function createTsPathMappings() {
                     dirs = [];
                     break;
                 }
-                if ((await fs.stat(srcPath)).isDirectory()) {
+                if (fs.statSync(srcPath).isDirectory()) {
                     dirs.push(srcPath.replace(/\/+$/, ""));
                 }
             }
@@ -366,10 +435,8 @@ async function createTsPathMappings() {
         } catch {}
     }
 
-    const entries = Object.entries(tsPathMappings);
-    entries.sort(([a], [b]) => a.localeCompare(b));
-    return Object.fromEntries(entries);
-}
+    return tsPathMappings;
+};
 
 /**
  * ESLint config
@@ -378,31 +445,19 @@ async function createTsPathMappings() {
  *
  * If "react" is found in any dependencies, then react plugins and rules
  * are loaded, otherwise they are not.
+ *
+ * @param {string[]} ignore_config_lines
+ * @param {import("./types.ts").PackageJson} package_json
+ * @param {string[]} non_ts_dirs
  */
-
-async function createEslintConfig(checkIgnoreLines, packageJson, nonTsDirectories) {
-    let react = false;
-    if (packageJson.dependencies) {
-        react = "react" in packageJson.dependencies;
-    }
-    if (!react && packageJson.devDependencies) {
-        react = "react" in packageJson.devDependencies;
-    }
-    if (!react && packageJson.peerDependencies) {
-        react = "react" in packageJson.peerDependencies;
-    }
-    if (!react && packageJson.optionalDependencies) {
-        react = "react" in packageJson.optionalDependencies;
-    }
-    if (!react && packageJson.bundledDependencies) {
-        react = "react" in packageJson.bundledDependencies;
-    }
+const create_eslint_config = async (ignore_config_lines, package_json, non_ts_dirs) => {
+    const react = has_dependency(package_json, "react");
 
     const ignore = [
-        ...nonTsDirectories,
+        ...non_ts_dirs,
         "./eslint.config.js", // ignore ourself
     ];
-    for (const line of checkIgnoreLines) {
+    for (const line of ignore_config_lines) {
         if (line.includes("tsconfig") || line.includes("eslint.config.js")) {
             continue;
         }
@@ -415,17 +470,29 @@ async function createEslintConfig(checkIgnoreLines, packageJson, nonTsDirectorie
         ignore.push(`**/${line}`);
     }
 
+    let is_public_lib = false;
+    if (package_json.files) {
+        for (const f of package_json.files) {
+            if (f.startsWith("./dist") || f.startsWith("dist")) {
+                // is a compiled library
+                is_public_lib = true;
+                break;
+            }
+        }
+    }
+
     const config = `import { config } from "mono-dev/eslint";
 export default config({
-    ignores: ${JSON.stringify(ignore)},
+    ignores: ${stringify_sorted(ignore)},
     react: ${react},
+    isLib: ${is_public_lib},
     tsconfigRootDir: import.meta.dirname
 });`;
-    await fs.writeFile("eslint.config.js", config);
-}
+    await fs_promises.writeFile("eslint.config.js", normalize_lineend(config));
+};
 
-async function createPrettierIgnore(checkIgnoreLines) {
-    const prettierIgnorePath = pathDotPrettierIgnore;
+/** @param {string[]} ignore_config_lines */
+const create_prettier_ignore = async (ignore_config_lines) => {
     const ignore = [
         "*.yml",
         "*.yaml",
@@ -436,16 +503,16 @@ async function createPrettierIgnore(checkIgnoreLines) {
         "tsconfig*.json",
         "eslint.config.js",
     ];
-    for (const line of checkIgnoreLines) {
+    for (const line of ignore_config_lines) {
         if (line.includes("tsconfig") || line.includes("eslint.config.js")) {
             continue;
         }
         ignore.push(line);
     }
-    await fs.writeFile(prettierIgnorePath, ignore.join("\n"));
-}
+    await fs_promises.writeFile(pathDotPrettierIgnore, ignore.join("\n"));
+};
 
-async function runTsc() {
+const run_tsc = async () => {
     if (TSC === "tsc") {
         return execute(TSC, ["--build", "--pretty"]);
     }
@@ -453,7 +520,7 @@ async function runTsc() {
     // do that ourselves
     const tsconfigs = [];
     try {
-        const folder = await fs.readdir(".");
+        const folder = await fs_promises.readdir(".");
         for (const file of folder) {
             if (file.match(/tsconfig\..+\.json$/)) {
                 tsconfigs.push(file);
@@ -468,9 +535,10 @@ async function runTsc() {
         }
     }
     return tsc;
-}
+};
 
-function runEslint(fix) {
+/** @param {boolean} fix */
+const run_eslint = async (fix) => {
     const args = [
         ".",
         "--color",
@@ -478,25 +546,28 @@ function runEslint(fix) {
         "--max-warnings=0",
         "--cache",
         "--cache-location",
-        "./node_modules/.mono-lint/.eslintcache",
+        pathEslintCache,
     ];
     if (fix) {
         args.push("--fix");
     }
     return execute("eslint", args);
-}
+};
 
-function runPrettier(fix) {
+/** @param {boolean} fix */
+const run_prettier = (fix) => {
     // there are some weird-ness when running prettier like this,
     // for example i can't figure out how to set the ignorePath
 
     // See types.ts in @prettier/cli
     // https://github.com/prettier/prettier-cli/blob/main/src/types.ts
+    /** @type {import("@prettier/cli/dist/types.js").Options} */
     const options = {
         /* INPUT OPTIONS */
         globs: ["."],
         /* OUTPUT OPTIONS */
         check: !fix,
+        dump: false,
         list: false,
         write: fix,
         /* CONFIG OPTIONS */
@@ -526,44 +597,4 @@ function runPrettier(fix) {
     };
 
     return prettierCli(options, {}, {});
-}
-
-function execute(bin, args) {
-    if (process.platform === "win32") {
-        bin += ".cmd";
-    }
-
-    const binPath = path.join(pathMonodevBin, bin);
-
-    // execution is not parallel because:
-    // 1. it's very annoying to do that in node
-    // 2. multiple projects can run at the same time (external parallellism)
-    let child;
-    if (process.platform === "win32") {
-        child = child_process.spawnSync(`"${binPath}"`, args, {
-            stdio: "inherit",
-            shell: true,
-        });
-    } else {
-        child = child_process.spawnSync(binPath, args, { stdio: "inherit" });
-    }
-    // for some reason node doesn't throw here...
-    // so we have to check the error manually
-    if (child.error) {
-        console.error(`[mono-lint] failed to spawn ${bin} with args ${args.join(" ")}`);
-        console.error(child.error);
-        child.status = 1;
-    }
-    return child;
-}
-
-async function exists(path) {
-    try {
-        await fs.stat(path);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-void main();
+};

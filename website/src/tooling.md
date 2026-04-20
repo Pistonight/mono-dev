@@ -1,6 +1,7 @@
-# Tooling
+# Tooling and Templates
 
-```admonish note
-This section is documentation for setting up packages to use the Standard,
-you don't need to read this as a contributer
-```
+This section covers 2 things:
+- Tooling: Introduces in detail tooling used for each type of projects in the Standard.
+- Templates: Guide for quickly stand up a package (copy-paste sections).
+
+Templates are mainly documentation for myself.

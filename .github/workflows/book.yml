@@ -11,17 +11,17 @@ jobs:
   build-book:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
-          submodules: true
       - uses: ./actions/setup
         with:
           skip-checkout: true
           tool-mdbook: true
+          mono-dev: false
 
       # run the thing
-      - run: task install-deps
+      - run: task copy-website-theme
       - run: task build-website
       - uses: actions/upload-pages-artifact@v3
         with:

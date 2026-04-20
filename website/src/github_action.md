@@ -22,3 +22,14 @@ The workflow files should be placed in the following directory structure:
     - ... (more .yml for workflows)
 ```
 
+## Blacksmith Runners
+Blacksmith now has all of Ubuntu, MacOS (very expensive) and Windows runners:
+
+```
+blacksmith-4vcpu-ubuntu-2404
+blacksmith-4vcpu-ubuntu-2404-arm
+blacksmith-4vcpu-windows-2025
+blacksmith-6vcpu-macos-latest
+```
+
+See [https://docs.blacksmith.sh/blacksmith-runners/overview](https://docs.blacksmith.sh/blacksmith-runners/overview)
