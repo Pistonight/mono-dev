@@ -1,7 +1,0 @@
-{
-    "compilerOptions": {},
-    "files": [],
-    "references": [ {
-        "path": "./tsconfig.toolsets.json"
-    } ]
-}
