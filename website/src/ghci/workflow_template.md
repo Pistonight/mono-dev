@@ -31,7 +31,7 @@ jobs:
         with:
           tool-mdbook: true
       - run: task build-pages
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: packages/manual/book
           retention-days: 3
@@ -124,7 +124,7 @@ See [Setup Action](./action_setup.md)
 
 ## Steps > Upload Artifacts
 ```yaml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           path: dist/foo
           name: foo
@@ -136,7 +136,7 @@ Note that the [Docker Image Action](./action_docker.md) automatically downloads 
 ```yaml
       - run: mkdir -p package
         shell: bash
-      - uses: dawidd6/action-download-artifact@v6
+      - uses: dawidd6/action-download-artifact@v20
         with:
           github_token: ${{ github.token }}
           workflow: CHANGEME.yml

@@ -33,6 +33,10 @@ tasks:
       - mdbook watch website &
       - live-server website/book -p 8081
 
+  dev2:
+    - rm -rf website/book
+    - shwoop website/book -w website --host -- mdbook build website
+
   build-website:
     desc: (Re-)build the book
     cmds:
@@ -53,6 +57,7 @@ tasks:
       - git push origin v{{.VERSION}}
 
   upgrade:
+    - rm -rf node_modules
     - >-
       pnpm up
       @types/bun @types/node

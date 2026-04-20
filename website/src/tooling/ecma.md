@@ -7,50 +7,55 @@ TypeScript projects use:
 - `tsc` for type checking and generating `d.ts` files for libraries
 - `vitest` for testing
 - `vite` for bundling library or app
-
-#### Template: `mono-dev` dependency
-
-```admonish todo
-this section needs updating after everything works
-```
+- `typedoc` for generating documentation using `rustdoc` theme
 
 `mono-dev` packages itself as a node module. In TypeScript/ECMAScript
 projects, the package needs to be declared in `package.json` to be
-managed by the package manager. The recommended setup is to link it with `pnpm`
-with `/mono-dev` at the root of the repo.
+managed by the package manager.
 
-```json
-{
-    "devDependencies": {
-        "mono-dev": "link:../../mono-dev"
+Running `pnpm up mono-dev` will resolve the latest commit and update it.
+
+#### Template: `package.json`
+-   ```json
+    {
+        "devDependencies": {
+            "mono-dev": "github:pistonight/mono-dev#main"
+        },
+        "nocheck": [
+            "/src/generated"
+        ],
+        "monolibbuild": {}
     }
-}
-```
+    ```
+
+    - Paths in `nocheck` will not be processed by `eslint` or `prettier`.
+      If the path is in the form of `/foo` or `foo`, the `foo` directory
+      will also not be type-checked.
+    - `monolibbuild` is the library build options. See [monolibbuild.js](https://github.com/Pistonight/mono-dev/blob/main/toolsets/js/src/lib_build.js)
 
 #### Template: `Taskfile.yml`
-```yaml
-version: '3'
+-   ```yaml
+    version: '3'
 
-includes:
-  ecma:
-    taskfile: ./node_modules/mono-dev/task/ecma.yaml
-    internal: true
-    optional: true
-```
+    includes:
+      ecma:
+        taskfile: ./node_modules/mono-dev/task/ecma.yaml
+        internal: true
+        optional: true
+    ```
 
 #### Template: `.gitignore`
-
-```
-# mono-dev: ecma gitignores
-node_modules
-package-lock.json
-.prettierignore
-.eslintcache
-/eslint.config.js
-/tsconfig*.json
-/mono-dev
-/dist
-```
+-   ```
+    # mono-dev: ecma gitignores
+    node_modules
+    package-lock.json
+    .prettierignore
+    .eslintcache
+    /eslint.config.js
+    /tsconfig*.json
+    /mono-dev
+    /dist
+    ```
 
 ## Type Checking
 `mono-dev` automatically generates type checking configs based on directory structure:
@@ -61,32 +66,24 @@ package-lock.json
 - If root directory contain any TypeScript stuff, it will be checked as well
 - ESLint only checks the TypeScript projects. If you use ECMAScript, you opt-out of safety anyway
 
-## `package.json > "nocheck"`
-For code that should be involved with type-checking, but ignored for other checks (usually generated code),
-a `"nocheck"` array in top-level of `package.json` can be provided using the same syntax as `.gitignore`,
-for example:
-```json
-{
-    "nocheck": ["/src/generated"]
-}
-```
-Paths in `nocheck` will not be processed by `eslint` or `prettier`.
-If the path is in the form of `/foo` or `foo`, the `foo` directory
-will also not be type-checked.
-
-## TS Import Path remapping
+## Import Path remapping
 
 TS import paths can be remapped in bundled apps to avoid the "relative parent import hell".
 The only scenario where this is bad is when the package exports raw TypeScript source,
 and therefore downstream cannot resolve the imports correctly because they don't have access
-to the mapping in `tsconfig.json`.
+to the mapping in `tsconfig.json` - This should rarely be the case now that mono-dev supports
+building libraries with vite's library mode.
 
 The mapping is automatically generated if `package.json` doesn't have `exports` or
 if any path in `exports` ends with `.(c|m)?tsx?` and does not end with `.d.ts`.
 
 Currently, the `src` directory is hardcoded to be the source directory and path mapping
 is only generated for that directory as `self::`. One import path is generated for the first `index.(c|m)?tsx?`
-file found for each nested directory in `src.
+file found for each nested directory in `src`. This is because some tools like `bun`
+only supports path mapping if found in `tsconfig.json`, not referenced projects.
+For max interop with tools such as `bun`, the same import map
+will appear in `tsconfig.json` and `tsconfig.src.json`.
+
 
 ~~~admonish example
 The following directory structure:
@@ -115,8 +112,6 @@ generates:
 
 ~~~
 
-For max interop with tools such as `bun`, the same import map
-will appear in `tsconfig.json` and `tsconfig.src.json`.
 
 
 ## Test
@@ -124,7 +119,7 @@ will appear in `tsconfig.json` and `tsconfig.src.json`.
 is managed by the version of `mono-dev`. Import anything from `mono-dev/vitest`
 instead of `vitest`.
 
-Use `ecma:vitest` task to run test once and `ecma:vitest-dev` task to run in watch mode.
+Use `ecma:test` task to run test once and `ecma:test-dev` task to run in watch mode.
 
 ## Build Library
 Building library from TS source into consumable package without TS supports zero-config.
@@ -151,14 +146,29 @@ Consideration: Unless the library is meant to be used as a framework, DO NOT add
 It's very easy to cause duplicated global states when resolving dependencies.
 
 `exports` in `package.json` is used to determine the entry points.
-Note those are the actual output path and the source location will be inferred
+Note those are the actual output path and the source location will be inferred.
 
+To specify a single export:
+```json
+{
+    "name": "my-lib",
+    "exports": "./dist/foo/index.js",
+    "types": "./dist/_dts_/src/foo/index.d.ts"
+}
+```
+To specify multiple exports
 ```json
 {
     "name": "my-lib",
     "exports": {
-        "./foo": "./dist/foo/index.js",
-        "./bar": "./dist/bar.js",
+        "./foo": {
+            "import": "./dist/foo/index.js",
+            "types": "./dist/_dts_/src/foo/index.d.ts"
+        },
+        "./bar": {
+            "import": "./dist/bar.js",
+            "types": "./dist/_dts_/src/bar.d.ts"
+        }
     }
 }
 ```
@@ -173,8 +183,8 @@ and configs to my projects.
 
 Add `vite` to the downstream project, with `vite.config.ts` at the root:
 ```typescript
-import { defineConfig } from "vite";
-import monodev from "mono-dev/vite";
+import { defineConfig } from "mono-dev/vite";
+import monodev from "mono-dev/vite-config";
 
 // see type definition for more info
 const monodevConfig = monodev({
@@ -189,18 +199,17 @@ export default defineConfig(monodevConfig({
 });
 ```
 
-These plugins are automatically added:
-- react
-- yaml
-- typescript paths
+Plugins are automatically added:
+- YAML loader (always added)
+- React and React Compiler (if react is installed)
+- WASM (if configured)
 
 Define vite types in `src/env.d.ts`:
 ```typescript
-/// <reference types="vite/client" />
-/// <reference types="mono-dev/vite/client" />
+/// <reference types="mono-dev/vite-types" />
 /// <reference types="dom" />
 /// <reference types="dom.iterable" />
 ```
 
-Use the `ecma:vite-dev` and `ecma:vite-build` tasks to execute vite
+Use the `ecma:app-dev` and `ecma:app-build` tasks to execute vite
 dev server and build.

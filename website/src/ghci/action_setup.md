@@ -5,8 +5,7 @@
 ```yaml
 jobs:
   change-me:
-    runs-on: ubuntu-latest
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
       - uses: Pistonight/mono-dev/actions/setup@main

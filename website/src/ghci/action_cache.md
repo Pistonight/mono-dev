@@ -15,7 +15,4 @@ with a task to generate the data to cache if miss
           version: v1
           # task to run to generate the data to cache (task exec --)
           task: generate-data
-
-          # If the runner is github hosted or blacksmith
-          runner: blacksmith
 ```

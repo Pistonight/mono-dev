@@ -11,8 +11,6 @@ inputs:
   version:
     description: "Cache version (appended to the key)"
     default: "v1"
-  runner:
-    default: "github"
   task:
     description: "Task to run if cache miss"
     required: true
@@ -20,21 +18,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - if: ${{ inputs.runner == 'github' }}
-      id: cache-github
-      uses: actions/cache@v4
+    - id: cache-github
+      uses: actions/cache@v5
       with:
         path: ${{ inputs.path }}
         key: ${{ inputs.key }}-${{ inputs.version }}
-    - if: ${{ inputs.runner == 'blacksmith' }}
-      id: cache-blacksmith
-      uses: useblacksmith/cache@v5
-      with:
-        path: ${{ inputs.path }}
-        key: ${{ inputs.key }}-${{ inputs.version }}
-    - if: ${{ inputs.runner == 'github' && steps.cache-github.outputs.cache-hit != 'true' }}
-      run: task ${{ inputs.task }}
-      shell: bash
-    - if: ${{ inputs.runner == 'blacksmith' && steps.cache-blacksmith.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.cache-github.outputs.cache-hit != 'true' }}
       run: task ${{ inputs.task }}
       shell: bash
