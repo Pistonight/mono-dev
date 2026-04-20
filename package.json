@@ -45,7 +45,8 @@
         "monolint": "./toolsets/js/src/monolint_main.js",
         "monolibbuild": "./toolsets/js/src/libbuild_main.js",
         "monotest": "./toolsets/js/src/monotest_main.js",
-        "monotypedoc": "./toolsets/js/src/monotypedoc_main.js"
+        "monotypedoc": "./toolsets/js/src/monotypedoc_main.js",
+        "monotaskfile": "./toolsets/js/src/monotaskfile.js"
     },
     "exports": {
         "./vite": "./toolsets/js/src/vite.js",
