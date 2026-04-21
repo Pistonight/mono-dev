@@ -51,7 +51,7 @@ tasks:
   watch-serve-doc:
     cmds:
       - >
-        shwoop target/doc -w src {{.SHWOOP_ARGS}} -- 
+        shwoop target/doc {{.SHWOOP_ARGS| default "-w src"}} --host -- 
         cargo {{.TOOLCHAIN}} doc --target-dir target --no-deps {{.CARGO_ARGS}}
 
   wasm-pack-build:
