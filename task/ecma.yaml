@@ -32,9 +32,9 @@ tasks:
   doc-dev:
     deps: [config]
     cmds:
-      - pnpm exec monotypedoc -w &
-      - cmd: live-server -p 8081 docs --poll
-        ignore_error: true
+      - >
+        shwoop docs {{.SHWOOP_ARGS| default "-w src" }} --host --
+        pnpm exec monotypedoc
 
   app-build:
     deps: [config] # needed for tsconfig for path mapping
