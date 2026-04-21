@@ -1,2 +1,2 @@
-export * from "@modyfi/vite-plugin-yaml/modules";
+export * from "./yaml.d.ts";
 export * from "vite/client";
