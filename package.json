@@ -1,13 +1,12 @@
 {
     "name": "mono-dev",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
     "dependencies": {
         "@babel/core": "^7.29.0",
         "@eslint/js": "^9.39.4",
-        "@modyfi/vite-plugin-yaml": "^1.1.1",
         "@prettier/cli": "^0.10.0",
         "@rolldown/plugin-babel": "^0.2.3",
         "@typescript/native-preview": "7.0.0-dev.20250530.1",

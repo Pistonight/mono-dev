@@ -4,8 +4,9 @@ import vitePluginReact, {
     reactCompilerPreset as viteBabelReactCompilerPreset,
 } from "@vitejs/plugin-react";
 import vitePluginBabel from "@rolldown/plugin-babel";
-import vitePluginYaml from "@modyfi/vite-plugin-yaml";
 import vitePluginWasm from "vite-plugin-wasm";
+
+import vitePluginYaml from "./vite_yaml.js";
 import { has_dependency } from "./util.js";
 import { get_package_json_path } from "./location.js";
 

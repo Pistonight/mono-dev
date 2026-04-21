@@ -56,7 +56,6 @@ tasks:
         react react-dom @types/react @types/react-dom
         @vitejs/plugin-react
         vite-plugin-wasm
-        @modyfi/vite-plugin-yaml
         @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh eslint-plugin-react-compiler
         globals
         typescript
