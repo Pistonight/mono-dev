@@ -9,8 +9,7 @@ export default function viteYaml() {
             const raw = readFileSync(id, "utf-8");
             // this is the stringified json '{"foo":"bar"}'
             const json /* string */ = JSON.stringify(YAML.load(raw));
-            // this converts it to a string literal that can be embeded
-            const json_literal = JSON.stringify(json);
+            const json_literal = "`" + json.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$") + "`";
             return { code: `export default JSON.parse(${json_literal});`, map: null };
         },
     };
