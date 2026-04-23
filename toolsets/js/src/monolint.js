@@ -83,9 +83,10 @@ export const run_monolint = async (argv) => {
         // run TSC last to verify when fixing
         const tsc = await run_tsc();
         if (tsc.status) {
-            console.error("[monolint] tsc failed, see above");
+            console.error("[monolint] typeck failed, see above");
             process.exit(1);
         }
+        console.log("[monolint] typeck passed!");
     }
 };
 
@@ -116,7 +117,7 @@ const create_configs = async (clean) => {
                 const version = fs.readFileSync(`${pathCache}/version`, "utf-8").trim();
                 if (version !== current_version) {
                     console.log(
-                        `[monolint] generating clean configs because of version update: ${version} -> ${current_version}`,
+                        `[monolint] cleaning cache because of version update: ${version} -> ${current_version}`,
                     );
                     clean = true;
                 }
@@ -135,6 +136,7 @@ const create_configs = async (clean) => {
             }
         }
     }
+    /** @type {import("./types.ts")}.PackageJson */
     const packageJson = JSON.parse(fs.readFileSync(pathCurrProjPackageJson, "utf-8"));
     let checkIgnoreLines = [];
     try {
@@ -150,7 +152,7 @@ const create_configs = async (clean) => {
         checkIgnoreLines.push(...packageJson.nocheck);
     }
     const [ts] = await Promise.all([
-        create_ts_configs(clean, packageJson),
+        create_ts_configs(packageJson),
         create_prettier_ignore(checkIgnoreLines),
     ]);
     if (ts.projectCount) {
@@ -173,10 +175,9 @@ const create_configs = async (clean) => {
  *
  * Also please add /tsconfig.*.json to .gitignore
  *
- * @param {boolean} clean
  * @param {import("./types.ts").PackageJson} packageJson
  */
-const create_ts_configs = async (clean, packageJson) => {
+const create_ts_configs = async (packageJson) => {
     const existingTsConfigs = new Set();
     const tsDirectories = [];
     const rootFiles = [];
@@ -243,8 +244,6 @@ const create_ts_configs = async (clean, packageJson) => {
         existingTsConfigsToRemove.delete(`tsconfig.${dir}__${DTS}.json`);
     });
 
-    let changed = false;
-
     let tsPathMappings = {};
     if (should_create_ts_path_mappings(packageJson)) {
         tsPathMappings = await create_ts_path_mappings();
@@ -255,9 +254,6 @@ const create_ts_configs = async (clean, packageJson) => {
         const tsconfig = `tsconfig.${dir}.json`;
         // the tsconfig only depends on the dir name,
         // we should never need to regenerate it
-        if (!(dir === "src" && hasTsPathMappings) && !clean && existingTsConfigs.has(tsconfig)) {
-            return;
-        }
         const tsconfigContent = {
             extends: path.join(
                 monodev_path,
@@ -275,39 +271,34 @@ const create_ts_configs = async (clean, packageJson) => {
             tsconfigContent.compilerOptions.paths = tsPathMappings;
         }
         await fs_promises.writeFile(tsconfig, normalize_lineend(stringify_sorted(tsconfigContent)));
-        changed = true;
     });
 
     const removeExisting = (async () => {
         for (const tsconfig of existingTsConfigsToRemove) {
             console.log(`[monolint] removing ${tsconfig}`);
             await fs_promises.unlink(tsconfig);
-            changed = true;
         }
     })();
 
     if (rootFiles.length) {
         const tsconfig = "tsconfig._.json";
-        if (clean || !existingTsConfigs.has(tsconfig)) {
-            const tsconfigContent = {
-                extends: path.join(
-                    monodev_path,
-                    "toolsets",
-                    "js",
-                    "typescript",
-                    "default-tsconfig.json",
-                ),
-                compilerOptions: {
-                    tsBuildInfoFile: path.join(pathCache, `tsconfig._.tsbuildinfo`),
-                },
-                include: rootFiles,
-            };
-            await fs_promises.writeFile(
-                tsconfig,
-                normalize_lineend(stringify_sorted(tsconfigContent)),
-            );
-            changed = true;
-        }
+        const tsconfigContent = {
+            extends: path.join(
+                monodev_path,
+                "toolsets",
+                "js",
+                "typescript",
+                "default-tsconfig.json",
+            ),
+            compilerOptions: {
+                tsBuildInfoFile: path.join(pathCache, `tsconfig._.tsbuildinfo`),
+            },
+            include: rootFiles,
+        };
+        await fs_promises.writeFile(
+            tsconfig,
+            normalize_lineend(stringify_sorted(tsconfigContent)),
+        );
     }
 
     const projectCount = rootFiles.length + tsDirectories.length;
@@ -316,32 +307,30 @@ const create_ts_configs = async (clean, packageJson) => {
     await Promise.all(directoryPromises);
 
     if (projectCount) {
-        if (changed || clean || !fs.existsSync("tsconfig.json")) {
-            const references = tsDirectories.map((dir) => ({
-                path: `./tsconfig.${dir}.json`,
-            }));
-            if (rootFiles.length) {
-                references.push({ path: "./tsconfig._.json" });
-            }
-            const tsconfig = "tsconfig.json";
-
-            /** @type {any} */
-            let packageTsConfig = packageJson.tsconfig || {};
-
-            const tsconfigContent = {
-                compilerOptions: {},
-                ...packageTsConfig,
-                files: [],
-                references,
-            };
-            if (hasTsPathMappings) {
-                tsconfigContent.compilerOptions.paths = tsPathMappings;
-            }
-            await fs_promises.writeFile(
-                tsconfig,
-                normalize_lineend(stringify_sorted(tsconfigContent)),
-            );
+        const references = tsDirectories.map((dir) => ({
+            path: `./tsconfig.${dir}.json`,
+        }));
+        if (rootFiles.length) {
+            references.push({ path: "./tsconfig._.json" });
         }
+        const tsconfig = "tsconfig.json";
+
+        /** @type {any} */
+        let packageTsConfig = packageJson.tsconfig || {};
+
+        const tsconfigContent = {
+            compilerOptions: {},
+            ...packageTsConfig,
+            files: [],
+            references,
+        };
+        if (hasTsPathMappings) {
+            tsconfigContent.compilerOptions.paths = tsPathMappings;
+        }
+        await fs_promises.writeFile(
+            tsconfig,
+            normalize_lineend(stringify_sorted(tsconfigContent)),
+        );
     } else {
         if (fs.existsSync("tsconfig.json")) {
             console.log("[monolint] removing tsconfig.json");
