@@ -1,5 +1,5 @@
-import { c as e, f as t, i as n, l as r, o as i, s as a, t as o, u as s } from "../util-DEsfW8c3.js";
-import { n as c, r as l, t as u } from "../project-u5JulOwA.js";
+import { c as e, f as t, i as n, l as r, o as i, s as a, t as o, u as s } from "../util-D7tOSluP.js";
+import { n as c, r as l, t as u } from "../project-Du8cCQaU.js";
 import d from "node:fs";
 import f from "node:path";
 import p, { execSync as m } from "node:child_process";
@@ -307,6 +307,7 @@ var y = (e) => {
 		"package"
 	])).err ? (console.error("[mono] tgz creation failed!"), 91) : (console.log("[mono] unpacked at: node_modules/.mono/pnpm-pack.temp/package"), console.log("[mono] packed at: " + v), n ? (console.log("[mono] dry-run, stopping"), 0) : m ? (await i("pnpm", r, [
 		"publish",
+		v,
 		"--access",
 		"public"
 	])).err ? (console.error("[mono] pnpm publish failed!"), 101) : 0 : (console.error("[mono] please set mono-dev option \"publish\": true"), 1));
