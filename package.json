@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.3.22",
+    "version": "0.3.23",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -29,7 +29,7 @@
         "@eslint/js": "^9.39.4",
         "@prettier/cli": "^0.10.0",
         "@rolldown/plugin-babel": "^0.2.3",
-        "@typescript/native-preview": "7.0.0-dev.20250530.1",
+        "@typescript/native-preview": "7.0.0-dev.20260421.2",
         "@vitejs/plugin-react": "^6.0.1",
         "babel-plugin-react-compiler": "^1.0.0",
         "eslint": "^9.39.4",

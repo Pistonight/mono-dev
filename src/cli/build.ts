@@ -63,7 +63,12 @@ export const runBuild = async (_args: string[]): Promise<number> => {
 
     console.log("[mono] generating dts...");
     const dtsStartTime = Date.now();
-    const tscResult = executeNode("tsc", rootDir, ["-p", tsconfigModifiedPath]);
+    const useTsc = !!packageJson["pistonight/mono-dev"]?.tsc;
+    const tscBin = useTsc ? "tsc" : "tsgo";
+    if (useTsc) {
+        console.warn("[mono] warning: using tsc instead of tsgo for generating declarations");
+    }
+    const tscResult = executeNode(tscBin, rootDir, ["-p", tsconfigModifiedPath]);
     if ("err" in tscResult) {
         console.error("[mono] dts generation with tsc failed: " + tscResult.err);
         return 31;
