@@ -2,13 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { execute } from "./execute.js";
-import { get_package_json_path, monodev_path } from "./location.js";
+import { get_package_json_path } from "./location.js";
 import { run_monolint } from "./monolint.js";
 import { DTS } from "./util.js";
 import { stringify_sorted } from "./json.js";
 import { parse_exports } from "./lib_parse_exports.js";
 
 const run_libbuild = async () => {
+    await run_monolint(["--config"]);
     const package_json_path = get_package_json_path();
     const root_path = path.dirname(package_json_path);
     const cache_path = path.join(root_path, "node_modules/.monolibbuild");
@@ -26,25 +27,22 @@ export default configure();
 
     const vite_child = execute("vite", ["build", "--config", vite_config_path]);
     if (vite_child.status) {
-        console.error("[monolibbuild] bundle with vite failed, please see error above");
+        console.error("[mono] bundle with vite failed, please see error above");
         process.exit(vite_child.status || 1);
     }
     /** @type {import("./types.ts").PackageJson} */
     const package_json = JSON.parse(fs.readFileSync(package_json_path, "utf-8"));
-    const [lib_exports, error] = parse_exports(root_path, package_json);
+    const [lib_exports, error] = parse_exports(root_path, package_json, true /* print */);
     if (error) {
-        console.error("[monolibbuild] " + error);
+        console.error("[mono] " + error);
         process.exit(1);
     }
     const { dist, src } = lib_exports;
 
     const tsconfig_path = path.join(root_path, "tsconfig." + src + ".json");
     if (!fs.existsSync(tsconfig_path)) {
-        await run_monolint(["--config"]);
-        if (!fs.existsSync(tsconfig_path)) {
-            console.error("[monolibbuild] failed to generate tsconfig for emitting declaration");
-            process.exit(1);
-        }
+        console.error("[mono] failed to generate tsconfig for emitting declaration");
+        process.exit(1);
     }
     const the_config = JSON.parse(fs.readFileSync(tsconfig_path, "utf-8"));
 
@@ -65,10 +63,10 @@ export default configure();
 
     const tsc_child = execute("tsc", ["-p", tsconfig_modified_path]);
     if (tsc_child.status) {
-        console.error("[monolibbuild] dts generation with tsc failed, please see error above");
+        console.error("[mono] dts generation with tsc failed, please see error above");
         process.exit(tsc_child.status || 1);
     }
-    console.log("[monolibbuild] dts generated at " + dist + "/" + DTS);
+    console.log("[mono] dts generated at " + dist + "/" + DTS);
 };
 
 void run_libbuild();

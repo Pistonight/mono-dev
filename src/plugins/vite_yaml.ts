@@ -1,10 +1,12 @@
+import { readFileSync } from "node:fs";
 import YAML from "js-yaml";
-import { readFileSync } from "fs";
+import type {Plugin} from "vite";
 
-export default function viteYaml() {
+
+export const viteYaml= ():Plugin => {
     return {
         name: "vite-yaml",
-        transform(_, id) {
+        transform(_, id: string) {
             if (!id.endsWith(".yaml") && !id.endsWith(".yml")) return null;
             const raw = readFileSync(id, "utf-8");
             // https://vite.dev/config/shared-options#json-stringify 

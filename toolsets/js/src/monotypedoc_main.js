@@ -8,6 +8,7 @@ import { parse_exports } from "./lib_parse_exports.js";
 import { run_monolint } from "./monolint.js";
 
 const run_monotypedoc = async () => {
+    await run_monolint(["--config"]);
     const args = process.argv.slice(2);
     const json = args.includes("--json");
 
@@ -18,18 +19,15 @@ const run_monotypedoc = async () => {
 
     const [lib_exports, error] = parse_exports(root_path, package_json);
     if (error) {
-        console.error("[monotypedoc] " + error);
+        console.error("[mono] " + error);
         process.exit(1);
     }
     const { src, exports } = lib_exports;
 
     const tsconfig_path = path.join(root_path, `tsconfig.${src}.json`);
     if (!fs.existsSync(tsconfig_path)) {
-        await run_monolint(["--config"]);
-        if (!fs.existsSync(tsconfig_path)) {
-            console.error("[monolibbuild] failed to generate tsconfig for emitting declaration");
-            process.exit(1);
-        }
+        console.error("[mono] failed to generate tsconfig for emitting declaration");
+        process.exit(1);
     }
 
     /** @type {Record<string, unknown>} */
@@ -47,7 +45,7 @@ const run_monotypedoc = async () => {
 
     const project = await app.convert();
     if (!project) {
-        console.error("[monotypedoc] failed to convert project");
+        console.error("[mono] failed to convert project");
         process.exit(1);
     }
     if (json) {

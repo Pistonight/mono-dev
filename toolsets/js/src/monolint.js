@@ -25,6 +25,7 @@ import { get_monodev_version, get_package_json_path, monodev_path } from "./loca
 import { DTS, has_dependency, normalize_lineend } from "./util.js";
 import { execute } from "./execute.js";
 import { stringify_sorted } from "./json.js";
+import { ensure_subpath_imports } from "./subpath_imports.js";
 
 // TSGO issues:
 // - doesn't support project references right now
@@ -54,7 +55,7 @@ export const run_monolint = async (argv) => {
 
     const ts_proj_count = await create_configs(clean);
     if (config_only) {
-        console.log("[monolint] config generated");
+        console.log("[mono] config generated");
         return;
     }
 
@@ -62,7 +63,7 @@ export const run_monolint = async (argv) => {
         // run TSC first if not fixing
         const tsc = await run_tsc();
         if (tsc.status) {
-            console.error("[monolint] tsc failed, see above");
+            console.error("[mono] tsc failed, see above");
             process.exit(1);
         }
     }
@@ -70,9 +71,9 @@ export const run_monolint = async (argv) => {
     const eslint = await run_eslint(fix);
     if (eslint.status) {
         if (fix) {
-            console.error("[monolint] eslint fix failed, see above");
+            console.error("[mono] eslint fix failed, see above");
         } else {
-            console.error("[monolint] eslint check failed, see above");
+            console.error("[mono] eslint check failed, see above");
         }
         process.exit(1);
     }
@@ -83,10 +84,10 @@ export const run_monolint = async (argv) => {
         // run TSC last to verify when fixing
         const tsc = await run_tsc();
         if (tsc.status) {
-            console.error("[monolint] typeck failed, see above");
+            console.error("[mono] typeck failed, see above");
             process.exit(1);
         }
-        console.log("[monolint] typeck passed!");
+        console.log("[mono] typeck passed!");
     }
 };
 
@@ -117,7 +118,7 @@ const create_configs = async (clean) => {
                 const version = fs.readFileSync(`${pathCache}/version`, "utf-8").trim();
                 if (version !== current_version) {
                     console.log(
-                        `[monolint] cleaning cache because of version update: ${version} -> ${current_version}`,
+                        `[mono] cleaning cache because of version update: ${version} -> ${current_version}`,
                     );
                     clean = true;
                 }
@@ -132,12 +133,18 @@ const create_configs = async (clean) => {
             try {
                 fs.writeFileSync(`${pathCache}/version`, current_version);
             } catch {
-                console.error("[monolint] failed to write version file, will retry next time");
+                console.error("[mono] failed to write version file, will retry next time");
             }
         }
     }
     /** @type {import("./types.ts")}.PackageJson */
     const packageJson = JSON.parse(fs.readFileSync(pathCurrProjPackageJson, "utf-8"));
+    if (!packageJson.private) {
+        console.error("[mono] 'private' must be set to true to prevent accidental publishing; to pack for publishing please use monopack");
+        process.exit(31);
+    }
+    await ensure_subpath_imports(packageJson, pathCurrProjPackageJson);
+
     let checkIgnoreLines = [];
     try {
         const gitignore = fs.readFileSync(path.join(pathRoot, ".gitignore"), "utf-8");
@@ -211,7 +218,7 @@ const create_ts_configs = async (packageJson) => {
             stats = await fs_promises.stat(p);
         } catch (e) {
             console.error(e);
-            console.warn(`[monolint] cannot stat ${p}, skipping`);
+            console.warn(`[mono] cannot stat ${p}, skipping`);
             return;
         }
         if (stats.isDirectory()) {
@@ -244,12 +251,6 @@ const create_ts_configs = async (packageJson) => {
         existingTsConfigsToRemove.delete(`tsconfig.${dir}__${DTS}.json`);
     });
 
-    let tsPathMappings = {};
-    if (should_create_ts_path_mappings(packageJson)) {
-        tsPathMappings = await create_ts_path_mappings();
-    }
-    const hasTsPathMappings = Object.keys(tsPathMappings).length > 0;
-
     const directoryPromises = tsDirectories.map(async (dir) => {
         const tsconfig = `tsconfig.${dir}.json`;
         // the tsconfig only depends on the dir name,
@@ -264,18 +265,16 @@ const create_ts_configs = async (packageJson) => {
             ),
             compilerOptions: {
                 tsBuildInfoFile: path.join(pathCache, `tsconfig.${dir}.tsbuildinfo`),
+                rootDir: "."
             },
             include: [dir],
         };
-        if (dir === "src" && hasTsPathMappings) {
-            tsconfigContent.compilerOptions.paths = tsPathMappings;
-        }
         await fs_promises.writeFile(tsconfig, normalize_lineend(stringify_sorted(tsconfigContent)));
     });
 
     const removeExisting = (async () => {
         for (const tsconfig of existingTsConfigsToRemove) {
-            console.log(`[monolint] removing ${tsconfig}`);
+            console.log(`[mono] removing ${tsconfig}`);
             await fs_promises.unlink(tsconfig);
         }
     })();
@@ -292,6 +291,7 @@ const create_ts_configs = async (packageJson) => {
             ),
             compilerOptions: {
                 tsBuildInfoFile: path.join(pathCache, `tsconfig._.tsbuildinfo`),
+                rootDir: "."
             },
             include: rootFiles,
         };
@@ -324,107 +324,17 @@ const create_ts_configs = async (packageJson) => {
             files: [],
             references,
         };
-        if (hasTsPathMappings) {
-            tsconfigContent.compilerOptions.paths = tsPathMappings;
-        }
         await fs_promises.writeFile(
             tsconfig,
             normalize_lineend(stringify_sorted(tsconfigContent)),
         );
     } else {
         if (fs.existsSync("tsconfig.json")) {
-            console.log("[monolint] removing tsconfig.json");
+            console.log("[mono] removing tsconfig.json");
             await fs_promises.unlink("tsconfig.json");
         }
     }
     return { projectCount, nonTsDirectories };
-};
-/** @param {import("./types.ts").PackageJson} package_json */
-const should_create_ts_path_mappings = (package_json) => {
-    if (!("exports" in package_json)) {
-        return true;
-    }
-    /** @type {string[]} */
-    const all_paths = [];
-    const exports = package_json.exports;
-    if (typeof exports === "string") {
-        all_paths.push(exports);
-    } else {
-        for (const e of Object.values(exports)) {
-            if (typeof e === "string") {
-                all_paths.push(e);
-            } else {
-                if (e.types) {
-                    all_paths.push(e.types);
-                }
-                if (e.import) {
-                    all_paths.push(e.import);
-                }
-            }
-        }
-    }
-
-    for (const p of all_paths) {
-        if (!p) {
-            continue;
-        }
-        if (p.endsWith(".d.ts")) {
-            continue;
-        }
-        if (
-            p.endsWith(".ts") ||
-            p.endsWith(".tsx") ||
-            p.endsWith(".cts") ||
-            p.endsWith(".mts") ||
-            p.endsWith(".ctsx") ||
-            p.endsWith(".mtsx")
-        ) {
-            return false;
-        }
-    }
-    return true;
-};
-
-/** Create import mapping from `self::` */
-const create_ts_path_mappings = async () => {
-    let rest = [];
-    try {
-        const top = await fs_promises.readdir("./src");
-        for (const p of top) {
-            const srcPath = `src/${p}`;
-            if (fs.statSync(srcPath).isDirectory()) {
-                rest.push(srcPath.replace(/\/+$/, ""));
-            }
-        }
-    } catch {}
-
-    /** @type {Record<string, string[]>}*/
-    const tsPathMappings = {};
-
-    while (rest.length) {
-        const next = rest.pop();
-        if (!next) {
-            break;
-        }
-        try {
-            const files = await fs_promises.readdir(next);
-            let dirs = [];
-            for (const f of files) {
-                const srcPath = `${next}/${f}`;
-                if (f.match(/index\.(c|m)?tsx?$/)) {
-                    tsPathMappings[next.replace(/^src\//, "self::")] = [`./${srcPath}`];
-                    dirs = [];
-                    break;
-                }
-                if (fs.statSync(srcPath).isDirectory()) {
-                    dirs.push(srcPath.replace(/\/+$/, ""));
-                }
-            }
-            rest.push(...dirs);
-        } catch {}
-    }
-
-    return tsPathMappings;
 };
 
 /**
@@ -455,8 +365,9 @@ const create_eslint_config = async (ignore_config_lines, package_json, non_ts_di
         }
         if (line.startsWith("/")) {
             ignore.push(`.${line}`);
+        } else {
+            ignore.push(`**/${line}`);
         }
-        ignore.push(`**/${line}`);
     }
 
     let is_public_lib = false;

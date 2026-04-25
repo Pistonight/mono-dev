@@ -1,0 +1,69 @@
+import path from "node:path";
+import fs from "node:fs";
+
+import { genPackageConfig, genTypeScriptConfig } from "#config";
+import { DTS, executeNode, getProjectPackageJsonPath, normalizeLineEnds, PackageJson, stringifySorted } from "#util";
+import { parseExports } from "#project";
+
+export const runBuild = async (_args: string[]): Promise<number> => {
+    const packageJsonPath = getProjectPackageJsonPath();
+    const rootDir = path.dirname(packageJsonPath);
+    const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+    if (!packageJson["pistonight/mono-dev"]?.lib) {
+        console.error("[mono] package.json mono dev option 'lib' must be true to build library");
+        return 1;
+    }
+
+    const libExports = parseExports(rootDir, packageJson, true /* print */);
+    if ("err" in libExports) {
+        console.error(`[mono] failed to parse exports: `+libExports.err);
+        return 1;
+    }
+    const { dist, src } = libExports.val;
+
+    await genPackageConfig(packageJson, packageJsonPath);
+    await genTypeScriptConfig(packageJson);
+
+    const cache_path = path.join(rootDir, "node_modules/.mono");
+    if (!fs.existsSync(cache_path)) {
+        fs.mkdirSync(cache_path, { recursive: true });
+    }
+    const vite_config_path = path.join(cache_path, "lib-build.config.js");
+    fs.writeFileSync(
+        vite_config_path,
+        `import { configure } from "mono-dev/lib-build-config"; export default configure();`,
+    );
+
+    const tsconfigPath = path.join(rootDir, "tsconfig." + src + ".json");
+    const theConfig = JSON.parse(fs.readFileSync(tsconfigPath, "utf-8"));
+
+    const tsbuildinfo = `${cache_path}/tsconfig.${src}__${DTS}.tsbuildinfo`;
+    // if we don't delete the incremental build file, tsc will not emit the output
+    // if no rebuild is needed (even if the output is gone because we clean it before building)
+    // -- truly amazing behavior
+    if (fs.existsSync(tsbuildinfo)) {
+        fs.unlinkSync(tsbuildinfo);
+    }
+
+    theConfig.compilerOptions.tsBuildInfoFile = tsbuildinfo;
+    theConfig.compilerOptions.noEmit = false;
+    theConfig.compilerOptions.outDir = path.join(dist, DTS);
+    theConfig.exclude = ["**/*.test.ts", "**/*.test.mts", "**/*.test.cts", "**/*.test.tsx"];
+    const tsconfigModifiedPath = path.join(rootDir, "tsconfig." + src + "__" + DTS + ".json");
+    fs.writeFileSync(tsconfigModifiedPath, normalizeLineEnds(stringifySorted(theConfig)||""));
+
+    const viteResult = executeNode("vite", ["build", "--config", vite_config_path]);
+    if ("err" in viteResult) {
+        console.error("[mono] bundle with vite failed: "+viteResult.err);
+        return 21;
+    }
+
+    const tscResult = executeNode("tsc", ["-p", tsconfigModifiedPath]);
+    if ("err" in tscResult) {
+        console.error("[mono] dts generation with tsc failed: "+tscResult.err);
+        return 31;
+    }
+    console.log("[mono] dts generated at " + dist + "/" + DTS);
+
+    return 0;
+}

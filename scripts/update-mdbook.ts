@@ -1,6 +1,7 @@
 import { $ } from "bun";
+import path from "node:path";
 
-const dir = import.meta.dirname;
+const dir = path.join(path.dirname(import.meta.dirname), "mdbook");
 
 await $`rm -rf ${dir}/template`;
 await $`mdbook init --ignore none --force --theme ${dir}/template`;
@@ -53,7 +54,6 @@ for (const line of content.split("\n")) {
 const book = `[book]
 authors = ["CHANGE--ME"]
 language = "en"
-multilingual = false
 src = "src"
 title = "CHANGE--ME"
 

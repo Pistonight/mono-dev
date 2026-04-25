@@ -6,37 +6,36 @@ import vitePluginReact, {
 } from "@vitejs/plugin-react";
 import vitePluginBabel from "@rolldown/plugin-babel";
 import babelReactCompiler from "babel-plugin-react-compiler";
+import vitePluginWasm from "vite-plugin-wasm";
 
-import vitePluginYaml from "./vite_yaml.js";
-import { get_package_json_path } from "./location.js";
-import { parse_exports } from "./lib_parse_exports.js";
-import { has_dependency } from "./util.js";
+import { viteYaml } from "#plugins";
+import { getProjectPackageJsonPath, hasDependency, PackageJson } from "#util";
+import { parseExports } from "#project";
 
 export const configure = () => {
-    const package_json_path = get_package_json_path();
-    const root_path = path.dirname(package_json_path);
-    /** @type {import("./types.ts").PackageJson} */
-    const package_json = JSON.parse(fs.readFileSync(package_json_path, "utf-8"));
-    const options = package_json.monolibbuild || {};
-    const sourcemap_option = "sourcemap" in options ? options.sourcemap : true;
+    const packageJsonPath = getProjectPackageJsonPath();
+    const rootDir = path.dirname(packageJsonPath);
+    const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
-    const [lib_exports, error] = parse_exports(root_path, package_json);
-    if (error) {
-        console.error("[monolibbuild] " + error);
+    const monodevOptions = packageJson["pistonight/mono-dev"] || {};
+    const sourcemapOption = "sourcemap" in monodevOptions ? monodevOptions.sourcemap : true;
+
+    const libExports = parseExports(rootDir, packageJson);
+    if ("err" in libExports) {
+        console.error("[mono] failed to parse exports: " + libExports.err);
         process.exit(1);
     }
-    const { exports } = lib_exports;
-    /** @type {Set<string>} */
-    const external_deps = new Set();
+    const { exports } = libExports.val;
+    const externalDeps = new Set<string>();
 
-    if (package_json.dependencies) {
-        for (const dep in package_json.dependencies) {
-            add_external_modules(root_path, dep, external_deps);
+    if (packageJson.dependencies) {
+        for (const dep in packageJson.dependencies) {
+            addExternalModules(rootDir, dep, externalDeps);
         }
     }
-    if (package_json.peerDependencies) {
-        for (const dep in package_json.peerDependencies) {
-            add_external_modules(root_path, dep, external_deps);
+    if (packageJson.peerDependencies) {
+        for (const dep in packageJson.peerDependencies) {
+            addExternalModules(rootDir, dep, externalDeps);
         }
     }
     // console.log(external_deps);
@@ -53,8 +52,8 @@ export const configure = () => {
     );
 
     const plugins = [];
-    plugins.push(vitePluginYaml());
-    if (has_dependency(package_json, "react")) {
+    plugins.push(viteYaml());
+    if (hasDependency(packageJson, "react")) {
         plugins.push(vitePluginReact());
         const reactCompilerPreset = viteBabelReactCompilerPreset();
         reactCompilerPreset.preset = () => {
@@ -69,6 +68,9 @@ export const configure = () => {
             }),
         );
     }
+    if (monodevOptions.wasm) {
+        plugins.push(vitePluginWasm());
+    }
 
     return viteDefineConfig({
         plugins,
@@ -77,9 +79,10 @@ export const configure = () => {
         },
         define: {
             "import.meta.vitest": "undefined",
+            "import.meta.version": JSON.stringify(packageJson.version),
         },
         build: {
-            sourcemap: sourcemap_option,
+            sourcemap: sourcemapOption,
             lib: {
                 entry: entry_config,
                 fileName: (_format, entry_name) => {
@@ -91,7 +94,7 @@ export const configure = () => {
                 formats: ["es"],
             },
             rolldownOptions: {
-                external: Array.from(external_deps),
+                external: Array.from(externalDeps),
             },
         },
     });
@@ -99,32 +102,27 @@ export const configure = () => {
 
 /**
  * Collect exports from the package and mark them as external (adding to out)
- *
- * @param {string} root_path
- * @param {string} package_name
- * @param {Set<string>} out
  */
-const add_external_modules = (root_path, package_name, out) => {
+const addExternalModules = (rootDir: string, packageName: string, out: Set<string>) => {
     // add the default output no matter what
-    out.add(package_name);
+    out.add(packageName);
 
-    const package_path = path.join(root_path, "node_modules", package_name);
-    const package_json_path = path.join(package_path, "package.json");
-    /** @type {import("./types.ts").PackageJson} */
-    const package_json = JSON.parse(fs.readFileSync(package_json_path, "utf-8"));
-    if (!package_json.exports || typeof package_json.exports === "string") {
+    const package_Path = path.join(rootDir, "node_modules", packageName);
+    const packageJsonPath = path.join(package_Path, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+    if (!packageJson.exports || typeof packageJson.exports === "string") {
         return;
     }
-    for (const export_name in package_json.exports) {
-        if (export_name === ".") {
+    for (const exportName in packageJson.exports) {
+        if (exportName === ".") {
             continue; // already added above
         }
-        if (!export_name.startsWith("./")) {
+        if (!exportName.startsWith("./")) {
             console.error(
-                `[monolibbuild] unconventional package exports found for package '${package_name}'`,
+                `[mono] unconventional package exports found for package '${packageName}'`,
             );
             process.exit(1);
         }
-        out.add(package_name + export_name.substring(1));
+        out.add(packageName + exportName.substring(1));
     }
 };

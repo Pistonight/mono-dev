@@ -1,15 +1,11 @@
+
 const INDENT = 4;
 
-/** @param {any} value */
-export const stringify_sorted = (value) => {
-    return stringify_sorted_indented(value, 0);
+export const stringifySorted = (value: unknown): string | undefined => {
+    return stringifySortedIndent(value, 0);
 };
 
-/**
- * @param {any} value
- * @param {number} indent
- */
-export const stringify_sorted_indented = (value, indent) => {
+export const stringifySortedIndent = (value: unknown, indent: number): string | undefined => {
     if (value === null || value === undefined) {
         return "null";
     }
@@ -24,7 +20,7 @@ export const stringify_sorted_indented = (value, indent) => {
                     return "[]";
                 }
                 if (value.length === 1) {
-                    const inner = stringify_sorted_indented(value[0], indent);
+                    const inner = stringifySortedIndent(value[0], indent);
                     if (inner !== undefined) {
                         return `[ ${inner} ]`;
                     }
@@ -34,7 +30,7 @@ export const stringify_sorted_indented = (value, indent) => {
                 let has_value = false;
                 const prefix = " ".repeat(indent);
                 for (let i = 0; i < value.length; i++) {
-                    const inner = stringify_sorted_indented(value[i], indent + INDENT);
+                    const inner = stringifySortedIndent(value[i], indent + INDENT);
                     if (inner === undefined) {
                         continue;
                     }
@@ -64,7 +60,7 @@ export const stringify_sorted_indented = (value, indent) => {
     const prefix = " ".repeat(indent);
     let has_value = false;
     for (let i = 0; i < keys.length; i++) {
-        const inner = stringify_sorted_indented(value[keys[i]], indent + INDENT);
+        const inner = stringifySortedIndent((value as Record<string, unknown>)[keys[i]], indent + INDENT);
         if (inner === undefined) {
             continue;
         }

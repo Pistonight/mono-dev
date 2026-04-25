@@ -21,23 +21,18 @@ tasks:
     - pnpm exec monotest run
 
   lib-build:
-    deps: [config]
-    cmds:
-      - pnpm exec monolibbuild
+    - pnpm exec monolibbuild
 
   doc-build:
-    deps: [config]
-    cmds:
-      - pnpm exec monotypedoc
+    - pnpm exec monotypedoc
   doc-dev:
-    deps: [config]
     cmds:
       - >
         shwoop docs {{.SHWOOP_ARGS| default "-w src" }} --host --
         pnpm exec monotypedoc
 
   app-build:
-    deps: [config] # needed for tsconfig for path mapping
+    deps: [config] # needed for subpath mapping
     cmds:
       - pnpm exec vite build
 

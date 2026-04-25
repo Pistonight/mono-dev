@@ -10,11 +10,6 @@ import vitePluginYaml from "./vite_yaml.js";
 import { has_dependency } from "./util.js";
 import { get_package_json_path } from "./location.js";
 
-const ChunkSizeWarningLimit = 4096;
-// const ManualChunks = {
-//     react: ["react", "react-dom", "@fluentui/react-components"],
-// };
-const Dedupe = ["@pistonite/pure", "@pistonite/workex", "i18next", "react-i18next"];
 
 /**
  * @param {import("./vite_config.d.ts").MonodevViteConfig} mono_config
@@ -33,7 +28,7 @@ const monodev = (mono_config) => {
 
         const has_react = has_dependency(packageJson, "react");
 
-        console.log("[mono-dev] injecting mono-dev configuration");
+        console.log("[mono] injecting mono-dev configuration");
         // === Plugins ===
         if (!config.plugins) {
             config.plugins = [];
@@ -85,7 +80,7 @@ const monodev = (mono_config) => {
         }
         if (config.build.chunkSizeWarningLimit) {
             console.warn(
-                "[mono-dev] not injecting chunk size warning limit because it is already specified",
+                "[mono] not injecting chunk size warning limit because it is already specified",
             );
         } else {
             config.build.chunkSizeWarningLimit = ChunkSizeWarningLimit;
@@ -112,7 +107,7 @@ const monodev = (mono_config) => {
         if (mono_config.https) {
             if (config.server.https) {
                 console.warn(
-                    "[mono-dev] not searching for HTTPS config because it is already specified",
+                    "[mono] not searching for HTTPS config because it is already specified",
                 );
             } else {
                 const https = find_https();
@@ -122,7 +117,7 @@ const monodev = (mono_config) => {
                     if (hostname) {
                         if (config.server.host) {
                             console.warn(
-                                `[mono-dev] not setting server.host to because it is already specified`,
+                                `[mono] not setting server.host to because it is already specified`,
                             );
                         } else {
                             config.server.host = hostname;
@@ -212,9 +207,9 @@ const find_https = () => {
                     }
                 }
             } catch (e) {
-                console.warn(`[mono-dev] failed to read cert.pem: ${e}`);
+                console.warn(`[mono] failed to read cert.pem: ${e}`);
             }
-            console.log(`[mono-dev] using HTTPS key and cert from "${directory}"`);
+            console.log(`[mono] using HTTPS key and cert from "${directory}"`);
             return { key, cert, hostname };
         } catch {
             // ignore
@@ -233,7 +228,7 @@ const find_https = () => {
     if (config) {
         return config;
     }
-    console.warn("[mono-dev] HTTPS key and cert not found, not using HTTPS.");
+    console.warn("[mono] HTTPS key and cert not found, not using HTTPS.");
     return undefined;
 };
 
@@ -243,12 +238,12 @@ const find_https = () => {
  */
 const transformRolldownOutputOption = (output) => {
     if (output.manualChunks) {
-        console.warn("[mono-dev] not injecting code splitting because 'manualChunks' is specified");
+        console.warn("[mono] not injecting code splitting because 'manualChunks' is specified");
         return output;
     }
     if ("codeSplitting" in output && typeof output.codeSplitting !== "object") {
         console.warn(
-            "[mono-dev] not injecting code splitting because 'codeSplitting' is specified and not an object",
+            "[mono] not injecting code splitting because 'codeSplitting' is specified and not an object",
         );
         return output;
     }

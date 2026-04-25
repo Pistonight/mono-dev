@@ -125,7 +125,7 @@ function process_file(filepath) {
         const desc = COMMON_DESCRIPTIONS[name];
         if (!desc) {
             console.warn(
-                `[monotaskfile] ${filepath}: unknown task "${name}" — add a desc manually`,
+                `[mono] ${filepath}: unknown task "${name}" — add a desc manually`,
             );
             had_warning = true;
         }
@@ -135,22 +135,22 @@ function process_file(filepath) {
             // Convert `  name:\n    - cmd` to `  name:\n    cmds:\n      - cmd`
             const updated = convert_shorthand_task(current_text, name, desc ?? null);
             if (updated === null) {
-                console.warn(`[monotaskfile] ${filepath}: could not locate task "${name}" in file`);
+                console.warn(`[mono] ${filepath}: could not locate task "${name}" in file`);
                 had_warning = true;
                 continue;
             }
             console.log(
-                `[monotaskfile] ${filepath}: converted shorthand for "${name}"${desc ? ` and added desc` : ""}`,
+                `[mono] ${filepath}: converted shorthand for "${name}"${desc ? ` and added desc` : ""}`,
             );
             current_text = updated;
         } else if (desc) {
             const updated = insert_desc(current_text, name, desc);
             if (updated === null) {
-                console.warn(`[monotaskfile] ${filepath}: could not locate task "${name}" in file`);
+                console.warn(`[mono] ${filepath}: could not locate task "${name}" in file`);
                 had_warning = true;
                 continue;
             }
-            console.log(`[monotaskfile] ${filepath}: added desc for "${name}"`);
+            console.log(`[mono] ${filepath}: added desc for "${name}"`);
             current_text = updated;
         }
     }
@@ -165,7 +165,7 @@ function process_file(filepath) {
 function run_monotaskfile() {
     const files = find_taskfiles();
     if (files.length === 0) {
-        console.log("[monotaskfile] no Taskfile.yml files found");
+        console.log("[mono] no Taskfile.yml files found");
         return;
     }
 

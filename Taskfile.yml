@@ -27,7 +27,6 @@ tasks:
       - task: mdbook:install-theme
         vars:
           MDBOOK_TARGET: website
-          MONO_DEV: .
 
   check:
     - node toolsets/js/src/monolint_main.js
@@ -63,5 +62,6 @@ tasks:
         js-yaml
         vitest
         typedoc typedoc-theme-oxide
+        which @types/which
       - pnpm dedupe
       - pnpm dedupe --check

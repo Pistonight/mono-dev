@@ -28,7 +28,8 @@
         /* === Section: Modules */
         "module": "esnext",
         "moduleResolution": "bundler",
-        // "baseUrl" will be set to the root of the folder, or not set if checking ts files in root
+        // "baseUrl" - removed in TS 7.0
+        // "rootDir" - set in each tsconfig.json to be "."
 
         // Types needs to be included manually using /// directives,
         // to avoid types being auto-included from node_modules
@@ -78,6 +79,9 @@
         /* === Lib Build Options */
         "declaration": true,
         "declarationMap": true,
-        "emitDeclarationOnly": true
+        "emitDeclarationOnly": true,
+
+        // TS 6->7 migration
+        "stableTypeOrdering": true
     }
 }
