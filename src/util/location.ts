@@ -4,9 +4,8 @@ import path from "node:path";
 const DIRNAME = import.meta.dirname;
 
 // compute dynamically based on if we are being executed from src or dist
-export const MONO_DEV_PATH = path.basename(DIRNAME) === "dist"
-    ? path.dirname(DIRNAME)
-    :    path.dirname(path.dirname(DIRNAME));
+export const MONO_DEV_PATH =
+    path.basename(DIRNAME) === "dist" ? path.dirname(DIRNAME) : path.dirname(path.dirname(DIRNAME));
 export const MONO_DEV_BIN_PATH = path.join(MONO_DEV_PATH, "node_modules", ".bin");
 
 export const getProjectLocations = (): ProjectLocation => {
@@ -17,9 +16,11 @@ export const getProjectLocations = (): ProjectLocation => {
         fs.mkdirSync(cacheDir, { recursive: true });
     }
     return {
-        packageJsonPath, rootDir, cacheDir
-    }
-}
+        packageJsonPath,
+        rootDir,
+        cacheDir,
+    };
+};
 
 export const getProjectPackageJsonPath = (): string => {
     let curr = path.resolve(".");
@@ -38,8 +39,8 @@ export const getMonodevVersion = (): string => {
     return import.meta.version;
 };
 
-export type ProjectLocation = {
-    packageJsonPath: string,
-    rootDir: string,
-    cacheDir: string,
+export interface ProjectLocation {
+    packageJsonPath: string;
+    rootDir: string;
+    cacheDir: string;
 }

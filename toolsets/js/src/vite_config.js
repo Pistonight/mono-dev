@@ -10,7 +10,6 @@ import vitePluginYaml from "./vite_yaml.js";
 import { has_dependency } from "./util.js";
 import { get_package_json_path } from "./location.js";
 
-
 /**
  * @param {import("./vite_config.d.ts").MonodevViteConfig} mono_config
  */

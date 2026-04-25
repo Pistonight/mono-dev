@@ -44,7 +44,10 @@ tasks:
     cmds:
       - node bin/mono.js check
   fix:
-    - node toolsets/js/src/monolint_main.js --fix
+    desc: Fix style
+    deps: [build]
+    cmds:
+      - node bin/mono.js check -f
 
   dev:
     cmds:

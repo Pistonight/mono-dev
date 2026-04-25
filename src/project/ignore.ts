@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { PackageJson } from "#util";
+import type { PackageJson } from "#util";
 
 export const getIgnoreConfig = (packageJson: PackageJson, rootDir: string): string[] => {
     let checkIgnoreLines: string[] = [];
@@ -18,4 +18,4 @@ export const getIgnoreConfig = (packageJson: PackageJson, rootDir: string): stri
         checkIgnoreLines.push(...packageJson.nocheck);
     }
     return checkIgnoreLines;
-}
+};

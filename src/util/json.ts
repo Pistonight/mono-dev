@@ -1,4 +1,3 @@
-
 const INDENT = 4;
 
 export const stringifySorted = (value: unknown): string | undefined => {
@@ -60,7 +59,10 @@ export const stringifySortedIndent = (value: unknown, indent: number): string | 
     const prefix = " ".repeat(indent);
     let has_value = false;
     for (let i = 0; i < keys.length; i++) {
-        const inner = stringifySortedIndent((value as Record<string, unknown>)[keys[i]], indent + INDENT);
+        const inner = stringifySortedIndent(
+            (value as Record<string, unknown>)[keys[i]],
+            indent + INDENT,
+        );
         if (inner === undefined) {
             continue;
         }

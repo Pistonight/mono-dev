@@ -124,9 +124,7 @@ function process_file(filepath) {
 
         const desc = COMMON_DESCRIPTIONS[name];
         if (!desc) {
-            console.warn(
-                `[mono] ${filepath}: unknown task "${name}" — add a desc manually`,
-            );
+            console.warn(`[mono] ${filepath}: unknown task "${name}" — add a desc manually`);
             had_warning = true;
         }
 

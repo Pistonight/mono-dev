@@ -2,7 +2,7 @@ import fs_promises from "node:fs/promises";
 import fs from "node:fs";
 import path from "node:path";
 
-import { DTS, normalizeLineEnds, PackageJson, stringifySorted } from "#util";
+import { DTS, normalizeLineEnds, type PackageJson, stringifySorted } from "#util";
 
 export const genTypeScriptConfig = async (packageJson: PackageJson) => {
     const existingTsConfigs = new Set<string>();
@@ -78,11 +78,14 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
             compilerOptions: {
                 ...DEFAULT_TSCONFIG.compilerOptions,
                 tsBuildInfoFile: `node_modules/.mono/tsconfig.${dir}.tsbuildinfo`,
-                rootDir: "."
+                rootDir: ".",
             },
             include: [dir],
         };
-        await fs_promises.writeFile(tsconfig, normalizeLineEnds(stringifySorted(tsconfigContent)||""));
+        await fs_promises.writeFile(
+            tsconfig,
+            normalizeLineEnds(stringifySorted(tsconfigContent) || ""),
+        );
     });
 
     const removeExisting = (async () => {
@@ -98,13 +101,13 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
             compilerOptions: {
                 ...DEFAULT_TSCONFIG.compilerOptions,
                 tsBuildInfoFile: `node_modules/.mono/tsconfig._.tsbuildinfo`,
-                rootDir: "."
+                rootDir: ".",
             },
             include: rootFiles,
         };
         await fs_promises.writeFile(
             tsconfig,
-            normalizeLineEnds(stringifySorted(tsconfigContent)||""),
+            normalizeLineEnds(stringifySorted(tsconfigContent) || ""),
         );
     }
 
@@ -133,7 +136,7 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
         };
         await fs_promises.writeFile(
             tsconfig,
-            normalizeLineEnds(stringifySorted(tsconfigContent)||""),
+            normalizeLineEnds(stringifySorted(tsconfigContent) || ""),
         );
     } else {
         if (fs.existsSync("tsconfig.json")) {
@@ -142,16 +145,16 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
         }
     }
     return { projectCount, nonTsDirectories };
-}
+};
 const DEFAULT_TSCONFIG = {
     /* https://aka.ms/tsconfig */
-    "compilerOptions": {
+    compilerOptions: {
         // -- we are only type checking, so no emit config is needed
-        "noEmit": true,
+        noEmit: true,
 
         /* === Section: Project */
-        "composite": true,
-        "incremental": true,
+        composite: true,
+        incremental: true,
         // "tsBuildInfoFile" is generated to be in node_modules/.tsc/
 
         // -- probably useless project options
@@ -163,16 +166,16 @@ const DEFAULT_TSCONFIG = {
         // extra lib needs to be declared using /// directives:
         // - /// <reference lib="dom" />
         // - /// <reference lib="dom.iterable" />
-        "lib": ["esnext"],
+        lib: ["esnext"],
 
-        "target": "esnext",
-        "useDefineForClassFields": true,
-        "jsx": "preserve",
-        "moduleDetection": "force",
+        target: "esnext",
+        useDefineForClassFields: true,
+        jsx: "preserve",
+        moduleDetection: "force",
 
         /* === Section: Modules */
-        "module": "esnext",
-        "moduleResolution": "bundler",
+        module: "esnext",
+        moduleResolution: "bundler",
         // "baseUrl" - removed in TS 7.0
         // "rootDir" - set in each tsconfig.json to be "."
 
@@ -181,37 +184,37 @@ const DEFAULT_TSCONFIG = {
         // - /// <reference types="node" />
         // - /// <reference types="bun" />
         // - /// <reference types="vite/client" />
-        "typeRoots": [],
-        "types": [],
-        "allowImportingTsExtensions": true,
+        typeRoots: [],
+        types: [],
+        allowImportingTsExtensions: true,
 
         // this is becoming natively supported in many runtime/frameworks, so let's just enable it
-        "resolveJsonModule": true,
+        resolveJsonModule: true,
 
         /* === Section: JavaScript Support */
         // JS support aren't enabled. If you use JS, you opt-out of type-checking automatically
-        "allowJs": false,
-        "checkJs": false,
+        allowJs: false,
+        checkJs: false,
 
         /* === Section: Interop Constraints */
         // This means modules are enough for tools other than tsc to understand
-        "isolatedModules": true,
+        isolatedModules: true,
         // This option might be useful in the future for libraries (like deno/JSR)
         // "isolatedDeclarations": true,
         // This isn't what you think it is. It means you cannot import X from "foo.ts",
         // if the file is actually "FoO.ts". (like the opposite of C includes)
-        "forceConsistentCasingInFileNames": true,
+        forceConsistentCasingInFileNames: true,
 
         /* === Section: Type Checking */
-        "strict": true,
+        strict: true,
         // these are covered by strict
         // noImplicitAny: true,
         // noImplicitThis: true,
-        "noImplicitOverride": true,
+        noImplicitOverride: true,
         // these are off because eslint covers them and allows marking them with _ to opt-out
         // "noUnusedLocals": true,
         // "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
+        noFallthroughCasesInSwitch: true,
 
         // -- other options are unused for now, but interesting to consider
         // "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
@@ -219,14 +222,14 @@ const DEFAULT_TSCONFIG = {
         // "noPropertyAccessFromIndexSignature": true,       /* Enforces using indexed accessors for keys declared using an indexed type. */
 
         /* === Section: Completeness */
-        "skipLibCheck": true,
+        skipLibCheck: true,
 
         /* === Lib Build Options */
-        "declaration": true,
-        "declarationMap": true,
-        "emitDeclarationOnly": true,
+        declaration: true,
+        declarationMap: true,
+        emitDeclarationOnly: true,
 
         // TS 6->7 migration
-        "stableTypeOrdering": true
-    }
-}
+        stableTypeOrdering: true,
+    },
+};

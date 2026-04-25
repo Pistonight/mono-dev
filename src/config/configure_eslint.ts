@@ -11,7 +11,7 @@ import reactCompiler from "eslint-plugin-react-compiler";
 import tseslint from "typescript-eslint";
 
 import { MonodevEslintPlugin } from "#plugins";
-import { getProjectPackageJsonPath, hasDependency, PackageJson } from "#util";
+import { getProjectPackageJsonPath, hasDependency, type PackageJson } from "#util";
 import { getIgnoreConfig } from "#project";
 
 export const configure = () => {
@@ -82,7 +82,7 @@ export const configure = () => {
     });
 
     return overrideEslintConfig(config, getDefaultOverrides());
-}
+};
 
 const getDefaultOverrides = (): Linter.RulesRecord => {
     // these only apply if they are already in the config
@@ -93,9 +93,7 @@ const getDefaultOverrides = (): Linter.RulesRecord => {
             "warn",
             { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
         ],
-        "@typescript-eslint/restrict-template-expressions": [
-            "warn", { allowNumber: true }
-        ],
+        "@typescript-eslint/restrict-template-expressions": ["warn", { allowNumber: true }],
         // we have TypeScript
         "react/prop-types": "off",
     };
@@ -103,7 +101,7 @@ const getDefaultOverrides = (): Linter.RulesRecord => {
 
 export const overrideEslintConfig = <T extends keyof EslintConfigPartSelector>(
     configs: EslintConfigPartSelector[T],
-    overrides: Linter.RulesRecord
+    overrides: Linter.RulesRecord,
 ): EslintConfigPartSelector[T] => {
     if (Array.isArray(configs)) {
         for (const config of configs) {
@@ -119,19 +117,19 @@ export const overrideEslintConfig = <T extends keyof EslintConfigPartSelector>(
         }
     }
     return configs;
-}
+};
 
-export type EslintConfigPart = {
-    rules?: Partial<Linter.RulesRecord> | undefined,
-};
+export interface EslintConfigPart {
+    rules?: Partial<Linter.RulesRecord> | undefined;
+}
 export interface EslintConfigPartSelector {
-    single: EslintConfigPart,
-    array: EslintConfigPart[],
-};
+    single: EslintConfigPart;
+    array: EslintConfigPart[];
+}
 
 const findIgnores = (packageJson: PackageJson, rootDir: string): string[] => {
     //ignore the config itself
-    const ignores: string[] = ["./eslint.config.js"]
+    const ignores: string[] = ["./eslint.config.js"];
 
     // ignore non-ts directories
     for (const p of fs.readdirSync(rootDir)) {
@@ -140,10 +138,12 @@ const findIgnores = (packageJson: PackageJson, rootDir: string): string[] => {
                 try {
                     fs.statSync(`${rootDir}/${p}/env.d.ts`);
                 } catch {
-                    ignores.push("./"+p);
+                    ignores.push("./" + p);
                 }
             }
-        } catch {}
+        } catch {
+            // ignore
+        }
     }
     const ignoreConfig = getIgnoreConfig(packageJson, rootDir);
     for (const line of ignoreConfig) {
@@ -160,4 +160,4 @@ const findIgnores = (packageJson: PackageJson, rootDir: string): string[] => {
         }
     }
     return ignores;
-}
+};

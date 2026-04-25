@@ -64,4 +64,4 @@ export const errstr = (e: unknown, recursing?: boolean): string => {
         return `${e.code}`;
     }
     return `${e}`;
-}
+};

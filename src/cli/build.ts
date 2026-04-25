@@ -2,7 +2,14 @@ import path from "node:path";
 import fs from "node:fs";
 
 import { checkMonodevVersion, genPackageConfig, genTypeScriptConfig } from "#config";
-import { DTS, executeNode, getProjectLocations, normalizeLineEnds, PackageJson, stringifySorted } from "#util";
+import {
+    DTS,
+    executeNode,
+    getProjectLocations,
+    normalizeLineEnds,
+    type PackageJson,
+    stringifySorted,
+} from "#util";
 import { parseExports } from "#project";
 
 export const runBuild = async (_args: string[]): Promise<number> => {
@@ -16,7 +23,7 @@ export const runBuild = async (_args: string[]): Promise<number> => {
 
     const libExports = parseExports(rootDir, packageJson, true /* print */);
     if ("err" in libExports) {
-        console.error(`[mono] failed to parse exports: `+libExports.err);
+        console.error(`[mono] failed to parse exports: ` + libExports.err);
         return 1;
     }
     const { dist, src } = libExports.val;
@@ -46,11 +53,11 @@ export const runBuild = async (_args: string[]): Promise<number> => {
     theConfig.compilerOptions.outDir = path.join(dist, DTS);
     theConfig.exclude = ["**/*.test.ts", "**/*.test.mts", "**/*.test.cts", "**/*.test.tsx"];
     const tsconfigModifiedPath = path.join(rootDir, "tsconfig." + src + "__" + DTS + ".json");
-    fs.writeFileSync(tsconfigModifiedPath, normalizeLineEnds(stringifySorted(theConfig)||""));
+    fs.writeFileSync(tsconfigModifiedPath, normalizeLineEnds(stringifySorted(theConfig) || ""));
 
     const viteResult = executeNode("vite", ["build", "--config", vite_config_path]);
     if ("err" in viteResult) {
-        console.error("[mono] bundle with vite failed: "+viteResult.err);
+        console.error("[mono] bundle with vite failed: " + viteResult.err);
         return 21;
     }
 
@@ -58,11 +65,11 @@ export const runBuild = async (_args: string[]): Promise<number> => {
     const dtsStartTime = Date.now();
     const tscResult = executeNode("tsc", ["-p", tsconfigModifiedPath]);
     if ("err" in tscResult) {
-        console.error("[mono] dts generation with tsc failed: "+tscResult.err);
+        console.error("[mono] dts generation with tsc failed: " + tscResult.err);
         return 31;
     }
     const dtsTime = Math.floor(Date.now() - dtsStartTime);
     console.log(`[mono] dts generated at ${dist}/${DTS} (${dtsTime}ms)`);
 
     return 0;
-}
+};

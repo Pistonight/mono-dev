@@ -12,11 +12,9 @@ await Bun.build({
     target: "node",
     external,
     define,
-    outdir: "dist/config"
+    outdir: "dist/config",
 });
 
 // then we can run build for ourself
 console.log("bootstrap: running vite build with bun");
 await runBuild([]);
-
-

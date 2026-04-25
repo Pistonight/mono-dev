@@ -4,6 +4,10 @@ import { getMonodevVersion } from "#util";
 
 export const checkMonodevVersion = (cacheDir: string) => {
     const currentVersion = getMonodevVersion();
+    if (!currentVersion) {
+        // in bootstrap we don't have the version
+        return;
+    }
     // using sync operations here so they are less likely to fail, and when they do,
     // it's possible to catch them
     if (!fs.existsSync(cacheDir)) {
@@ -34,4 +38,4 @@ export const checkMonodevVersion = (cacheDir: string) => {
             }
         }
     }
-}
+};

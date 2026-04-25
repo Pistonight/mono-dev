@@ -1,4 +1,3 @@
-
 export const normalizeLineEnds = (content: string) => {
     return content
         .split("\r")

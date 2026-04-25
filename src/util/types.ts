@@ -1,4 +1,4 @@
-export type PackageJson = {
+export interface PackageJson {
     private?: true;
     version?: string;
     files?: string[];
@@ -12,20 +12,20 @@ export type PackageJson = {
     ["pistonight/mono-dev"]?: MonoDevOptions;
     nocheck?: string[];
     imports?: Record<string, string>;
-};
+}
 
-export type PackageExport = {
+export interface PackageExport {
     types?: string;
     import?: string;
-};
+}
 
-export type MonoDevOptions = {
+export interface MonoDevOptions {
     /** Allow publishing */
     publish?: boolean;
     /** if lib mode should be used, which adds more rules to eslint. default is true */
     lib?: boolean;
     /** Additional modules to be externalized */
-    external?: string[],
+    external?: string[];
     /** undefined = true */
     sourcemap?: boolean | "inline" | "hidden";
     /** undefined = true, set to false to disable zapping "imports" field in package.json */
@@ -50,17 +50,16 @@ export type MonoDevOptions = {
      * - other: set the same plugins for worker, and set the format to the value
      */
     worker?: "default" | "es";
-};
+}
 
-export type LibExportConfig = {
+export interface LibExportConfig {
     dist: string;
     src: string;
     exports: ParsedExport[];
-};
+}
 
-export type ParsedExport = {
+export interface ParsedExport {
     entry_name: string;
     source_path_abs: string;
     dist_path_rel: string;
-};
-
+}

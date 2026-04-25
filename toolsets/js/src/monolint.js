@@ -140,7 +140,9 @@ const create_configs = async (clean) => {
     /** @type {import("./types.ts")}.PackageJson */
     const packageJson = JSON.parse(fs.readFileSync(pathCurrProjPackageJson, "utf-8"));
     if (!packageJson.private) {
-        console.error("[mono] 'private' must be set to true to prevent accidental publishing; to pack for publishing please use monopack");
+        console.error(
+            "[mono] 'private' must be set to true to prevent accidental publishing; to pack for publishing please use monopack",
+        );
         process.exit(31);
     }
     await ensure_subpath_imports(packageJson, pathCurrProjPackageJson);
@@ -265,7 +267,7 @@ const create_ts_configs = async (packageJson) => {
             ),
             compilerOptions: {
                 tsBuildInfoFile: path.join(pathCache, `tsconfig.${dir}.tsbuildinfo`),
-                rootDir: "."
+                rootDir: ".",
             },
             include: [dir],
         };
@@ -291,14 +293,11 @@ const create_ts_configs = async (packageJson) => {
             ),
             compilerOptions: {
                 tsBuildInfoFile: path.join(pathCache, `tsconfig._.tsbuildinfo`),
-                rootDir: "."
+                rootDir: ".",
             },
             include: rootFiles,
         };
-        await fs_promises.writeFile(
-            tsconfig,
-            normalize_lineend(stringify_sorted(tsconfigContent)),
-        );
+        await fs_promises.writeFile(tsconfig, normalize_lineend(stringify_sorted(tsconfigContent)));
     }
 
     const projectCount = rootFiles.length + tsDirectories.length;
@@ -324,10 +323,7 @@ const create_ts_configs = async (packageJson) => {
             files: [],
             references,
         };
-        await fs_promises.writeFile(
-            tsconfig,
-            normalize_lineend(stringify_sorted(tsconfigContent)),
-        );
+        await fs_promises.writeFile(tsconfig, normalize_lineend(stringify_sorted(tsconfigContent)));
     } else {
         if (fs.existsSync("tsconfig.json")) {
             console.log("[mono] removing tsconfig.json");

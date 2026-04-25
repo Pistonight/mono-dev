@@ -1,5 +1,5 @@
 /// <reference types="node" />
 interface ImportMeta {
-  url: string,
-  readonly version: string,
+    url: string;
+    readonly version: string;
 }

@@ -9,7 +9,7 @@ import babelReactCompiler from "babel-plugin-react-compiler";
 import vitePluginWasm from "vite-plugin-wasm";
 
 import { viteYaml } from "#plugins";
-import { getProjectPackageJsonPath, hasDependency, PackageJson } from "#util";
+import { getProjectPackageJsonPath, hasDependency, type PackageJson } from "#util";
 import { parseExports } from "#project";
 
 export const configure = () => {

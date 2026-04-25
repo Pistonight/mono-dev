@@ -1,15 +1,14 @@
 import { readFileSync } from "node:fs";
 import YAML from "js-yaml";
-import type {Plugin} from "vite";
+import type { Plugin } from "vite";
 
-
-export const viteYaml= ():Plugin => {
+export const viteYaml = (): Plugin => {
     return {
         name: "vite-yaml",
         transform(_, id: string) {
             if (!id.endsWith(".yaml") && !id.endsWith(".yml")) return null;
             const raw = readFileSync(id, "utf-8");
-            // https://vite.dev/config/shared-options#json-stringify 
+            // https://vite.dev/config/shared-options#json-stringify
             // https://v8.dev/blog/cost-of-javascript-2019#json:~:text=A%20good%20rule%20of%20thumb%20is%20to%20apply%20this%20technique%20for%20objects%20of%2010%20kB%20or%20larger
             if (raw.length > 10_000) {
                 // this is the stringified json '{"foo":"bar"}'
@@ -21,4 +20,4 @@ export const viteYaml= ():Plugin => {
             return { code: `export default ${json};`, map: null };
         },
     };
-}
+};

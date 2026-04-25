@@ -1,6 +1,7 @@
 import { getMonodevVersion } from "#util";
 
 import { runBuild } from "./build.ts";
+import { runCheck } from "./check.ts";
 import { runConfig } from "./config.ts";
 
 export const main = async (args: string[]): Promise<never> => {
@@ -10,33 +11,36 @@ export const main = async (args: string[]): Promise<never> => {
     }
 
     const [command, ...rest] = args;
-    switch(command) {
+    switch (command) {
         case "help":
         case "--help":
         case "?":
         case "-h": {
             logHelp();
-            process.exit(0);
+            return process.exit(0);
         }
         case "version": {
-            console.log("mono-dev "+getMonodevVersion());
-            process.exit(0);
+            console.log("mono-dev " + getMonodevVersion());
+            return process.exit(0);
         }
         case "config": {
-            process.exit(await runConfig(rest));
+            return process.exit(await runConfig(rest));
+        }
+        case "check": {
+            return process.exit(await runCheck(rest));
         }
         case "build": {
-            process.exit(await runBuild(rest));
+            return process.exit(await runBuild(rest));
         }
     }
 
-    console.error("[mono] unknown command "+command);
+    console.error("[mono] unknown command " + command);
     logHelp();
     process.exit(1);
-}
+};
 
 const logHelp = () => {
-        console.log(`mono-dev CLI
+    console.log(`mono-dev CLI
   config           Generate typeck and eslint config, for language servers
   check [-f]       Run typeck, prettier, eslint
   build            Build library (for bundling app run vite directly)
@@ -45,4 +49,4 @@ const logHelp = () => {
   publish          Publish the package
   version          Print the version
 `);
-}
+};
