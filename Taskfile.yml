@@ -92,8 +92,9 @@ tasks:
                exit 2;
              fi;
              cp -R node_modules/.mono/pnpm-pack.temp/package/* node_modules/.mono/publish;
-             git commit -am "publish: $nextversion";
-             git push;
+             git -C node_modules/.mono/publish add .;
+             git -C node_modules/.mono/publish commit -m "publish: $nextversion";
+             git -C node_modules/.mono/publish push;
              echo "published $lastversion -> $nextversion";
 
     

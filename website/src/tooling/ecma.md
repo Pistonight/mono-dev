@@ -19,19 +19,19 @@ Running `pnpm up mono-dev` will resolve the latest commit and update it.
 -   ```json
     {
         "devDependencies": {
-            "mono-dev": "github:pistonight/mono-dev#main"
+            "mono-dev": "github:Pistonight/mono-dev#dist"
         },
         "nocheck": [
             "/src/generated"
         ],
-        "monolibbuild": {}
+        "pistonight/mono-dev": {}
     }
     ```
 
     - Paths in `nocheck` will not be processed by `eslint` or `prettier`.
       If the path is in the form of `/foo` or `foo`, the `foo` directory
       will also not be type-checked.
-    - `monolibbuild` is the library build options. See [BuildOptions](https://github.com/Pistonight/mono-dev/blob/main/toolsets/js/src/types.ts)
+    - `pistonight/mono-dev` is the options for mono-dev. See [MonoDevOptions](https://github.com/Pistonight/mono-dev/blob/main/src/util/types.ts)
 
 #### Template: `Taskfile.yml`
 -   ```yaml
@@ -58,7 +58,7 @@ Running `pnpm up mono-dev` will resolve the latest commit and update it.
     /docs
     ```
 
-## Type Checking
+## Type Checking & Linting
 `mono-dev` automatically generates type checking configs based on directory structure:
 - Each directory is type-checked separately
   and allow for different env config (for example, `src` vs `scripts`)
@@ -66,6 +66,11 @@ Running `pnpm up mono-dev` will resolve the latest commit and update it.
   in each directory. Only directories with `env.d.ts` will be checked.
 - If root directory contain any TypeScript stuff, it will be checked as well
 - ESLint only checks the TypeScript projects. If you use ECMAScript, you opt-out of safety anyway
+
+For LSP and compatibility with other tools, ESLint and tsconfig files
+will be generated at the project root (like how they are for a regular project).
+For eslint-lsp, you may need to add `eslint` dependency to downstream in order
+for the server to find the eslint library.
 
 ## Import Path remapping
 
@@ -81,7 +86,7 @@ This is why the field is mapped to the source typescript files instead of files 
 
 The mapping is automatically generated if `package.json` doesn't have `exports` or
 if any path in `exports` ends with `.(c|m)?tsx?` and does not end with `.d.ts`.
-It can also be manuall disabled with the `monolibbuild.importmap = false` option.
+It can also be manuall disabled with the `importmap = false` option.
 
 The source directory detected from the exports is used to generate the mapping.
 
@@ -109,6 +114,9 @@ generates:
 #util/image -> ./src/util/image/index.ts
 #util/data -> ./src/util/data/index.ts
 ```
+
+Note that in the published `package.json`, the imports will be replaced
+with the `.d.ts` files
 
 ~~~
 
@@ -169,25 +177,26 @@ The source for `my-lib/foo` will be `./src/foo/index.ts` and for `my-lib/bar`, `
 If `.ts` extension is not found, `.tsx` is tried. Note that even for single entry points,
 it needs to be specified as an `exports` object for TSC to respect the types.
 
+If needed, the `lib-types` export defines the types for library builds.
+Put in `env.d.ts`
+```typescript
+/// <reference types="mono-dev/lib-types" />
+```
+
 
 ## Vite
 `mono-dev` ships a baseline vite config that adds common plugins
 and configs to my projects.
 
-Add `vite` to the downstream project, with `vite.config.ts` at the root:
+`vite.config.ts` at the root:
 ```typescript
-import { defineConfig } from "mono-dev/vite";
-import monodev from "mono-dev/vite-config";
+import { configure } from "mono-dev/app-build-config";
 
-// see type definition for more info
-const monodevConfig = monodev({
-    https: true, // if secure context is needed, needs trusted certificate
-    wasm: true, // if wasm
-    worker: "es", // if ES worker is needed
-});
+// config options are referenced from pistonight/mono-dev options
+// in package.json
 
-// wrap vite config with monodevConfig
-export default defineConfig(monodevConfig({
+// use configure just like defineConfig
+export default configure({
     /** normal vite config here */
 });
 ```
@@ -199,10 +208,17 @@ Plugins are automatically added:
 
 Define vite types in `src/env.d.ts`:
 ```typescript
-/// <reference types="mono-dev/vite-types" />
+/// <reference types="mono-dev/app-types" />
 /// <reference types="dom" />
-/// <reference types="dom.iterable" />
 ```
 
 Use the `ecma:app-dev` and `ecma:app-build` tasks to execute vite
 dev server and build.
+
+## Publish
+The tool need to zap the `package.json` before publishing.
+Therefore, `private` must be `true` to prevent accidental
+publishing of the original package.json.
+Use the `ecma:publish` or `pnpm exec mono publish` to publish the package.
+
+`--access public` is always specified.
