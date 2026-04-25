@@ -4,6 +4,7 @@ import { runBuild } from "./build.ts";
 import { runCheck } from "./check.ts";
 import { runConfig } from "./config.ts";
 import { runDoc } from "./doc.ts";
+import { runPublish } from "./publish.ts";
 import { runTaskfile } from "./taskfile.ts";
 import { runTest } from "./vitest.ts";
 
@@ -44,6 +45,9 @@ export const main = async (args: string[]): Promise<never> => {
         case "taskfile": {
             return process.exit(runTaskfile());
         }
+        case "publish": {
+            return process.exit(await runPublish(rest));
+        }
     }
 
     console.error("[mono] unknown command " + command);
@@ -59,7 +63,7 @@ const logHelp = () => {
   test  ARGS...    Run test (with vitest)
   doc   [--json]   Build documentation 
   taskfile         Fixup taskfiles
-  publish          Publish the package
+  publish [-n]     Publish the package (-n for dry-run)
   version          Print the version
 `);
 };

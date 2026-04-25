@@ -20,7 +20,7 @@ export interface PackageExport {
 }
 
 export interface MonoDevOptions {
-    /** Allow publishing */
+    /** Allow publishing (default false) */
     publish?: boolean;
     /** if lib mode should be used, which adds more rules to eslint. default is true */
     lib?: boolean;

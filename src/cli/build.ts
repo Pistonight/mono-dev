@@ -55,7 +55,7 @@ export const runBuild = async (_args: string[]): Promise<number> => {
     const tsconfigModifiedPath = path.join(rootDir, "tsconfig." + src + "__" + DTS + ".json");
     fs.writeFileSync(tsconfigModifiedPath, normalizeLineEnds(stringifySorted(theConfig) || ""));
 
-    const viteResult = executeNode("vite", ["build", "--config", vite_config_path]);
+    const viteResult = executeNode("vite", rootDir, ["build", "--config", vite_config_path]);
     if ("err" in viteResult) {
         console.error("[mono] bundle with vite failed: " + viteResult.err);
         return 21;
@@ -63,7 +63,7 @@ export const runBuild = async (_args: string[]): Promise<number> => {
 
     console.log("[mono] generating dts...");
     const dtsStartTime = Date.now();
-    const tscResult = executeNode("tsc", ["-p", tsconfigModifiedPath]);
+    const tscResult = executeNode("tsc", rootDir, ["-p", tsconfigModifiedPath]);
     if ("err" in tscResult) {
         console.error("[mono] dts generation with tsc failed: " + tscResult.err);
         return 31;

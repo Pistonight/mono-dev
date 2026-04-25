@@ -28,7 +28,7 @@ export const checkMonodevVersion = (cacheDir: string) => {
             clean = true;
         }
         if (clean) {
-            fs.rmSync(cacheDir, { recursive: true });
+            fs.rmSync(cacheDir, { recursive: true, force: true });
             fs.mkdirSync(cacheDir, { recursive: true });
             // this can fail for some reason
             try {

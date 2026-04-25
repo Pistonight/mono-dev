@@ -5,7 +5,7 @@ import { checkMonodevVersion, genPackageConfig, genTypeScriptConfig } from "#con
 import { executeNode, getProjectLocations, type PackageJson } from "#util";
 
 export const runTest = async (args: string[]): Promise<number> => {
-    const { packageJsonPath, cacheDir } = getProjectLocations();
+    const { packageJsonPath, rootDir, cacheDir } = getProjectLocations();
     checkMonodevVersion(cacheDir);
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
@@ -17,7 +17,7 @@ export const runTest = async (args: string[]): Promise<number> => {
         `import { configure } from "mono-dev/test-config"; export default configure();`,
     );
 
-    const result = executeNode("vitest", ["--config", configPath, ...args]);
+    const result = executeNode("vitest", rootDir, ["--config", configPath, ...args]);
     if (result.err) {
         return 1;
     }

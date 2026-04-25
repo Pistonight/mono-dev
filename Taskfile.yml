@@ -33,9 +33,10 @@ tasks:
     cmds:
       - rm -rf dist
       - bun scripts/bootstrap.ts
-      - cmd: "echo 'bootstrap: running vite build with node'"
+      - cmd: "echo 'bootstrap: re-running vite build with node'"
         silent: true
-      - node bin/mono.js build
+      - cmd: node bin/mono.js build
+        silent: true
       - node bin/mono.js config
 
   check:
@@ -65,6 +66,37 @@ tasks:
     cmds:
       - rm -rf website/book
       - mdbook build website
+
+  publish:
+    desc: Publish to the dist branch
+    vars:
+      VERSION:
+        sh: jq '.version' package.json | tr -d '"'
+    cmds:
+      - task: build
+      - node bin/mono.js check
+      - node bin/mono.js test run
+      - node bin/mono.js publish --dry-run
+      - silent: true
+        cmd: >
+             rm -rf node_modules/.mono/publish;
+             mkdir -p node_modules/.mono/publish;
+             git -C node_modules/.mono/publish init;
+             git -C node_modules/.mono/publish remote add origin git@github.com:Pistonight/mono-dev;
+             git -C node_modules/.mono/publish fetch origin dist;
+             git -C node_modules/.mono/publish checkout dist;
+             lastversion=$(jq '.version' node_modules/.mono/publish/package.json | tr -d '"');
+             nextversion="{{.VERSION}}";
+             if [ "$lastversion" = "$nextversion" ]; then
+               echo "version $nextversion is already published";
+               exit 2;
+             fi;
+             cp -R node_modules/.mono/pnpm-pack.temp/package/* node_modules/.mono/publish;
+             git commit -am "publish: $nextversion";
+             git push;
+             echo "published $lastversion -> $nextversion";
+
+    
 
   upgrade:
     desc: Upgrade dependencies

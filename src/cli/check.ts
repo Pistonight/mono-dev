@@ -31,11 +31,11 @@ export const runCheck = async (args: string[]): Promise<number> => {
         if (!runPrettier(rootDir, cacheDir, fix)) {
             return 51;
         }
-        if (!runTypeck()) {
+        if (!runTypeck(rootDir)) {
             return 31;
         }
     } else {
-        if (!runTypeck()) {
+        if (!runTypeck(rootDir)) {
             return 31;
         }
         if (!runEslint(rootDir, cacheDir, fix)) {
@@ -49,9 +49,9 @@ export const runCheck = async (args: string[]): Promise<number> => {
     return 0;
 };
 
-const runTypeck = (): boolean => {
+const runTypeck = (rootDir: string): boolean => {
     const tscStartTime = Date.now();
-    const tscResult = executeNode("tsc", ["--build", "--pretty"]);
+    const tscResult = executeNode("tsc", rootDir, ["--build", "--pretty"]);
     if ("err" in tscResult) {
         console.error("[mono] typeck failed!");
         return false;
@@ -63,7 +63,7 @@ const runTypeck = (): boolean => {
 
 const runEslint = (rootDir: string, cacheDir: string, fix: boolean): boolean => {
     const args = [
-        rootDir,
+        ".",
         "--color",
         "--report-unused-disable-directives",
         "--max-warnings=0",
@@ -75,7 +75,7 @@ const runEslint = (rootDir: string, cacheDir: string, fix: boolean): boolean => 
         args.push("--fix");
     }
     const eslintStartTime = Date.now();
-    const eslintResult = executeNode("eslint", args);
+    const eslintResult = executeNode("eslint", rootDir, args);
     if ("err" in eslintResult) {
         console.error("[mono] eslint failed!");
         return false;
@@ -94,7 +94,7 @@ const runPrettier = (rootDir: string, cacheDir: string, fix: boolean) => {
     const child = child_process.spawnSync(
         process.argv[0],
         [prettierWrapper, ignorePath, cachePath, fix ? "-f" : "-c"],
-        { stdio: "pipe" },
+        { cwd: rootDir, stdio: "pipe" },
     );
     if (child.error) {
         console.error("[mono] failed to spawn prettier: " + child.error);
