@@ -1,1 +1,1 @@
-{"version":3,"file":"ignore.d.ts","sourceRoot":"","sources":["../../../../src/project/ignore.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,OAAO,CAAC;AAEzC,eAAO,MAAM,eAAe,GAAI,aAAa,WAAW,EAAE,SAAS,MAAM,KAAG,MAAM,EAejF,CAAC"}
+{"version":3,"file":"ignore.d.ts","sourceRoot":"","sources":["../../../../src/project/ignore.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,WAAW,EAAE,MAAM,OAAO,CAAC;AAEzC,eAAO,MAAM,eAAe,gBAAiB,WAAW,WAAW,MAAM,KAAG,MAAM,EAejF,CAAC"}

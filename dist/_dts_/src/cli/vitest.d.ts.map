@@ -1,1 +1,1 @@
-{"version":3,"file":"vitest.d.ts","sourceRoot":"","sources":["../../../../src/cli/vitest.ts"],"names":[],"mappings":"AAMA,eAAO,MAAM,OAAO,GAAU,MAAM,MAAM,EAAE,KAAG,OAAO,CAAC,MAAM,CAkB5D,CAAC"}
+{"version":3,"file":"vitest.d.ts","sourceRoot":"","sources":["../../../../src/cli/vitest.ts"],"names":[],"mappings":"AAMA,eAAO,MAAM,OAAO,SAAgB,MAAM,EAAE,KAAG,OAAO,CAAC,MAAM,CAkB5D,CAAC"}

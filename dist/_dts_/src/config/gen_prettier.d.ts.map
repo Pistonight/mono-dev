@@ -1,1 +1,1 @@
-{"version":3,"file":"gen_prettier.d.ts","sourceRoot":"","sources":["../../../../src/config/gen_prettier.ts"],"names":[],"mappings":"AAIA,OAAO,EAAqB,KAAK,WAAW,EAAE,MAAM,OAAO,CAAC;AAE5D,eAAO,MAAM,iBAAiB,GAAI,aAAa,WAAW,EAAE,SAAS,MAAM,SAmB1E,CAAC"}
+{"version":3,"file":"gen_prettier.d.ts","sourceRoot":"","sources":["../../../../src/config/gen_prettier.ts"],"names":[],"mappings":"AAIA,OAAO,EAAqB,KAAK,WAAW,EAAE,MAAM,OAAO,CAAC;AAE5D,eAAO,MAAM,iBAAiB,gBAAiB,WAAW,WAAW,MAAM,SAmB1E,CAAC"}

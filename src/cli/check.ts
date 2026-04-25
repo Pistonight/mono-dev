@@ -23,6 +23,8 @@ export const runCheck = async (args: string[]): Promise<number> => {
     }
     genPrettierConfig(packageJson, rootDir);
 
+    const useTsc = !!packageJson["pistonight/mono-dev"]?.tsc;
+
     const fix = args.includes("--fix") || args.includes("-f");
     if (fix) {
         if (!runEslint(rootDir, cacheDir, fix)) {
@@ -31,11 +33,11 @@ export const runCheck = async (args: string[]): Promise<number> => {
         if (!runPrettier(rootDir, cacheDir, fix)) {
             return 51;
         }
-        if (!runTypeck(rootDir)) {
+        if (!runTypeck(rootDir, useTsc)) {
             return 31;
         }
     } else {
-        if (!runTypeck(rootDir)) {
+        if (!runTypeck(rootDir, useTsc)) {
             return 31;
         }
         if (!runEslint(rootDir, cacheDir, fix)) {
@@ -49,9 +51,13 @@ export const runCheck = async (args: string[]): Promise<number> => {
     return 0;
 };
 
-const runTypeck = (rootDir: string): boolean => {
+const runTypeck = (rootDir: string, useTsc: boolean): boolean => {
     const tscStartTime = Date.now();
-    const tscResult = executeNode("tsc", rootDir, ["--build", "--pretty"]);
+    const bin = useTsc ? "tsc" : "tsgo";
+    if (useTsc) {
+        console.warn("[mono] warning: using tsc instead of tsgo for typeck");
+    }
+    const tscResult = executeNode(bin, rootDir, ["--build", "--pretty"]);
     if ("err" in tscResult) {
         console.error("[mono] typeck failed!");
         return false;

@@ -10,5 +10,5 @@ tasks:
       MONO_DEV: '{{.TASKFILE_DIR}}/..'
     cmds:
       - rm -rf {{.MDBOOK_TARGET_RESOLVED}}/theme
-      - cp -r {{.MONO_DEV}}/toolsets/mdbook/theme {{.MDBOOK_TARGET_RESOLVED}}
-      - cp -r {{.MONO_DEV}}/toolsets/mdbook/css {{.MDBOOK_TARGET_RESOLVED}}/theme/extra-css
+      - cp -r {{.MONO_DEV}}/mdbook/theme {{.MDBOOK_TARGET_RESOLVED}}
+      - cp -r {{.MONO_DEV}}/mdbook/css {{.MDBOOK_TARGET_RESOLVED}}/theme/extra-css

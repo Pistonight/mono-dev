@@ -18,6 +18,8 @@ export interface PackageExport {
     import?: string;
 }
 export interface MonoDevOptions {
+    /** Use tsc instead of tsgo - for 6->7 transition if something breaks. Default tsgo will be used */
+    tsc?: boolean;
     /** Allow publishing (default false) */
     publish?: boolean;
     /** if lib mode should be used, which adds more rules to eslint. default is true */

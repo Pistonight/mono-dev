@@ -1,5 +1,5 @@
-import { c as e, f as t, i as n, l as r, o as i, s as a, t as o, u as s } from "../util-Bacx7hSX.js";
-import { n as c, r as l, t as u } from "../project-8S5mdlBW.js";
+import { c as e, f as t, i as n, l as r, o as i, s as a, t as o, u as s } from "../util-C2LEqfgW.js";
+import { n as c, r as l, t as u } from "../project-CKlVkcHT.js";
 import d from "node:fs";
 import f from "node:path";
 import p, { execSync as m } from "node:child_process";
@@ -181,31 +181,33 @@ var y = (e) => {
 	]);
 	if ("err" in C) return console.error("[mono] bundle with vite failed: " + C.err), 21;
 	console.log("[mono] generating dts...");
-	let T = Date.now(), E = a("tsc", i, ["-p", x]);
-	if ("err" in E) return console.error("[mono] dts generation with tsc failed: " + E.err), 31;
-	let D = Math.floor(Date.now() - T);
-	return console.log(`[mono] dts generated at ${m}/${t} (${D}ms)`), 0;
+	let T = Date.now(), E = !!u["pistonight/mono-dev"]?.tsc, D = E ? "tsc" : "tsgo";
+	E && console.warn("[mono] warning: using tsc instead of tsgo for generating declarations");
+	let O = a(D, i, ["-p", x]);
+	if ("err" in O) return console.error("[mono] dts generation with tsc failed: " + O.err), 31;
+	let k = Math.floor(Date.now() - T);
+	return console.log(`[mono] dts generated at ${m}/${t} (${k}ms)`), 0;
 }, E = async (e) => {
 	let { packageJsonPath: t, rootDir: n, cacheDir: r } = s();
 	w(r);
 	let i = JSON.parse(d.readFileSync(t, "utf-8"));
 	await b(i, t), (await S(i)).projectCount && y(n), x(i, n);
-	let a = e.includes("--fix") || e.includes("-f");
-	if (a) {
-		if (!O(n, r, a)) return 41;
-		if (!k(n, r, a)) return 51;
-		if (!D(n)) return 31;
+	let a = !!i["pistonight/mono-dev"]?.tsc, o = e.includes("--fix") || e.includes("-f");
+	if (o) {
+		if (!O(n, r, o)) return 41;
+		if (!k(n, r, o)) return 51;
+		if (!D(n, a)) return 31;
 	} else {
-		if (!D(n)) return 31;
-		if (!O(n, r, a)) return 41;
-		if (!k(n, r, a)) return 51;
+		if (!D(n, a)) return 31;
+		if (!O(n, r, o)) return 41;
+		if (!k(n, r, o)) return 51;
 	}
 	return 0;
-}, D = (e) => {
-	let t = Date.now();
-	if ("err" in a("tsc", e, ["--build", "--pretty"])) return console.error("[mono] typeck failed!"), !1;
-	let n = Math.floor(Date.now() - t);
-	return console.log(`[mono] typeck passed (${n}ms)`), !0;
+}, D = (e, t) => {
+	let n = Date.now(), r = t ? "tsc" : "tsgo";
+	if (t && console.warn("[mono] warning: using tsc instead of tsgo for typeck"), "err" in a(r, e, ["--build", "--pretty"])) return console.error("[mono] typeck failed!"), !1;
+	let i = Math.floor(Date.now() - n);
+	return console.log(`[mono] typeck passed (${i}ms)`), !0;
 }, O = (e, t, n) => {
 	let r = [
 		".",
