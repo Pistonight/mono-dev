@@ -100,7 +100,12 @@ export const runPublish = async (args: string[]): Promise<number> => {
         return 1;
     }
 
-    const publishResult = await executeNative("pnpm", rootDir, ["publish", "--access", "public"]);
+    const publishResult = await executeNative("pnpm", rootDir, [
+        "publish",
+        outTar,
+        "--access",
+        "public",
+    ]);
     if (publishResult.err) {
         console.error("[mono] pnpm publish failed!");
         return 101;
