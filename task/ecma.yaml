@@ -5,39 +5,32 @@ version: '3'
 
 tasks:
   config:
-    - pnpm exec monolint --config
-  check-clean:
-    - pnpm exec monolint --clean
+    - pnpm exec mono config
   check:
-    - pnpm exec monolint
+    - pnpm exec mono check
   fix:
-    - pnpm exec monolint --fix
+    - pnpm exec mono check --fix
 
   test-dev:
-    - cmd: pnpm exec monotest --watch
+    - cmd: pnpm exec mono test --watch
       ignore_error: true
 
   test:
-    - pnpm exec monotest run
+    - pnpm exec mono test run
 
   lib-build:
-    deps: [config]
-    cmds:
-      - pnpm exec monolibbuild
+    - pnpm exec mono build
 
   doc-build:
-    deps: [config]
-    cmds:
-      - pnpm exec monotypedoc
+    - pnpm exec mono doc
   doc-dev:
-    deps: [config]
     cmds:
       - >
         shwoop docs {{.SHWOOP_ARGS| default "-w src" }} --host --
-        pnpm exec monotypedoc
+        pnpm exec mono doc
 
   app-build:
-    deps: [config] # needed for tsconfig for path mapping
+    deps: [config] # needed for subpath mapping
     cmds:
       - pnpm exec vite build
 
@@ -47,3 +40,5 @@ tasks:
       - cmd: pnpm exec vite dev --host
         ignore_error: true
 
+  publish:
+    - pnpm exec mono publish

@@ -27,12 +27,34 @@ tasks:
       - task: mdbook:install-theme
         vars:
           MDBOOK_TARGET: website
-          MONO_DEV: .
+
+  build:
+    desc: Build with bootstrap
+    cmds:
+      - rm -rf dist
+      - bun scripts/bootstrap.ts
+      - cmd: "echo 'bootstrap: re-running vite build with node'"
+        silent: true
+      - cmd: node bin/mono.js build
+        silent: true
+      - node bin/mono.js config
 
   check:
-    - node toolsets/js/src/monolint_main.js
+    desc: Check style
+    deps: [build]
+    cmds:
+      - node bin/mono.js check
   fix:
-    - node toolsets/js/src/monolint_main.js --fix
+    desc: Fix style
+    deps: [build]
+    cmds:
+      - node bin/mono.js check -f
+
+  test:
+    deps: [build]
+    cmds:
+      - node bin/mono.js test run
+      - node bin/mono.js doc
 
   dev:
     cmds:
@@ -45,10 +67,42 @@ tasks:
       - rm -rf website/book
       - mdbook build website
 
+  publish:
+    desc: Publish to the dist branch
+    vars:
+      VERSION:
+        sh: jq '.version' package.json | tr -d '"'
+    cmds:
+      - task: build
+      - node bin/mono.js check
+      - node bin/mono.js test run
+      - node bin/mono.js publish --dry-run
+      - silent: true
+        cmd: >
+             rm -rf node_modules/.mono/publish;
+             mkdir -p node_modules/.mono/publish;
+             git -C node_modules/.mono/publish init;
+             git -C node_modules/.mono/publish remote add origin git@github.com:Pistonight/mono-dev;
+             git -C node_modules/.mono/publish fetch origin dist;
+             git -C node_modules/.mono/publish checkout dist;
+             lastversion=$(jq '.version' node_modules/.mono/publish/package.json | tr -d '"');
+             nextversion="{{.VERSION}}";
+             if [ "$lastversion" = "$nextversion" ]; then
+               echo "version $nextversion is already published";
+               exit 2;
+             fi;
+             cp -R node_modules/.mono/pnpm-pack.temp/package/* node_modules/.mono/publish;
+             git -C node_modules/.mono/publish add .;
+             git -C node_modules/.mono/publish commit -m "publish: $nextversion";
+             git -C node_modules/.mono/publish push;
+             echo "published $lastversion -> $nextversion";
+
+    
+
   upgrade:
     desc: Upgrade dependencies
     cmds:
-      - rm -rf node_modules
+      - pnpm install @typescript/native-preview@beta
       - >-
         pnpm up
         @types/bun @types/node
@@ -63,5 +117,6 @@ tasks:
         js-yaml
         vitest
         typedoc typedoc-theme-oxide
+        which @types/which
       - pnpm dedupe
       - pnpm dedupe --check

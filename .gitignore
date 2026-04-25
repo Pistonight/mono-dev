@@ -6,3 +6,7 @@ node_modules
 .prettierignore
 /eslint.config.js
 /tsconfig*.json
+/*.tgz
+/pack
+/dist
+/docs
