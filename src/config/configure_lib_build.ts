@@ -1,16 +1,11 @@
 import path from "node:path";
 import fs from "node:fs";
 import { defineConfig as viteDefineConfig } from "vite";
-import vitePluginReact, {
-    reactCompilerPreset as viteBabelReactCompilerPreset,
-} from "@vitejs/plugin-react";
-import vitePluginBabel from "@rolldown/plugin-babel";
-import babelReactCompiler from "babel-plugin-react-compiler";
-import vitePluginWasm from "vite-plugin-wasm";
 
-import { viteYaml } from "#plugins";
-import { getProjectPackageJsonPath, hasDependency, type PackageJson } from "#util";
+import { getProjectPackageJsonPath, type PackageJson } from "#util";
 import { parseExports } from "#project";
+
+import { genViteDefines, genVitePlugins } from "./gen_vite.ts";
 
 export const configure = () => {
     const packageJsonPath = getProjectPackageJsonPath();
@@ -51,35 +46,13 @@ export const configure = () => {
         }),
     );
 
-    const plugins = [];
-    plugins.push(viteYaml());
-    if (hasDependency(packageJson, "react")) {
-        plugins.push(vitePluginReact());
-        const reactCompilerPreset = viteBabelReactCompilerPreset();
-        reactCompilerPreset.preset = () => {
-            return {
-                plugins: [[babelReactCompiler, {}]],
-            };
-        };
-
-        plugins.push(
-            vitePluginBabel({
-                presets: [reactCompilerPreset],
-            }),
-        );
-    }
-    if (monodevOptions.wasm) {
-        plugins.push(vitePluginWasm());
-    }
+    const plugins = genVitePlugins(packageJson);
 
     return viteDefineConfig({
         plugins,
-        resolve: {
-            tsconfigPaths: true,
-        },
         define: {
+            ...genViteDefines(packageJson),
             "import.meta.vitest": "undefined",
-            "import.meta.version": JSON.stringify(packageJson.version),
         },
         build: {
             sourcemap: sourcemapOption,

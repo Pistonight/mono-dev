@@ -4,8 +4,7 @@ import fs from "node:fs";
 import { execSync } from "node:child_process";
 import YAML from "js-yaml";
 
-/** @type {Record<string, string>} */
-const COMMON_DESCRIPTIONS = {
+const COMMON_DESCRIPTIONS: Record<string, string> = {
     "install-cargo-extra-tools":
         "Install or upgrade extra tools needed for development using cargo onto the system",
     setup: "One-time setup for the project",
@@ -30,9 +29,8 @@ const COMMON_DESCRIPTIONS = {
 
 /**
  * Find all non-gitignored Taskfile.yml paths under cwd
- * @returns {string[]}
  */
-function find_taskfiles() {
+function find_taskfiles(): string[] {
     const output = execSync("git ls-files --cached --others --exclude-standard", {
         encoding: "utf8",
     });
@@ -42,13 +40,10 @@ function find_taskfiles() {
 /**
  * Find the end line index (exclusive) of a task's body — lines after `  name:`
  * up to (but not including) the next top-level key at 2-space indent.
- * @param {string[]} lines
- * @param {number} taskLineIdx
- * @returns {number}
  */
-function find_task_body_end(lines, taskLineIdx) {
+function find_task_body_end(lines: string[], taskLineIdx: number): number {
     let end = taskLineIdx + 1;
-    while (end < lines.length && !/^  \S/.test(lines[end])) {
+    while (end < lines.length && !/^ {2}\S/.test(lines[end])) {
         end++;
     }
     return end;
@@ -58,12 +53,8 @@ function find_task_body_end(lines, taskLineIdx) {
  * For tasks using shorthand list syntax (`  name:\n    - cmd`), wrap the
  * commands in a `cmds:` key and optionally prepend a `desc:` line.
  * Returns the modified text, or null if the task line was not found.
- * @param {string} text
- * @param {string} name
- * @param {string | null} desc
- * @returns {string | null}
  */
-function convert_shorthand_task(text, name, desc) {
+function convert_shorthand_task(text: string, name: string, desc: string | null): string | null {
     const lines = text.split("\n");
     const pattern = new RegExp(`^  ${name}\\s*:`);
     const taskIdx = lines.findIndex((l) => pattern.test(l));
@@ -89,12 +80,8 @@ function convert_shorthand_task(text, name, desc) {
 /**
  * Insert `    desc: ...` on the line after `  name:` in the file text.
  * Returns the modified text, or null if the task line was not found.
- * @param {string} text
- * @param {string} name
- * @param {string} desc
- * @returns {string | null}
  */
-function insert_desc(text, name, desc) {
+function insert_desc(text: string, name: string, desc: string): string | null {
     const lines = text.split("\n");
     const pattern = new RegExp(`^  ${name}\\s*:`);
     const idx = lines.findIndex((l) => pattern.test(l));
@@ -108,9 +95,10 @@ function insert_desc(text, name, desc) {
  * @param {string} filepath
  * @returns {boolean}
  */
-function process_file(filepath) {
+function process_file(filepath: string): boolean {
     const text = fs.readFileSync(filepath, "utf8");
-    const doc = /** @type {any} */ (YAML.load(text));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const doc = YAML.load(text) as any;
     const tasks = doc?.tasks;
     if (!tasks || typeof tasks !== "object") return false;
 
@@ -119,8 +107,10 @@ function process_file(filepath) {
 
     for (const [name, task] of Object.entries(tasks)) {
         if (!task || typeof task !== "object") continue;
-        if (/** @type {any} */ (task).internal) continue;
-        if (/** @type {any} */ (task).desc) continue;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((task as any).internal) continue;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((task as any).desc) continue;
 
         const desc = COMMON_DESCRIPTIONS[name];
         if (!desc) {
@@ -160,11 +150,11 @@ function process_file(filepath) {
     return had_warning;
 }
 
-function run_monotaskfile() {
+export const runTaskfile = (): number => {
     const files = find_taskfiles();
     if (files.length === 0) {
         console.log("[mono] no Taskfile.yml files found");
-        return;
+        return 0;
     }
 
     let any_warnings = false;
@@ -174,7 +164,7 @@ function run_monotaskfile() {
     }
 
     if (any_warnings) {
-        process.exit(1);
+        return 1;
     }
+    return 0;
 }
-run_monotaskfile();

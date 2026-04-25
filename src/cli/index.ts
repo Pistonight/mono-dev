@@ -3,6 +3,9 @@ import { getMonodevVersion } from "#util";
 import { runBuild } from "./build.ts";
 import { runCheck } from "./check.ts";
 import { runConfig } from "./config.ts";
+import { runDoc } from "./doc.ts";
+import { runTaskfile } from "./taskfile.ts";
+import { runTest } from "./vitest.ts";
 
 export const main = async (args: string[]): Promise<never> => {
     if (!args.length) {
@@ -32,6 +35,15 @@ export const main = async (args: string[]): Promise<never> => {
         case "build": {
             return process.exit(await runBuild(rest));
         }
+        case "test": {
+            return process.exit(await runTest(rest));
+        }
+        case "doc": {
+            return process.exit(await runDoc(rest));
+        }
+        case "taskfile": {
+            return process.exit(runTaskfile());
+        }
     }
 
     console.error("[mono] unknown command " + command);
@@ -46,6 +58,7 @@ const logHelp = () => {
   build            Build library (for bundling app run vite directly)
   test  ARGS...    Run test (with vitest)
   doc   [--json]   Build documentation 
+  taskfile         Fixup taskfiles
   publish          Publish the package
   version          Print the version
 `);

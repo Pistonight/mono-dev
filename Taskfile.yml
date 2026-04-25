@@ -49,6 +49,12 @@ tasks:
     cmds:
       - node bin/mono.js check -f
 
+  test:
+    deps: [build]
+    cmds:
+      - node bin/mono.js test run
+      - node bin/mono.js doc
+
   dev:
     cmds:
       - rm -rf website/book
