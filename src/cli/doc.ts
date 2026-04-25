@@ -5,7 +5,7 @@ import { Application } from "typedoc";
 import { load as typedocThemeOxidePlugin } from "typedoc-theme-oxide";
 
 import { checkMonodevVersion, genPackageConfig, genTypeScriptConfig } from "#config";
-import { getProjectLocations, type PackageJson, } from "#util";
+import { getProjectLocations, type PackageJson } from "#util";
 import { parseExports } from "#project";
 
 export const runDoc = async (args: string[]): Promise<number> => {
@@ -28,7 +28,7 @@ export const runDoc = async (args: string[]): Promise<number> => {
 
     await genPackageConfig(packageJson, packageJsonPath);
     const ts = await genTypeScriptConfig(packageJson);
-    if (!ts.projectCount)  {
+    if (!ts.projectCount) {
         console.error("[mono] no typescript directory, cannot generate doc");
         return 1;
     }
@@ -52,9 +52,9 @@ export const runDoc = async (args: string[]): Promise<number> => {
         return 61;
     }
     if (json) {
-        await app.generateJson(project, (options.out));
+        await app.generateJson(project, options.out);
     } else {
-        await app.generateDocs(project, (options.out));
+        await app.generateDocs(project, options.out);
     }
     return 0;
-}
+};

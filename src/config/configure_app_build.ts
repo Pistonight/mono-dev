@@ -5,7 +5,7 @@ import type { ConfigEnv, UserConfig, UserConfigFnPromise } from "vite";
 import { defineConfig } from "vite";
 import type { OutputOptions as RolldownOutputOptions } from "rolldown";
 
-import { getProjectPackageJsonPath, hasDependency, PackageJson } from "#util";
+import { getProjectPackageJsonPath, hasDependency, type PackageJson } from "#util";
 
 import { genViteDefines, genVitePlugins } from "./gen_vite.ts";
 
@@ -14,23 +14,32 @@ const ChunkSizeWarningLimit = 4096;
 // const ManualChunks = {
 //     react: ["react", "react-dom", "@fluentui/react-components"],
 // };
-const Dedupe = ["@pistonite/pure", "@pistonite/celera", "@pistonite/workex", "i18next", "react-i18next"];
+const Dedupe = [
+    "@pistonite/pure",
+    "@pistonite/celera",
+    "@pistonite/workex",
+    "i18next",
+    "react-i18next",
+];
 
-export const configure = async (config: 
-    UserConfig | Promise<UserConfig> | ((env: ConfigEnv) => UserConfig | Promise<UserConfig>)
+export const configure = async (
+    config:
+        | UserConfig
+        | Promise<UserConfig>
+        | ((env: ConfigEnv) => UserConfig | Promise<UserConfig>),
 ): Promise<UserConfig | UserConfigFnPromise> => {
     const configA = await config;
-    if (typeof configA === 'function') {
+    if (typeof configA === "function") {
         return defineConfig(async (env) => {
             const innerConfig = await configA(env);
             return patchUserConfigWithMonodev(env, innerConfig);
         });
     }
     return defineConfig(async (env) => patchUserConfigWithMonodev(env, configA));
-}
+};
 
 const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserConfig => {
-    const packageJsonPath  = getProjectPackageJsonPath();
+    const packageJsonPath = getProjectPackageJsonPath();
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
     const monodevOptions = packageJson["pistonight/mono-dev"] || {};
 
@@ -65,7 +74,7 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     config.define = {
         ...genViteDefines(packageJson),
         "import.meta.vitest": "undefined",
-        ...config.define
+        ...config.define,
     };
 
     // === Package Dependencies ===
@@ -87,14 +96,10 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     if (!("sourcemap" in config.build)) {
         config.build.sourcemap = sourcemapOption;
     } else {
-        console.warn(
-            "[mono] not setting sourcemap option because it is already specified",
-        );
+        console.warn("[mono] not setting sourcemap option because it is already specified");
     }
     if (config.build.chunkSizeWarningLimit) {
-        console.warn(
-            "[mono] not setting chunk size warning limit because it is already specified",
-        );
+        console.warn("[mono] not setting chunk size warning limit because it is already specified");
     } else {
         config.build.chunkSizeWarningLimit = ChunkSizeWarningLimit;
     }
@@ -120,9 +125,7 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     }
     if (enableHttps) {
         if (config.server.https) {
-            console.warn(
-                "[mono] not searching for HTTPS config because it is already specified",
-            );
+            console.warn("[mono] not searching for HTTPS config because it is already specified");
         } else {
             const https = findHttps();
             if (https) {
@@ -155,7 +158,7 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     }
 
     return config;
-}
+};
 /**
  * Filter to dependencies inside package.json
  */

@@ -31,10 +31,10 @@ export const genVitePlugins = (packageJson: PackageJson): Plugin[] => {
         plugins.push(vitePluginWasm());
     }
     return plugins;
-}
+};
 
 export const genViteDefines = (packageJson: PackageJson): Record<string, string> => {
     return {
         "import.meta.version": JSON.stringify(packageJson.version),
     };
-}
+};

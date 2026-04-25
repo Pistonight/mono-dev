@@ -2,11 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 
 import { checkMonodevVersion, genPackageConfig, genTypeScriptConfig } from "#config";
-import {
-    executeNode,
-    getProjectLocations,
-    type PackageJson,
-} from "#util";
+import { executeNode, getProjectLocations, type PackageJson } from "#util";
 
 export const runTest = async (args: string[]): Promise<number> => {
     const { packageJsonPath, cacheDir } = getProjectLocations();
@@ -26,4 +22,4 @@ export const runTest = async (args: string[]): Promise<number> => {
         return 1;
     }
     return 0;
-}
+};

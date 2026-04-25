@@ -83,7 +83,7 @@
         "./app-build-config": {
             "import": "./dist/config/configure_app_build.js",
             "types": "./dist/_dts_/src/config/configure_app_build.d.ts"
-        },
+        }
     },
     "imports": {
         "#cli": "./src/cli/index.ts",

@@ -167,4 +167,4 @@ export const runTaskfile = (): number => {
         return 1;
     }
     return 0;
-}
+};
