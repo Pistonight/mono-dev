@@ -26,7 +26,7 @@ export const configure = () => {
         process.exit(1);
     }
     const { exports } = libExports.val;
-    const externalDeps = new Set<string>();
+    const externalDeps = new Set<string>(monodevOptions.external || []);
 
     if (packageJson.dependencies) {
         for (const dep in packageJson.dependencies) {
@@ -116,6 +116,9 @@ const addExternalModules = (rootDir: string, packageName: string, out: Set<strin
     for (const exportName in packageJson.exports) {
         if (exportName === ".") {
             continue; // already added above
+        }
+        if (exportName === "import" || exportName === "require") {
+            continue; // built-in names
         }
         if (!exportName.startsWith("./")) {
             console.error(

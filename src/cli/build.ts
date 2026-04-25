@@ -1,13 +1,13 @@
 import path from "node:path";
 import fs from "node:fs";
 
-import { genPackageConfig, genTypeScriptConfig } from "#config";
-import { DTS, executeNode, getProjectPackageJsonPath, normalizeLineEnds, PackageJson, stringifySorted } from "#util";
+import { checkMonodevVersion, genPackageConfig, genTypeScriptConfig } from "#config";
+import { DTS, executeNode, getProjectLocations, normalizeLineEnds, PackageJson, stringifySorted } from "#util";
 import { parseExports } from "#project";
 
 export const runBuild = async (_args: string[]): Promise<number> => {
-    const packageJsonPath = getProjectPackageJsonPath();
-    const rootDir = path.dirname(packageJsonPath);
+    const { packageJsonPath, rootDir, cacheDir } = getProjectLocations();
+    checkMonodevVersion(cacheDir);
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
     if (!packageJson["pistonight/mono-dev"]?.lib) {
         console.error("[mono] package.json mono dev option 'lib' must be true to build library");
@@ -24,11 +24,7 @@ export const runBuild = async (_args: string[]): Promise<number> => {
     await genPackageConfig(packageJson, packageJsonPath);
     await genTypeScriptConfig(packageJson);
 
-    const cache_path = path.join(rootDir, "node_modules/.mono");
-    if (!fs.existsSync(cache_path)) {
-        fs.mkdirSync(cache_path, { recursive: true });
-    }
-    const vite_config_path = path.join(cache_path, "lib-build.config.js");
+    const vite_config_path = path.join(cacheDir, "lib-build.config.js");
     fs.writeFileSync(
         vite_config_path,
         `import { configure } from "mono-dev/lib-build-config"; export default configure();`,
@@ -37,7 +33,7 @@ export const runBuild = async (_args: string[]): Promise<number> => {
     const tsconfigPath = path.join(rootDir, "tsconfig." + src + ".json");
     const theConfig = JSON.parse(fs.readFileSync(tsconfigPath, "utf-8"));
 
-    const tsbuildinfo = `${cache_path}/tsconfig.${src}__${DTS}.tsbuildinfo`;
+    const tsbuildinfo = `${cacheDir}/tsconfig.${src}__${DTS}.tsbuildinfo`;
     // if we don't delete the incremental build file, tsc will not emit the output
     // if no rebuild is needed (even if the output is gone because we clean it before building)
     // -- truly amazing behavior
@@ -58,12 +54,15 @@ export const runBuild = async (_args: string[]): Promise<number> => {
         return 21;
     }
 
+    console.log("[mono] generating dts...");
+    const dtsStartTime = Date.now();
     const tscResult = executeNode("tsc", ["-p", tsconfigModifiedPath]);
     if ("err" in tscResult) {
         console.error("[mono] dts generation with tsc failed: "+tscResult.err);
         return 31;
     }
-    console.log("[mono] dts generated at " + dist + "/" + DTS);
+    const dtsTime = Math.floor(Date.now() - dtsStartTime);
+    console.log(`[mono] dts generated at ${dist}/${DTS} (${dtsTime}ms)`);
 
     return 0;
 }

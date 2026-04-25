@@ -1,9 +1,26 @@
 import fs from "node:fs";
 import path from "node:path";
 
-// we are at mono-dev/src/util
-export const MONO_DEV_PATH = path.dirname(path.dirname(import.meta.dirname));
+const DIRNAME = import.meta.dirname;
+
+// compute dynamically based on if we are being executed from src or dist
+export const MONO_DEV_PATH = path.basename(DIRNAME) === "dist"
+    ? path.dirname(DIRNAME)
+    :    path.dirname(path.dirname(DIRNAME));
 export const MONO_DEV_BIN_PATH = path.join(MONO_DEV_PATH, "node_modules", ".bin");
+
+export const getProjectLocations = (): ProjectLocation => {
+    const packageJsonPath = getProjectPackageJsonPath();
+    const rootDir = path.dirname(packageJsonPath);
+    const cacheDir = path.join(rootDir, "node_modules/.mono");
+    if (!fs.existsSync(cacheDir)) {
+        fs.mkdirSync(cacheDir, { recursive: true });
+    }
+    return {
+        packageJsonPath, rootDir, cacheDir
+    }
+}
+
 export const getProjectPackageJsonPath = (): string => {
     let curr = path.resolve(".");
     let currJson = path.join(curr, "package.json");
@@ -20,3 +37,9 @@ export const getProjectPackageJsonPath = (): string => {
 export const getMonodevVersion = (): string => {
     return import.meta.version;
 };
+
+export type ProjectLocation = {
+    packageJsonPath: string,
+    rootDir: string,
+    cacheDir: string,
+}

@@ -24,6 +24,8 @@ export type MonoDevOptions = {
     publish?: boolean;
     /** if lib mode should be used, which adds more rules to eslint. default is true */
     lib?: boolean;
+    /** Additional modules to be externalized */
+    external?: string[],
     /** undefined = true */
     sourcemap?: boolean | "inline" | "hidden";
     /** undefined = true, set to false to disable zapping "imports" field in package.json */

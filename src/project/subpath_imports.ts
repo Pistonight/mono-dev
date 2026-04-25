@@ -134,6 +134,7 @@ const write_subpath_import_mappings = async ( mappings: Record<string, string> |
     if (packageJson.imports) {
         const current_imports = stringifySortedIndent(packageJson.imports, 4);
         if (current_imports === new_imports) {
+            console.log("[mono] subpath import mapping is up-to-date");
             return {};
         }
     }

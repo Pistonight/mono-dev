@@ -28,8 +28,21 @@ tasks:
         vars:
           MDBOOK_TARGET: website
 
+  build:
+    desc: Build with bootstrap
+    cmds:
+      - rm -rf dist
+      - bun scripts/bootstrap.ts
+      - cmd: "echo 'bootstrap: running vite build with node'"
+        silent: true
+      - node bin/mono.js build
+      - node bin/mono.js config
+
   check:
-    - node toolsets/js/src/monolint_main.js
+    desc: Check style
+    deps: [build]
+    cmds:
+      - node bin/mono.js check
   fix:
     - node toolsets/js/src/monolint_main.js --fix
 

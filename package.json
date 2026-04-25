@@ -5,8 +5,21 @@
     "private": true,
     "type": "module",
     "files": [
-        "task/**/*"
+        "task/**/*",
+        "bin/**/*",
+        "dist/**/*",
+        "src/**/*"
     ],
+    "pistonight/mono-dev": {
+        "lib": true,
+        "external": [
+            "node:fs",
+            "node:path",
+            "path",
+            "node:fs/promises",
+            "node:child_process"
+        ]
+    },
     "dependencies": {
         "@babel/core": "^7.29.0",
         "@eslint/js": "^9.39.4",
@@ -15,17 +28,14 @@
         "@typescript/native-preview": "7.0.0-dev.20250530.1",
         "@vitejs/plugin-react": "^6.0.1",
         "babel-plugin-react-compiler": "^1.0.0",
-        "cheerio": "^1.1.2",
         "eslint": "^9.39.4",
         "eslint-plugin-react-compiler": "19.1.0-rc.2",
         "eslint-plugin-react-hooks": "^7.1.1",
         "eslint-plugin-react-refresh": "^0.5.2",
-        "flexsearch": "^0.8.212",
         "globals": "^17.5.0",
         "js-yaml": "^4.1.1",
         "react": "^19.2.5",
         "react-dom": "^19.2.5",
-        "slug": "^11.0.1",
         "typedoc": "^0.28.19",
         "typedoc-theme-oxide": "^0.3.0",
         "typescript": "^6.0.3",
@@ -47,11 +57,7 @@
     },
     "bin": {
         "vite": "./bin/vite.js",
-        "monolint": "./toolsets/js/src/monolint_main.js",
-        "monolibbuild": "./toolsets/js/src/libbuild_main.js",
-        "monotest": "./toolsets/js/src/monotest_main.js",
-        "monotypedoc": "./toolsets/js/src/monotypedoc_main.js",
-        "monotaskfile": "./toolsets/js/src/monotaskfile.js"
+        "mono": "./bin/mono.js"
     },
     "exports": {
         "./vite": "./lib/vite.js",
@@ -60,7 +66,7 @@
         "./app-types": "./types/app_types.d.ts",
         "./cli": {
             "import": "./dist/cli/index.js",
-            "types": "./dist/_dts/src/cli/index.d.ts"
+            "types": "./dist/_dts_/src/cli/index.d.ts"
         },
         "./eslint-config": {
             "import": "./dist/config/configure_eslint.js",
@@ -72,20 +78,19 @@
         },
         "./test-config": {
             "import": "./dist/config/configure_vitest.js",
-            "types": "./dist/_dts/src/config/configure_vitest.d.ts"
+            "types": "./dist/_dts_/src/config/configure_vitest.d.ts"
         },
-        "./vite-config": "./toolsets/js/src/vite_config.js",
-        "./toolsets/js/typescript/default-tsconfig.json": "./toolsets/js/typescript/default-tsconfig.json"
+        "./vite-config": "./toolsets/js/src/vite_config.js"
     },
     "imports": {
-        "#util": "./src/util/index.ts",
-        "#plugins": "./src/plugins/index.ts",
+        "#cli": "./src/cli/index.ts",
         "#config": "./src/config/index.ts",
-        "#project": "./src/project/index.ts"
+        "#plugins": "./src/plugins/index.ts",
+        "#project": "./src/project/index.ts",
+        "#util": "./src/util/index.ts"
     },
     "nocheck": [
         "/mdbook/css",
-        "/mdbook/theme",
-        "/toolsets/mdbook"
+        "/mdbook/theme"
     ]
 }
