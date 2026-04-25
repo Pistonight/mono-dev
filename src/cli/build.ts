@@ -28,7 +28,11 @@ export const runBuild = async (_args: string[]): Promise<number> => {
     }
     const { dist, src } = libExports.val;
 
-    await genPackageConfig(packageJson, packageJsonPath);
+    const result = await genPackageConfig(packageJson, packageJsonPath);
+    if ("err" in result) {
+        console.error(`[mono] failed to config package: ` + result.err);
+        return 1;
+    }
     await genTypeScriptConfig(packageJson);
 
     const vite_config_path = path.join(cacheDir, "lib-build.config.js");

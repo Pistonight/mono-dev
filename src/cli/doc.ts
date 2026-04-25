@@ -26,7 +26,11 @@ export const runDoc = async (args: string[]): Promise<number> => {
         return 1;
     }
 
-    await genPackageConfig(packageJson, packageJsonPath);
+    const result = await genPackageConfig(packageJson, packageJsonPath);
+    if ("err" in result) {
+        console.error(`[mono] failed to config package: ` + result.err);
+        return 1;
+    }
     const ts = await genTypeScriptConfig(packageJson);
     if (!ts.projectCount) {
         console.error("[mono] no typescript directory, cannot generate doc");
