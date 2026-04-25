@@ -1,0 +1,44 @@
+# Taskfile include for JS ecosystem
+#
+
+version: '3'
+
+tasks:
+  config:
+    - pnpm exec monolint --config
+  check-clean:
+    - pnpm exec monolint --clean
+  check:
+    - pnpm exec monolint
+  fix:
+    - pnpm exec monolint --fix
+
+  test-dev:
+    - cmd: pnpm exec monotest --watch
+      ignore_error: true
+
+  test:
+    - pnpm exec monotest run
+
+  lib-build:
+    - pnpm exec monolibbuild
+
+  doc-build:
+    - pnpm exec monotypedoc
+  doc-dev:
+    cmds:
+      - >
+        shwoop docs {{.SHWOOP_ARGS| default "-w src" }} --host --
+        pnpm exec monotypedoc
+
+  app-build:
+    deps: [config] # needed for subpath mapping
+    cmds:
+      - pnpm exec vite build
+
+  app-dev:
+    deps: [config]
+    cmds:
+      - cmd: pnpm exec vite dev --host
+        ignore_error: true
+

@@ -1,0 +1,28 @@
+# Taskfile include for Containers
+#
+
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - docker build -t {{.DOCKER_IMAGE}} .
+
+  run:
+    cmds:
+      - cmd: docker run {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}}
+        ignore_error: true
+  
+  connect:
+    cmds:
+      - cmd: docker exec -it $(docker container ls -q --filter ancestor={{.DOCKER_IMAGE}}) /bin/sh
+        ignore_error: true 
+
+  stop:
+    cmds:
+      - docker stop $(docker ps -q -a --filter ancestor={{.DOCKER_IMAGE}})
+
+  clean:
+    cmds:
+      - docker container prune
+      - docker image rm $(docker image ls -q -a --filter reference={{.DOCKER_IMAGE}})

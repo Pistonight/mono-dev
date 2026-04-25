@@ -1,0 +1,1 @@
+{"version":3,"file":"gen_vite.d.ts","sourceRoot":"","sources":["../../../../src/config/gen_vite.ts"],"names":[],"mappings":"AAMA,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,MAAM,CAAC;AAGnC,OAAO,EAAiB,KAAK,WAAW,EAAE,MAAM,OAAO,CAAC;AAExD,eAAO,MAAM,cAAc,GAAI,aAAa,WAAW,KAAG,MAAM,EAsB/D,CAAC;AAEF,eAAO,MAAM,cAAc,GAAI,aAAa,WAAW,KAAG,MAAM,CAAC,MAAM,EAAE,MAAM,CAI9E,CAAC"}

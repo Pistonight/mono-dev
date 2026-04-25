@@ -1,0 +1,23 @@
+# Taskfile include for Go ecosystem
+#
+
+version: '3'
+
+tasks:
+  fmt-check:
+    cmds:
+      - task: fmt-check-bash
+        platforms: [linux, darwin]
+      - task: fmt-check-pwsh
+        platforms: [windows]
+  fmt-check-bash:
+    cmds:
+      - cmd: if ! [ -z $(gofmt -l .) ]; then echo 'Please run `go fmt` to format the source files:'; gofmt -l .; exit 2; fi
+        silent: true
+  fmt-check-pwsh:
+    cmds:
+      - cmd: powershell -NoLogo -NoProfile -Command "$output=$(gofmt -l .); if ([string]::IsNullOrEmpty($output.Trim())) { Write-Output "Please run go fmt to format the source files."; gofmt -l .; exit 2 }"
+        silent: true
+
+
+

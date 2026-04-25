@@ -1,0 +1,16 @@
+
+{
+    "compilerOptions": {
+        "noEmit": true,
+        "lib": ["esnext"],
+        "target": "esnext",
+        "moduleDetection": "force",
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "allowJs": false,
+        "isolatedModules": true,
+        "forceConsistentCasingInFileNames": true,
+        "types": ["bun"],
+    },
+    "include": ["."]
+}

@@ -1,0 +1,22 @@
+version: '3'
+
+tasks:
+  exec:
+    aliases: [x]
+    desc: Execute a task in a package (exec -- PACKAGE:TASK)
+    cmds:
+      - task: "{{.CLI_ARGS}}"
+
+  list:
+    aliases: [ls]
+    desc: List tasks in a package (list -- PACKAGE)
+    dir: "packages/{{.CLI_ARGS}}"
+    silent: true
+    cmds:
+      - cmd: "{{.TASK_EXE}} --list"
+
+  # For projects to setup install-cargo-extra-tools
+  cargo-binstall:
+    cmds:
+      - which cargo-binstall || cargo install cargo-binstall
+      - cargo binstall {{.PACKAGES}} -y
