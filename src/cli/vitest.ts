@@ -9,7 +9,11 @@ export const runTest = async (args: string[]): Promise<number> => {
     checkMonodevVersion(cacheDir);
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
-    await genPackageConfig(packageJson, packageJsonPath);
+    const packageResult = await genPackageConfig(packageJson, packageJsonPath);
+    if ("err" in packageResult) {
+        console.error(`[mono] failed to config package: ` + packageResult.err);
+        return 1;
+    }
     await genTypeScriptConfig(packageJson);
     const configPath = path.join(cacheDir, "vitest.config.js");
     fs.writeFileSync(

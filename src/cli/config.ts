@@ -13,7 +13,11 @@ export const runConfig = async (_args: string[]): Promise<number> => {
     checkMonodevVersion(cacheDir);
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
-    await genPackageConfig(packageJson, packageJsonPath);
+    const result = await genPackageConfig(packageJson, packageJsonPath);
+    if ("err" in result) {
+        console.error(`[mono] failed to config package: ` + result.err);
+        return 1;
+    }
     const ts = await genTypeScriptConfig(packageJson);
 
     if (ts.projectCount) {

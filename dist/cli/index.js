@@ -1,5 +1,5 @@
-import { c as e, f as t, i as n, l as r, o as i, s as a, t as o, u as s } from "../util-DCpPhRS-.js";
-import { n as c, r as l, t as u } from "../project-BD0iNmsX.js";
+import { c as e, f as t, i as n, l as r, o as i, s as a, t as o, u as s } from "../util-DEsfW8c3.js";
+import { n as c, r as l, t as u } from "../project-u5JulOwA.js";
 import d from "node:fs";
 import f from "node:path";
 import p, { execSync as m } from "node:child_process";
@@ -161,46 +161,48 @@ var y = (e) => {
 	if (!u["pistonight/mono-dev"]?.lib) return console.error("[mono] package.json mono dev option 'lib' must be true to build library"), 1;
 	let p = l(i, u, !0);
 	if ("err" in p) return console.error("[mono] failed to parse exports: " + p.err), 1;
-	let { dist: m, src: h } = p.val;
-	await b(u, r), await S(u);
-	let g = f.join(c, "lib-build.config.js");
-	d.writeFileSync(g, "import { configure } from \"mono-dev/lib-build-config\"; export default configure();");
-	let _ = f.join(i, "tsconfig." + h + ".json"), v = JSON.parse(d.readFileSync(_, "utf-8")), y = `${c}/tsconfig.${h}__${t}.tsbuildinfo`;
-	d.existsSync(y) && d.unlinkSync(y), v.compilerOptions.tsBuildInfoFile = y, v.compilerOptions.noEmit = !1, v.compilerOptions.outDir = f.join(m, t), v.exclude = [
+	let { dist: m, src: h } = p.val, g = await b(u, r);
+	if ("err" in g) return console.error("[mono] failed to config package: " + g.err), 1;
+	await S(u);
+	let _ = f.join(c, "lib-build.config.js");
+	d.writeFileSync(_, "import { configure } from \"mono-dev/lib-build-config\"; export default configure();");
+	let v = f.join(i, "tsconfig." + h + ".json"), y = JSON.parse(d.readFileSync(v, "utf-8")), x = `${c}/tsconfig.${h}__${t}.tsbuildinfo`;
+	d.existsSync(x) && d.unlinkSync(x), y.compilerOptions.tsBuildInfoFile = x, y.compilerOptions.noEmit = !1, y.compilerOptions.outDir = f.join(m, t), y.exclude = [
 		"**/*.test.ts",
 		"**/*.test.mts",
 		"**/*.test.cts",
 		"**/*.test.tsx"
 	];
-	let x = f.join(i, "tsconfig." + h + "__" + t + ".json");
-	d.writeFileSync(x, o(n(v) || ""));
-	let C = a("vite", i, [
+	let C = f.join(i, "tsconfig." + h + "__" + t + ".json");
+	d.writeFileSync(C, o(n(y) || ""));
+	let T = a("vite", i, [
 		"build",
 		"--config",
-		g
+		_
 	]);
-	if ("err" in C) return console.error("[mono] bundle with vite failed: " + C.err), 21;
+	if ("err" in T) return console.error("[mono] bundle with vite failed: " + T.err), 21;
 	console.log("[mono] generating dts...");
-	let T = Date.now(), E = !!u["pistonight/mono-dev"]?.tsc, D = E ? "tsc" : "tsgo";
-	E && console.warn("[mono] warning: using tsc instead of tsgo for generating declarations");
-	let O = a(D, i, ["-p", x]);
-	if ("err" in O) return console.error("[mono] dts generation with tsc failed: " + O.err), 31;
-	let k = Math.floor(Date.now() - T);
-	return console.log(`[mono] dts generated at ${m}/${t} (${k}ms)`), 0;
+	let E = Date.now(), D = !!u["pistonight/mono-dev"]?.tsc, O = D ? "tsc" : "tsgo";
+	D && console.warn("[mono] warning: using tsc instead of tsgo for generating declarations");
+	let k = a(O, i, ["-p", C]);
+	if ("err" in k) return console.error("[mono] dts generation with tsc failed: " + k.err), 31;
+	let A = Math.floor(Date.now() - E);
+	return console.log(`[mono] dts generated at ${m}/${t} (${A}ms)`), 0;
 }, E = async (e) => {
 	let { packageJsonPath: t, rootDir: n, cacheDir: r } = s();
 	w(r);
-	let i = JSON.parse(d.readFileSync(t, "utf-8"));
-	await b(i, t), (await S(i)).projectCount && y(n), x(i, n);
-	let a = !!i["pistonight/mono-dev"]?.tsc, o = e.includes("--fix") || e.includes("-f");
-	if (o) {
-		if (!O(n, r, o)) return 41;
-		if (!k(n, r, o)) return 51;
-		if (!D(n, a)) return 31;
+	let i = JSON.parse(d.readFileSync(t, "utf-8")), a = await b(i, t);
+	if ("err" in a) return console.error("[mono] failed to config package: " + a.err), 1;
+	(await S(i)).projectCount && y(n), x(i, n);
+	let o = !!i["pistonight/mono-dev"]?.tsc, c = e.includes("--fix") || e.includes("-f");
+	if (c) {
+		if (!O(n, r, c)) return 41;
+		if (!k(n, r, c)) return 51;
+		if (!D(n, o)) return 31;
 	} else {
-		if (!D(n, a)) return 31;
-		if (!O(n, r, o)) return 41;
-		if (!k(n, r, o)) return 51;
+		if (!D(n, o)) return 31;
+		if (!O(n, r, c)) return 41;
+		if (!k(n, r, c)) return 51;
 	}
 	return 0;
 }, D = (e, t) => {
@@ -243,8 +245,8 @@ var y = (e) => {
 }, A = async (e) => {
 	let { packageJsonPath: t, rootDir: n, cacheDir: r } = s();
 	w(r);
-	let i = JSON.parse(d.readFileSync(t, "utf-8"));
-	return await b(i, t), (await S(i)).projectCount ? y(n) : console.log("[mono] not generating eslint config because no typescript directories exist"), console.log("[mono] config generated"), 0;
+	let i = JSON.parse(d.readFileSync(t, "utf-8")), a = await b(i, t);
+	return "err" in a ? (console.error("[mono] failed to config package: " + a.err), 1) : ((await S(i)).projectCount ? y(n) : console.log("[mono] not generating eslint config because no typescript directories exist"), console.log("[mono] config generated"), 0);
 }, j = async (e) => {
 	let t = e.includes("--json"), { packageJsonPath: n, rootDir: r, cacheDir: i } = s();
 	w(i);
@@ -252,14 +254,16 @@ var y = (e) => {
 	if ("err" in o) return console.error("[mono] failed to parse exports: " + o.err), 1;
 	let { src: c, exports: u } = o.val;
 	if (!u.length) return console.error("[mono] exports are empty, cannot generate doc"), 1;
-	if (await b(a, n), !(await S(a)).projectCount) return console.error("[mono] no typescript directory, cannot generate doc"), 1;
-	let p = f.join(r, `tsconfig.${c}.json`), m = {
+	let p = await b(a, n);
+	if ("err" in p) return console.error("[mono] failed to config package: " + p.err), 1;
+	if (!(await S(a)).projectCount) return console.error("[mono] no typescript directory, cannot generate doc"), 1;
+	let m = f.join(r, `tsconfig.${c}.json`), h = {
 		entryPoints: u.map(({ source_path_abs: e }) => e),
 		entryPointStrategy: "resolve",
 		out: f.join(r, t ? "docs.json" : "docs"),
 		theme: "oxide",
 		plugin: [_],
-		tsconfig: p,
+		tsconfig: m,
 		highlightLanguages: [
 			"typescript",
 			"css",
@@ -267,8 +271,8 @@ var y = (e) => {
 			"bash",
 			"tsx"
 		]
-	}, h = await g.bootstrapWithPlugins(m), v = await h.convert();
-	return v ? (t ? await h.generateJson(v, m.out) : await h.generateDocs(v, m.out), 0) : (console.error("[mono] failed to process project with typedoc"), 61);
+	}, v = await g.bootstrapWithPlugins(h), y = await v.convert();
+	return y ? (t ? await v.generateJson(y, h.out) : await v.generateDocs(y, h.out), 0) : (console.error("[mono] failed to process project with typedoc"), 61);
 }, M = async (e) => {
 	let n = e.includes("-n") || e.includes("--dry-run"), { rootDir: r, cacheDir: a } = s();
 	if (d.existsSync(a) || d.mkdirSync(a, { recursive: !0 }), (await i("pnpm", r, [
@@ -381,12 +385,13 @@ var z = () => {
 }, B = async (e) => {
 	let { packageJsonPath: t, rootDir: n, cacheDir: r } = s();
 	w(r);
-	let i = JSON.parse(d.readFileSync(t, "utf-8"));
-	await b(i, t), await S(i);
-	let o = f.join(r, "vitest.config.js");
-	return d.writeFileSync(o, "import { configure } from \"mono-dev/test-config\"; export default configure();"), +!!a("vitest", n, [
+	let i = JSON.parse(d.readFileSync(t, "utf-8")), o = await b(i, t);
+	if ("err" in o) return console.error("[mono] failed to config package: " + o.err), 1;
+	await S(i);
+	let c = f.join(r, "vitest.config.js");
+	return d.writeFileSync(c, "import { configure } from \"mono-dev/test-config\"; export default configure();"), +!!a("vitest", n, [
 		"--config",
-		o,
+		c,
 		...e
 	]).err;
 }, V = async (e) => {
