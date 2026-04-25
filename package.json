@@ -1,11 +1,12 @@
 {
   "name": "mono-dev",
-  "version": "0.3.23",
+  "version": "0.3.24",
   "description": "NPM module for mono-dev utilities",
   "type": "module",
   "files": [
     "bin/**/*",
     "dist/**/*",
+    "lib/**/*",
     "mdbook/**/*",
     "scripts/**/*",
     "src/**/*",
