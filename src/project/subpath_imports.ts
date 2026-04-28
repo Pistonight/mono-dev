@@ -8,6 +8,7 @@ import {
     type Result,
     stringifySortedIndent,
     type Void,
+    stringifySorted,
 } from "#util";
 import { parseExports } from "./exports.ts";
 
@@ -22,7 +23,7 @@ export const ensureSubpathImports = async (
         }
     }
     if (!shouldCreateSubpathImports(packageJson)) {
-        await writeSubpathImports(undefined, packageJson, jsonPath);
+        return await writeSubpathImports(undefined, packageJson, jsonPath);
     } else {
         const mappings = await createSubpathImports(
             path.dirname(path.resolve(jsonPath)),
@@ -31,7 +32,7 @@ export const ensureSubpathImports = async (
         if (mappings.err) {
             return mappings;
         }
-        await writeSubpathImports(mappings.val, packageJson, jsonPath);
+        return await writeSubpathImports(mappings.val, packageJson, jsonPath);
     }
     return {};
 };
@@ -40,6 +41,7 @@ const shouldCreateSubpathImports = (packageJson: PackageJson) => {
     const all_paths: string[] = [];
     const exports = packageJson.exports;
     if (!exports) {
+        // always create mappings for local/dev packages
         return true;
     }
     if (typeof exports === "string") {
@@ -66,6 +68,8 @@ const shouldCreateSubpathImports = (packageJson: PackageJson) => {
         if (p.endsWith(".d.ts")) {
             continue;
         }
+        // if there are typescript exports, don't create mappings,
+        // since the mapping could be exposed in the output
         if (
             p.endsWith(".ts") ||
             p.endsWith(".tsx") ||
@@ -149,56 +153,108 @@ const writeSubpathImports = async (
     packageJson: PackageJson,
     jsonPath: string,
 ): Promise<Void<string>> => {
-    const new_imports = stringifySortedIndent(mappings, 4);
+    const newImports = stringifySortedIndent(mappings, 4);
     if (packageJson.imports) {
-        const current_imports = stringifySortedIndent(packageJson.imports, 4);
-        if (current_imports === new_imports) {
+        const currentImports = stringifySortedIndent(packageJson.imports, 4);
+        if (currentImports === newImports) {
             console.log("[mono] subpath import mapping is up-to-date");
             return {};
         }
     }
-    const old_content = (await fs_promises.readFile(jsonPath, "utf-8")).trim();
-    const current_lines = old_content.split("\n").map((x) => x.trimEnd());
-    const start_line = current_lines.indexOf(`    "imports": {`);
-    if (start_line === -1 && "imports" in packageJson) {
-        return {
-            err: "failed to edit 'imports' in package.json. Please delete the field manually and retry",
-        };
-    }
-    if (start_line === -1) {
-        if (mappings) {
-            const old_content_without_closing = old_content.endsWith("}")
-                ? old_content.substring(0, old_content.length - 1)
-                : old_content;
-            const new_content =
-                old_content_without_closing.trimEnd() + `,\n    "imports": ${new_imports}\n}`;
-            await fs_promises.writeFile(jsonPath, normalizeLineEnds(new_content));
+    const oldContent = (await fs_promises.readFile(jsonPath, "utf-8")).trim();
+    const currentLines = oldContent.split("\n").map((x) => x.trimEnd());
+
+    let startLine: number;
+    let endLine: number;
+    let isLastField: boolean;
+
+    startLine = currentLines.indexOf(`    "imports": {`);
+    if (startLine !== -1) {
+        endLine = currentLines.indexOf(`    },`, startLine + 1);
+        if (endLine !== -1) {
+            endLine = currentLines.indexOf(`    }`, startLine + 1);
+            if (endLine === -1) {
+                return {
+                    err: "failed to edit 'imports' in package.json: cannot find end of 'imports' field. Please delete the field manually and retry",
+                };
+            }
+            isLastField = true;
+        } else {
+            isLastField = false;
         }
     } else {
-        let end_line = current_lines.indexOf(`    },`, start_line + 1);
-        let trailing_comma = ",";
-        if (end_line === -1) {
-            end_line = current_lines.indexOf(`    }`, start_line + 1);
-            trailing_comma = "";
-            if (end_line === -1) {
-                console.error(
-                    "[mono] failed to edit 'imports' in package.json. Please delete the field manually and retry",
-                );
-                process.exit(1);
+        startLine = currentLines.indexOf(`    "imports": {}`);
+        if (startLine !== -1) {
+            endLine = startLine;
+            isLastField = true;
+        } else {
+            startLine = currentLines.indexOf(`    "imports": {},`);
+            if (startLine !== -1) {
+                endLine = startLine;
+                isLastField = false;
+            } else {
+                // else: imports field not in old content
+                startLine = endLine = -1;
+                isLastField = false;
             }
         }
+    }
+
+    if (startLine === -1 && "imports" in packageJson) {
+        return {
+            err: "failed to edit 'imports' in package.json: cannot locate 'imports' field. Please delete the field manually and retry",
+        };
+    }
+
+    let newContent: string;
+
+    if (startLine !== -1) {
+        const trailingComma = isLastField ? "" : ",";
 
         if (mappings) {
-            current_lines.splice(
-                start_line,
-                end_line - start_line + 1,
-                `    "imports": ${new_imports}${trailing_comma}`,
+            currentLines.splice(
+                startLine,
+                endLine - startLine + 1,
+                `    "imports": ${newImports}${trailingComma}`,
             );
         } else {
-            current_lines.splice(start_line, end_line - start_line + 1);
+            currentLines.splice(startLine, endLine - startLine + 1);
         }
-        await fs_promises.writeFile(jsonPath, normalizeLineEnds(current_lines.join("\n")));
+        newContent = normalizeLineEnds(currentLines.join("\n"));
+    } else {
+        if (mappings) {
+            const oldContentWithoutClosing = oldContent.endsWith("}")
+                ? oldContent.substring(0, oldContent.length - 1)
+                : oldContent;
+            newContent = normalizeLineEnds(
+                oldContentWithoutClosing.trimEnd() + `,\n    "imports": ${newImports}\n}`,
+            );
+        } else {
+            console.log("[mono] subpath import mapping is up-to-date");
+            return {};
+        }
     }
+    const packageJsonCopy = { ...packageJson };
+    if (!mappings) {
+        delete packageJsonCopy.imports;
+    } else {
+        packageJsonCopy.imports = mappings;
+    }
+    const expectedContent = normalizeLineEnds(stringifySorted(packageJsonCopy) || "");
+    try {
+        const actualContent = normalizeLineEnds(stringifySorted(JSON.parse(newContent)) || "");
+        if (expectedContent !== actualContent) {
+            return {
+                err: "failed to edit 'imports' in package.json: failed to edit 'imports'. Please delete the field manually and retry",
+            };
+        }
+    } catch {
+        return {
+            err: "failed to edit 'imports' in package.json: failed to edit 'imports': content is not valid JSON after editing. Please delete the field manually and retry",
+        };
+    }
+
+    await fs_promises.writeFile(jsonPath, newContent);
     if (!mappings) {
         delete packageJson.imports;
     } else {
