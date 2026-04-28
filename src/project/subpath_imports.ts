@@ -171,7 +171,7 @@ const writeSubpathImports = async (
     startLine = currentLines.indexOf(`    "imports": {`);
     if (startLine !== -1) {
         endLine = currentLines.indexOf(`    },`, startLine + 1);
-        if (endLine !== -1) {
+        if (endLine === -1) {
             endLine = currentLines.indexOf(`    }`, startLine + 1);
             if (endLine === -1) {
                 return {
@@ -244,6 +244,7 @@ const writeSubpathImports = async (
     try {
         const actualContent = normalizeLineEnds(stringifySorted(JSON.parse(newContent)) || "");
         if (expectedContent !== actualContent) {
+            console.log({ expectedContent, actualContent });
             return {
                 err: "failed to edit 'imports' in package.json: failed to edit 'imports'. Please delete the field manually and retry",
             };
