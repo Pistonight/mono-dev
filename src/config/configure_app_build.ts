@@ -143,6 +143,7 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
                 if (config.server.hmr) {
                     const hmrConfig = {
                         host: hostname,
+                        protocol: "wss",
                     };
                     if (typeof config.server.hmr === "boolean") {
                         config.server.hmr = hmrConfig;

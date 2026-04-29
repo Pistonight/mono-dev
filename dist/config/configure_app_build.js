@@ -1,5 +1,5 @@
-import { f as e, r as t } from "../util-FeSJ31r6.js";
-import { n, t as r } from "../gen_vite-Cohg8cnj.js";
+import { f as e, r as t } from "../util-C0bxyxA5.js";
+import { n, t as r } from "../gen_vite-kO1VSm7R.js";
 import i from "node:fs";
 import a from "node:path";
 import { defineConfig as o } from "vite";
@@ -44,7 +44,10 @@ var s = 4096, c = [
 				key: t,
 				cert: n
 			}, r && (a.server.host ? console.warn("[mono] not setting server.host to because it is already specified") : a.server.host = r), a.server.hmr) {
-				let e = { host: r };
+				let e = {
+					host: r,
+					protocol: "wss"
+				};
 				typeof a.server.hmr == "boolean" ? a.server.hmr = e : a.server.hmr = {
 					...a.server.hmr,
 					...e
