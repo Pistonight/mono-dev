@@ -8,6 +8,8 @@ import { runPublish } from "./publish.ts";
 import { runTaskfile } from "./taskfile.ts";
 import { runTest } from "./vitest.ts";
 
+export { executeShim } from "#util";
+
 export const main = async (args: string[]): Promise<never> => {
     if (!args.length) {
         logHelp();
