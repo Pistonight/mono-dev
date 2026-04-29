@@ -1,2 +1,2 @@
-import { executeShim } from "../dist/index.js";
+import { executeShim } from "../dist/cli/index.js";
 executeShim("vite");
