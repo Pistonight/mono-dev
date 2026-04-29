@@ -1,6 +1,6 @@
 {
   "name": "mono-dev",
-  "version": "0.3.31",
+  "version": "0.3.32",
   "description": "NPM module for mono-dev utilities",
   "type": "module",
   "files": [
@@ -33,7 +33,7 @@
     "typedoc": "^0.28.19",
     "typedoc-theme-oxide": "^0.3.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.0",
+    "typescript-eslint": "^8.59.1",
     "vite": "^8.0.10",
     "vite-plugin-wasm": "^3.6.0",
     "vitest": "^4.1.5"

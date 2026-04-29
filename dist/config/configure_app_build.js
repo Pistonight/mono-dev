@@ -1,10 +1,14 @@
-import { f as e, r as t } from "../util-C0bxyxA5.js";
-import { n, t as r } from "../gen_vite-kO1VSm7R.js";
+import { f as e, r as t } from "../util-jaKMGCTu.js";
+import { n, t as r } from "../gen_vite-Ba512xlQ.js";
 import i from "node:fs";
 import a from "node:path";
 import { defineConfig as o } from "vite";
 //#region src/config/configure_app_build.ts
 var s = 4096, c = [
+	"react",
+	"react-dom",
+	"@fluentui/react-components",
+	"@fluentui/react-icons",
 	"@pistonite/pure",
 	"@pistonite/celera",
 	"@pistonite/workex",
@@ -90,7 +94,7 @@ var s = 4096, c = [
 	}, t = e(".");
 	if (t || (t = e(".."), t) || (t = e("../.."), t)) return t;
 	console.warn("[mono] HTTPS key and cert not found, not using HTTPS.");
-}, p = (e) => e.manualChunks ? (console.warn("[mono] not injecting code splitting because 'manualChunks' is specified"), e) : ("codeSplitting" in e && typeof e.codeSplitting != "object" && console.warn("[mono] not injecting code splitting because 'codeSplitting' is specified and not an object"), e);
+}, p = (e) => e;
 //#endregion
 export { l as configure };
 
