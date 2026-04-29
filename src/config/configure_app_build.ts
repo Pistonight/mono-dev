@@ -15,6 +15,10 @@ const ChunkSizeWarningLimit = 4096;
 //     react: ["react", "react-dom", "@fluentui/react-components"],
 // };
 const Dedupe = [
+    "react",
+    "react-dom",
+    "@fluentui/react-components",
+    "@fluentui/react-icons",
     "@pistonite/pure",
     "@pistonite/celera",
     "@pistonite/workex",
@@ -220,16 +224,6 @@ const findHttps = () => {
 };
 
 const transformRolldownOutputOption = (output: RolldownOutputOptions): RolldownOutputOptions => {
-    if (output.manualChunks) {
-        console.warn("[mono] not injecting code splitting because 'manualChunks' is specified");
-        return output;
-    }
-    if ("codeSplitting" in output && typeof output.codeSplitting !== "object") {
-        console.warn(
-            "[mono] not injecting code splitting because 'codeSplitting' is specified and not an object",
-        );
-        return output;
-    }
     // if (!output.codeSplitting) {
     //     output.codeSplitting = {};
     // }
