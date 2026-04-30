@@ -10,7 +10,6 @@ export interface PackageJson {
     optionalDependencies?: Record<string, string>;
     bundledDependencies?: Record<string, string>;
     ["pistonight/mono-dev"]?: MonoDevOptions;
-    nocheck?: string[];
     imports?: Record<string, string>;
 }
 
@@ -20,6 +19,12 @@ export interface PackageExport {
 }
 
 export interface MonoDevOptions {
+    /** path patterns to skip TS/prettier/eslint check */
+    nocheck?: string[];
+    /** exports to skip compiling and export the raw TS file */
+    nocompile?: string[];
+    /** additional exports to compile, the corresponding key in 'exports' should have import and type */
+    compile?: Record<string, string>;
     /** Use tsc instead of tsgo - for 6->7 transition if something breaks. Default tsgo will be used */
     tsc?: boolean;
     /** Allow publishing (default false) */
@@ -55,13 +60,16 @@ export interface MonoDevOptions {
 }
 
 export interface LibExportConfig {
-    dist: string;
-    src: string;
     exports: ParsedExport[];
 }
 
 export interface ParsedExport {
-    entry_name: string;
-    source_path_abs: string;
-    dist_path_rel: string;
+    /** If the export key is '.' then this is '.', other wise the part without ./ */
+    entryName: string;
+    /** absolute path of the source file */
+    sourcePathAbs: string;
+    /** dist relative path without the ./dist/ */
+    distPathRel: string;
+    /** dist dts relative path without the ./dist/ */
+    distDtsPathRel: string;
 }

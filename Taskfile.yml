@@ -32,7 +32,8 @@ tasks:
     desc: Build with bootstrap
     cmds:
       - rm -rf dist
-      - bun scripts/bootstrap.ts
+      - bun scripts/bootstrap-stage1.ts
+      - bun scripts/bootstrap-stage2.ts
       - cmd: "echo 'bootstrap: re-running vite build with node'"
         silent: true
       - cmd: node bin/mono.js build

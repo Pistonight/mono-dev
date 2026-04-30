@@ -11,8 +11,9 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
     const nonTsDirectories: string[] = [];
 
     const ignore_paths = new Set<string>();
-    if (packageJson.nocheck) {
-        for (const path of packageJson.nocheck) {
+    const nocheck = packageJson["pistonight/mono-dev"]?.nocheck;
+    if (nocheck) {
+        for (const path of nocheck) {
             if (path.startsWith("/") && !path.substring(1).includes("/")) {
                 // /foo
                 ignore_paths.add(path.substring(1));

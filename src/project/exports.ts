@@ -1,14 +1,11 @@
 import path from "node:path";
 import fs from "node:fs";
 
-import {
-    DTS,
-    type PackageJson,
-    type Result,
-    type LibExportConfig,
-    splitOnce,
-    type ParsedExport,
-} from "#util";
+// note: not using subpath imports because they won't work in bootstrap
+// if package.json does not already have the correct exports
+import { DTS, SRC, DIST } from "../util/constants.ts";
+import type { Result } from "../util/result.ts";
+import type { PackageJson, LibExportConfig, ParsedExport } from "../util/types.ts";
 
 export const parseExports = (
     root: string,
@@ -18,8 +15,6 @@ export const parseExports = (
     if (!packageJson.exports) {
         return {
             val: {
-                dist: "dist",
-                src: "src",
                 exports: [],
             },
         };
@@ -33,16 +28,69 @@ export const parseExports = (
         };
     }
     const exports = packageJson.exports;
+    const nocompile = new Set(packageJson["pistonight/mono-dev"]?.nocompile || []);
+    const compile = packageJson["pistonight/mono-dev"]?.compile || {};
+    const SRC_PREFIX = "./" + SRC + "/";
 
-    let dist = "";
-    let src = "";
     const parsedExports: ParsedExport[] = [];
-    for (let name in exports) {
-        const target = exports[name];
-        if (typeof target === "string") {
-            if (print) {
-                console.warn(`[mono] skipping processing string export ${target}`);
+    for (const name in exports) {
+        let entryFileName = name;
+        if (name !== ".") {
+            if (!name.startsWith("./")) {
+                return { err: "entry name subpath must start with './'" };
             }
+            entryFileName = name.substring(2);
+            if (entryFileName.includes("/")) {
+                return { err: "too avoid over-complicated export paths, entry name cannot contain '/' other than the initial './'" };
+            }
+            if (entryFileName.includes(".")) {
+                return { err: "entry name cannot contain '.' other than the initial './'" };
+            }
+        }
+        const target = exports[name];
+        
+        if (typeof target !== "string") {
+            const distPath = target.import;
+            if (!distPath) {
+                return {
+                    err: `object-type 'exports' must be have an 'import' (for entry point '${name}')`
+                };
+            }
+            if (!distPath.startsWith("./"+DIST+"/") || !distPath.endsWith(".js")) {
+                return {
+                    err: `object-type 'exports' .import must start with ./${DIST}/ and end with .js (for entry point '${name}')`
+                };
+            }
+            const expectedTypesPath = "./" + DIST + "/" + DTS + "/" + SRC + distPath.substring(DIST.length+2, distPath.length-3) + ".d.ts";
+            const typesPath = target.types;
+            if (typesPath !== expectedTypesPath) {
+                return {
+                    err: `object-type 'exports' .import=${distPath} must be have .types=${expectedTypesPath} (for entry point '${name}')`
+                };
+            }
+            const sourcePath = compile[name];
+            if (!sourcePath) {
+                return {
+                    err: `object-type 'exports' must have the source specified in mono-dev 'compile' option (for entry point '${name}')`,
+                };
+            }
+            const sourcePathAbs = path.join(root, sourcePath);
+            if (!fs.existsSync(sourcePathAbs)) {
+                return {
+                    err: `couldn't find extra compile source ${sourcePath} (for entry point '${name}')`
+                };
+            }
+            if (print) {
+                console.log(
+                    `[mono] configured compile entry "${name}": ${target}`,
+                );
+            }
+            parsedExports.push({
+                entryName: entryFileName,
+                sourcePathAbs: sourcePathAbs,
+                distPathRel: distPath.substring(DIST.length+3),
+                distDtsPathRel: typesPath.substring(DIST.length+3)
+            });
             continue;
         }
         if (name.includes(" ")) {
@@ -54,125 +102,73 @@ export const parseExports = (
         if (name === DTS) {
             return { err: `entry name must not be "${DTS}"` };
         }
-        if (name !== ".") {
-            if (!name.startsWith("./")) {
-                return { err: "entry name subpath must start with './'" };
-            }
-            name = name.substring(2);
-            if (name.includes("/")) {
-                return { err: "entry name cannot contain '/' other than the initial './'" };
-            }
-            if (name.includes(".")) {
-                return { err: "entry name cannot contain '.' other than the initial './'" };
-            }
-        }
-        let import_path = target["import"];
-        let type_path = target["types"];
 
-        if (!import_path || !type_path) {
-            return { err: `exports value must be object with "import" and "types"` };
+        if (target.endsWith(".d.ts")) {
+            // raw decalaration export, skip processing
+            if (print) {
+                console.warn(`[mono] skipping raw .d.ts export '${name}'`);
+            }
+            continue;
+        }
+        // only process typescript exports, which will be compiled
+        if (nocompile.has(name)) {
+            if (print) {
+                console.warn(`[mono] skipping nocompile export '${name}'`);
+            }
+            continue;
+        }
+        if (!target.match(/\.(c|m)?tsx?$/)) {
+            if (print) {
+                console.warn(`[mono] skipping non-typescript export '${name}'`);
+            }
+            continue;
         }
 
-        if (!import_path.startsWith("./")) {
-            return { err: `import path must start with './' (for entry point '${name}')` };
+
+
+
+        if (!target.startsWith(SRC_PREFIX)) {
+            return { err: `compiled export path must start with '${SRC_PREFIX}' (for entry point '${name}')` };
         }
-        import_path = import_path.substring(2);
-        if (dist) {
-            if (!import_path.startsWith(`${dist}/`)) {
-                return {
-                    err: `dist path must be the same for each entry point, the first is "${dist}"; found import path "${import_path}"`,
-                };
-            }
-            import_path = import_path.substring(dist.length + 1);
-        } else {
-            const [dist_part, rest] = splitOnce(import_path, "/");
-            if (!rest) {
-                return { err: `import path must be in the format of "./<dist>/<file>.js"` };
-            }
-            dist = dist_part.trim();
-            import_path = rest;
-        }
-        if (!import_path.endsWith(".js")) {
+        const inSrcPath = target.substring(SRC_PREFIX.length);
+
+        const sourcePathAbs = path.join(root, target);
+        if (!fs.existsSync(sourcePathAbs)) {
             return {
-                err: `import path must end with ".js": ${import_path} (for entry point '${name}')`,
+                err: `couldn't find compiled export source ${target} (for entry point '${name}')`
             };
-        }
-        import_path = import_path.substring(0, import_path.length - 3);
-
-        if (!type_path.startsWith(`./${dist}/${DTS}/`)) {
-            return {
-                err: `types path must be in the format of "./${dist}/${DTS}/<src>/<file>.d.ts"`,
-            };
-        }
-        type_path = type_path.substring(dist.length + DTS.length + 4);
-        if (src) {
-            if (!type_path.startsWith(`${src}/`)) {
-                return {
-                    err: `src path must be the same for each entry point, the first is "${src}"; found type path "${type_path}"`,
-                };
-            }
-            type_path = type_path.substring(src.length + 1);
-        } else {
-            const [src_part, rest] = splitOnce(type_path, "/");
-            if (!rest) {
-                return {
-                    err: `types path must be in the format of "./${dist}/${DTS}/<src>/<file>.d.ts"`,
-                };
-            }
-            src = src_part.trim();
-            type_path = rest;
-        }
-        if (type_path !== `${import_path}.d.ts`) {
-            return {
-                err: `types path for "./${dist}/${import_path}.js" must be "./${dist}/${DTS}/${src}/${import_path}.d.ts", found "./${dist}/${DTS}/${src}/${type_path}"`,
-            };
-        }
-
-        let source_path = path.join(root, src, import_path + ".ts");
-        let is_tsx = false;
-        if (!fs.existsSync(source_path)) {
-            source_path += "x";
-            is_tsx = true;
-            if (!fs.existsSync(source_path)) {
-                return {
-                    err: `couldn't find source for export path ./dist/${import_path}.js, which should be ./${src}/${import_path}.ts{x}`,
-                };
-            }
         }
         if (print) {
             console.log(
-                `[mono] configured entry "${name}": ${src}/${import_path}.ts${is_tsx ? "x" : ""}`,
+                `[mono] auto-configured entry "${name}": ${target}`,
             );
         }
+        const lastDotIndex = inSrcPath.lastIndexOf('.');
+        if (lastDotIndex === -1) {
+            console.error(`[mono] unexpected: failed to get inSrcPath extension`);
+            process.exit(1);
+        }
+
+        const distPath =  inSrcPath.substring(0, lastDotIndex) + ".js";
+        const distDtsPath =  DTS + "/" + SRC + "/" + inSrcPath.substring(0, lastDotIndex) + ".d.ts";
         parsedExports.push({
-            entry_name: name,
-            source_path_abs: source_path,
-            dist_path_rel: import_path + ".js",
+            entryName: entryFileName,
+            sourcePathAbs: sourcePathAbs,
+            distPathRel: distPath,
+            distDtsPathRel: distDtsPath
         });
     }
 
     if (!parsedExports.length) {
         return {
             val: {
-                dist: "dist",
-                src: "src",
                 exports: [],
             },
         };
     }
 
-    if (!dist) {
-        return { err: 'dist directory cannot be ""' };
-    }
-
-    if (!src) {
-        return { err: 'src directory cannot be ""' };
-    }
-
     return {
         val: {
-            dist,
-            src,
             exports: parsedExports,
         },
     };

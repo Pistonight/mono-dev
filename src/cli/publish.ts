@@ -7,6 +7,8 @@ import {
     normalizeLineEnds,
     type PackageJson,
     executeNative,
+    SRC,
+    DIST,
 } from "#util";
 import { parseExports } from "#project";
 
@@ -43,6 +45,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
     const packageJsonPath = path.join(tempDir, "package", "package.json");
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
     const allowPublish = !!packageJson["pistonight/mono-dev"]?.publish;
+
     delete packageJson["pistonight/mono-dev"];
     delete packageJson.private;
 
@@ -52,7 +55,29 @@ export const runPublish = async (args: string[]): Promise<number> => {
         return 1;
     }
 
-    const { dist, src } = libExports.val;
+    // change compiled exports to {
+    //   import: dist.js
+    //   types: dts
+    // }
+    if (packageJson.exports) {
+        if (typeof packageJson.exports === "string") {
+            console.error("[mono] failed to parse exports: 'exports' field must be an object");
+            return 1;
+        }
+        const compile = packageJson["pistonight/mono-dev"]?.compile || {};
+        for (const {entryName, distPathRel, distDtsPathRel} of libExports.val.exports) {
+            const key = entryName === "." ? "." : "./" + entryName;
+            if (key in compile) {
+                // skip the manually-configured to compile ones, since the exports
+                // should already be correct
+                continue;
+            }
+            packageJson.exports[key] = {
+                import: "./"+DIST + "/" + distPathRel,
+                types: "./"+DIST+"/"+distDtsPathRel
+            }
+        }
+    }
 
     // change imports to .d.ts
     if (packageJson.imports) {
@@ -61,7 +86,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
                 continue;
             }
             const value = packageJson.imports[key];
-            if (!value.startsWith("./" + src)) {
+            if (!value.startsWith("./" + SRC)) {
                 continue;
             }
             if (!value.match(/\.(c|m)?tsx?$/)) {
@@ -69,7 +94,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
             }
             const lastDot = value.lastIndexOf(".");
             const base = value.substring(2, lastDot);
-            const mapped = "./" + dist + "/" + DTS + "/" + base + ".d.ts";
+            const mapped = "./" + DIST + "/" + DTS + "/" + base + ".d.ts";
             packageJson.imports[key] = mapped;
         }
     }

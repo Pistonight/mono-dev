@@ -2,6 +2,8 @@ import path from "node:path";
 import fs from "node:fs";
 import { defineConfig as viteDefineConfig } from "vite";
 
+// note: not using subpath imports because they won't work in bootstrap
+// if package.json does not already have the correct exports
 import { getProjectPackageJsonPath, type PackageJson } from "#util";
 import { parseExports } from "#project";
 
@@ -36,12 +38,14 @@ export const configure = () => {
     // console.log(external_deps);
 
     const entry_config = Object.fromEntries(
-        exports.map(({ entry_name, source_path_abs }) => {
+        exports.map(({ entryName: entry_name, sourcePathAbs: source_path_abs }) => {
+            // substring to remove "./"
             return [entry_name === "." ? "index" : entry_name, source_path_abs];
         }),
     );
     const file_name_config = Object.fromEntries(
-        exports.map(({ entry_name, dist_path_rel }) => {
+        exports.map(({ entryName: entry_name, distPathRel: dist_path_rel }) => {
+            // substring to remove "./"
             return [entry_name === "." ? "index" : entry_name, dist_path_rel];
         }),
     );
