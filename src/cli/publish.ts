@@ -110,7 +110,9 @@ export const runPublish = async (args: string[]): Promise<number> => {
     if (packageJson.files) {
         for (const f in packageJson.files) {
             if (f.startsWith("dist")) {
-                logWarn("not adding 'dist/**/*' to files since there are dist paths specified in original package.json");
+                logWarn(
+                    "not adding 'dist/**/*' to files since there are dist paths specified in original package.json",
+                );
                 shouldAddDistToFiles = false;
                 break;
             }
