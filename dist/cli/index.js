@@ -1,5 +1,5 @@
-import { a as e, c as t, g as n, h as r, i, l as a, m as o, o as s, p as c, r as l, s as u, t as d, u as f } from "../util-DECbB0Go.js";
-import { n as p, r as m, t as h } from "../project-BLoD2pU7.js";
+import { a as e, c as t, g as n, h as r, i, l as a, m as o, o as s, p as c, r as l, s as u, t as d, u as f } from "../util-CgTOXVXw.js";
+import { n as p, r as m, t as h } from "../project-Dy3JaZtN.js";
 import g from "node:fs";
 import _ from "node:path";
 import v, { execSync as y } from "node:child_process";
@@ -267,50 +267,57 @@ var w = (e) => {
 	}, p = await x.bootstrapWithPlugins(d), h = await p.convert();
 	return h ? (t ? await p.generateJson(h, d.out) : await p.generateDocs(h, d.out), 0) : (c("failed to process project with typedoc"), 61);
 }, L = async (e) => {
-	let t = e.includes("-n") || e.includes("--dry-run"), { rootDir: r, packageJsonPath: i, cacheDir: a } = f();
-	if (g.existsSync(a) || g.mkdirSync(a, { recursive: !0 }), (await l("pnpm", r, [
+	let t = e.includes("-n") || e.includes("--dry-run"), { rootDir: i, packageJsonPath: a, cacheDir: d } = f();
+	if (g.existsSync(d) || g.mkdirSync(d, { recursive: !0 }), (await l("pnpm", i, [
 		"pack",
 		"--out",
-		_.join(a, "pnpm-pack.temp.tgz")
+		_.join(d, "pnpm-pack.temp.tgz")
 	])).err) return c("pnpm pack failed!"), 81;
-	let d = _.join(a, "pnpm-pack.temp");
-	if (g.existsSync(d) && g.rmSync(d, {
+	let p = _.join(d, "pnpm-pack.temp");
+	if (g.existsSync(p) && g.rmSync(p, {
 		recursive: !0,
 		force: !0
-	}), g.mkdirSync(d, { recursive: !0 }), (await l("tar", d, ["-xzf", "../pnpm-pack.temp.tgz"])).err) return c("tgz extract failed!"), 91;
-	let p = _.join(d, "package", "package.json"), h = JSON.parse(g.readFileSync(p, "utf8")), v = JSON.parse(g.readFileSync(i, "utf8")), y = !!h["pistonight/mono-dev"]?.publish;
-	delete h["pistonight/mono-dev"], delete h.private;
-	let b = m(r, v);
-	if ("err" in b) return c("failed to parse exports: " + b.err), 1;
-	if (h.exports) {
-		if (typeof h.exports == "string") return c("failed to parse exports: 'exports' field must be an object"), 1;
-		let e = h["pistonight/mono-dev"]?.compile || {};
-		for (let { entryName: t, distPathRel: n, distDtsPathRel: r } of b.val.exports) {
+	}), g.mkdirSync(p, { recursive: !0 }), (await l("tar", p, ["-xzf", "../pnpm-pack.temp.tgz"])).err) return c("tgz extract failed!"), 91;
+	let h = _.join(p, "package", "package.json"), v = JSON.parse(g.readFileSync(h, "utf8")), y = JSON.parse(g.readFileSync(a, "utf8")), b = !!v["pistonight/mono-dev"]?.publish;
+	delete v["pistonight/mono-dev"], delete v.private;
+	let x = m(i, y);
+	if ("err" in x) return c("failed to parse exports: " + x.err), 1;
+	if (v.exports) {
+		if (typeof v.exports == "string") return c("failed to parse exports: 'exports' field must be an object"), 1;
+		let e = v["pistonight/mono-dev"]?.compile || {};
+		for (let { entryName: t, distPathRel: n, distDtsPathRel: r } of x.val.exports) {
 			let i = t === "." ? "." : "./" + t;
-			i in e || (h.exports[i] = {
+			i in e || (v.exports[i] = {
 				import: "./" + s + "/" + n,
 				types: "./" + s + "/" + r
 			});
 		}
 	}
-	if (h.imports) for (let e in h.imports) {
+	if (v.imports) for (let e in v.imports) {
 		if (!e.startsWith("#")) continue;
-		let t = h.imports[e];
+		let t = v.imports[e];
 		if (!t.startsWith("./src") || !t.match(/\.(c|m)?tsx?$/)) continue;
 		let n = t.lastIndexOf("."), r = t.substring(2, n), i = "./" + s + "/" + u + "/" + r + ".d.ts";
-		h.imports[e] = i;
+		v.imports[e] = i;
 	}
-	g.writeFileSync(p, n(JSON.stringify(h, void 0, 2)));
-	let x = _.join(a, "pnpm-packed.tgz");
-	return (await l("tar", a, [
+	let S = !0;
+	if (v.files) {
+		for (let e in v.files) if (e.startsWith("dist")) {
+			r("not adding 'dist/**/*' to files since there are dist paths specified in original package.json"), S = !1;
+			break;
+		}
+	}
+	S && (o("adding 'dist/**/*' to files in package.json"), v.files ? v.files.push("dist/**/*") : v.files = ["dist/**/*"]), g.writeFileSync(h, n(JSON.stringify(v, void 0, 2)));
+	let C = _.join(d, "pnpm-packed.tgz");
+	return (await l("tar", d, [
 		"-czf",
 		"pnpm-packed.tgz",
 		"-C",
 		"pnpm-pack.temp",
 		"package"
-	])).err ? (c("tgz creation failed!"), 91) : (o("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), o("packed at: " + x), t ? (o("dry-run, stopping"), 0) : y ? (await l("pnpm", r, [
+	])).err ? (c("tgz creation failed!"), 91) : (o("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), o("packed at: " + C), t ? (o("dry-run, stopping"), 0) : b ? (await l("pnpm", i, [
 		"publish",
-		x,
+		C,
 		"--access",
 		"public"
 	])).err ? (c("pnpm publish failed!"), 101) : 0 : (c("please set mono-dev option \"publish\": true"), 1));

@@ -11,6 +11,7 @@ import {
     DIST,
     logError,
     logInfo,
+    logWarn,
 } from "#util";
 import { parseExports } from "#project";
 
@@ -101,6 +102,28 @@ export const runPublish = async (args: string[]): Promise<number> => {
             const base = value.substring(2, lastDot);
             const mapped = "./" + DIST + "/" + DTS + "/" + base + ".d.ts";
             packageJson.imports[key] = mapped;
+        }
+    }
+
+    // add dist/**/* to files
+    let shouldAddDistToFiles = true;
+    if (packageJson.files) {
+        for (const f in packageJson.files) {
+            if (f.startsWith("dist")) {
+                logWarn(
+                    "not adding 'dist/**/*' to files since there are dist paths specified in original package.json",
+                );
+                shouldAddDistToFiles = false;
+                break;
+            }
+        }
+    }
+    if (shouldAddDistToFiles) {
+        logInfo("adding 'dist/**/*' to files in package.json");
+        if (packageJson.files) {
+            packageJson.files.push("dist/**/*");
+        } else {
+            packageJson.files = ["dist/**/*"];
         }
     }
 
