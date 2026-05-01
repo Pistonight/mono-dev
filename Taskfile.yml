@@ -32,7 +32,8 @@ tasks:
     desc: Build with bootstrap
     cmds:
       - rm -rf dist
-      - bun scripts/bootstrap.ts
+      - bun scripts/bootstrap-stage1.ts
+      - bun scripts/bootstrap-stage2.ts
       - cmd: "echo 'bootstrap: re-running vite build with node'"
         silent: true
       - cmd: node bin/mono.js build
@@ -66,6 +67,12 @@ tasks:
     cmds:
       - rm -rf website/book
       - mdbook build website
+
+  package:
+    desc: Package the package using publish --dry-run
+    cmds:
+      - task: build
+      - node bin/mono.js publish --dry-run
 
   publish:
     desc: Publish to the dist branch

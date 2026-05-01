@@ -6,7 +6,7 @@ import {
     genPackageConfig,
     genTypeScriptConfig,
 } from "#config";
-import { getProjectLocations, type PackageJson } from "#util";
+import { getProjectLocations, logError, logInfo, type PackageJson } from "#util";
 
 export const runConfig = async (_args: string[]): Promise<number> => {
     const { packageJsonPath, rootDir, cacheDir } = getProjectLocations();
@@ -15,7 +15,7 @@ export const runConfig = async (_args: string[]): Promise<number> => {
 
     const result = await genPackageConfig(packageJson, packageJsonPath);
     if ("err" in result) {
-        console.error(`[mono] failed to config package: ` + result.err);
+        logError("failed to config package: " + result.err);
         return 1;
     }
     const ts = await genTypeScriptConfig(packageJson);
@@ -23,9 +23,9 @@ export const runConfig = async (_args: string[]): Promise<number> => {
     if (ts.projectCount) {
         genEslintConfig(rootDir);
     } else {
-        console.log("[mono] not generating eslint config because no typescript directories exist");
+        logInfo("not generating eslint config because no typescript directories exist");
     }
 
-    console.log("[mono] config generated");
+    logInfo("config generated");
     return 0;
 };

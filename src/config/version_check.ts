@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-import { getMonodevVersion } from "#util";
+import { getMonodevVersion, logInfo, logWarn } from "#util";
 
 export const checkMonodevVersion = (cacheDir: string) => {
     const currentVersion = getMonodevVersion();
@@ -19,8 +19,8 @@ export const checkMonodevVersion = (cacheDir: string) => {
         try {
             const version = fs.readFileSync(`${cacheDir}/version`, "utf-8").trim();
             if (version !== currentVersion) {
-                console.log(
-                    `[mono] cleaning cache because of version update: ${version} -> ${currentVersion}`,
+                logInfo(
+                    `cleaning cache because of version update: ${version} -> ${currentVersion}`,
                 );
                 clean = true;
             }
@@ -34,7 +34,7 @@ export const checkMonodevVersion = (cacheDir: string) => {
             try {
                 fs.writeFileSync(`${cacheDir}/version`, currentVersion);
             } catch {
-                console.error("[mono] failed to write version file, will retry next time");
+                logWarn("failed to write version file, will retry next time");
             }
         }
     }

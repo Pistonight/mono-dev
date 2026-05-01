@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import child_process from "node:child_process";
 
-import { getProjectPackageJsonPath, MONO_DEV_BIN_PATH } from "./location.ts";
+import { getProjectPackageJsonPath, MONO_DEV_BIN_PATH } from "./misc.ts";
 import { errstr, type Void } from "./result.ts";
 
 export const executeShim = (bin: string): never => {

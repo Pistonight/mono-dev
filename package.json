@@ -1,30 +1,9 @@
 {
     "name": "mono-dev",
-    "version": "0.3.32",
+    "version": "0.4.0",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
-    "files": [
-        "bin/**/*",
-        "dist/**/*",
-        "lib/**/*",
-        "mdbook/**/*",
-        "scripts/**/*",
-        "src/**/*",
-        "task/**/*",
-        "toolsets/**/*",
-        "types/**/*"
-    ],
-    "pistonight/mono-dev": {
-        "lib": true,
-        "external": [
-            "node:fs",
-            "node:path",
-            "path",
-            "node:fs/promises",
-            "node:child_process"
-        ]
-    },
     "dependencies": {
         "@babel/core": "^7.29.0",
         "@eslint/js": "^9.39.4",
@@ -64,6 +43,17 @@
         "vite": "./bin/vite.js",
         "mono": "./bin/mono.js"
     },
+    "files": [
+        "bin/**/*",
+        "dist/**/*",
+        "lib/**/*",
+        "mdbook/**/*",
+        "scripts/**/*",
+        "src/**/*",
+        "task/**/*",
+        "toolsets/**/*",
+        "types/**/*"
+    ],
     "exports": {
         "./vite": "./lib/vite.js",
         "./vitest": "./lib/vitest.js",
@@ -73,22 +63,10 @@
             "import": "./dist/cli/index.js",
             "types": "./dist/_dts_/src/cli/index.d.ts"
         },
-        "./eslint-config": {
-            "import": "./dist/config/configure_eslint.js",
-            "types": "./dist/_dts_/src/config/configure_eslint.d.ts"
-        },
-        "./lib-build-config": {
-            "import": "./dist/config/configure_lib_build.js",
-            "types": "./dist/_dts_/src/config/configure_lib_build.d.ts"
-        },
-        "./test-config": {
-            "import": "./dist/config/configure_vitest.js",
-            "types": "./dist/_dts_/src/config/configure_vitest.d.ts"
-        },
-        "./app-build-config": {
-            "import": "./dist/config/configure_app_build.js",
-            "types": "./dist/_dts_/src/config/configure_app_build.d.ts"
-        }
+        "./eslint-config": "./src/config/configure_eslint.ts",
+        "./lib-build-config": "./src/config/configure_lib_build.ts",
+        "./test-config": "./src/config/configure_vitest.ts",
+        "./app-build-config": "./src/config/configure_app_build.ts"
     },
     "imports": {
         "#cli": "./src/cli/index.ts",
@@ -97,8 +75,21 @@
         "#project": "./src/project/index.ts",
         "#util": "./src/util/index.ts"
     },
-    "nocheck": [
-        "/mdbook/css",
-        "/mdbook/theme"
-    ]
+    "pistonight/mono-dev": {
+        "lib": true,
+        "external": [
+            "node:fs",
+            "node:path",
+            "path",
+            "node:fs/promises",
+            "node:child_process"
+        ],
+        "nocheck": [
+            "/mdbook/css",
+            "/mdbook/theme"
+        ],
+        "compile": {
+            "./cli": "./src/cli/index.ts"
+        }
+    }
 }
