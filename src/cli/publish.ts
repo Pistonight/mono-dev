@@ -17,7 +17,7 @@ import { parseExports } from "#project";
 export const runPublish = async (args: string[]): Promise<number> => {
     const dryRun = args.includes("-n") || args.includes("--dry-run");
 
-    const { rootDir, cacheDir } = getProjectLocations();
+    const { rootDir, packageJsonPath: originalPackageJsonPath, cacheDir } = getProjectLocations();
     if (!fs.existsSync(cacheDir)) {
         fs.mkdirSync(cacheDir, { recursive: true });
     }
@@ -46,12 +46,15 @@ export const runPublish = async (args: string[]): Promise<number> => {
 
     const packageJsonPath = path.join(tempDir, "package", "package.json");
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    const originalPackageJson: PackageJson = JSON.parse(
+        fs.readFileSync(originalPackageJsonPath, "utf8"),
+    );
     const allowPublish = !!packageJson["pistonight/mono-dev"]?.publish;
 
     delete packageJson["pistonight/mono-dev"];
     delete packageJson.private;
 
-    const libExports = parseExports(rootDir, packageJson);
+    const libExports = parseExports(rootDir, originalPackageJson);
     if ("err" in libExports) {
         logError("failed to parse exports: " + libExports.err);
         return 1;
