@@ -1,2 +1,2 @@
-export declare const runBuild: (_args: string[]) => Promise<number>;
+export declare const runBuild: () => Promise<number>;
 //# sourceMappingURL=build.d.ts.map

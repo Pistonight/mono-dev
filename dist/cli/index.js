@@ -1,5 +1,5 @@
-import { a as e, c as t, g as n, h as r, i, l as a, m as o, o as s, p as c, r as l, s as u, t as d, u as f } from "../util-CgTOXVXw.js";
-import { n as p, r as m, t as h } from "../project-Dy3JaZtN.js";
+import { a as e, c as t, g as n, h as r, i, l as a, m as o, o as s, p as c, r as l, s as u, t as d, u as f } from "../util-DuBhmBx3.js";
+import { n as p, r as m, t as h } from "../project-C3WUWoVu.js";
 import g from "node:fs";
 import _ from "node:path";
 import v, { execSync as y } from "node:child_process";
@@ -154,38 +154,38 @@ var w = (e) => {
 			}
 		}
 	}
-}, A = async (e) => {
-	let { packageJsonPath: t, rootDir: a, cacheDir: l } = f();
-	k(l);
-	let p = JSON.parse(g.readFileSync(t, "utf-8"));
-	if (!p["pistonight/mono-dev"]?.lib) return c("package.json mono dev option 'lib' must be true to build library"), 1;
-	let h = await T(p, t);
-	if ("err" in h) return c("failed to config package: " + h.err), 1;
-	await D(p);
-	let v = m(a, p, !0);
-	if ("err" in v) return c("failed to parse exports: " + v.err), 1;
-	let y = _.join(l, "lib-build.config.js");
-	g.writeFileSync(y, "import { configure } from \"mono-dev/lib-build-config\"; export default configure();");
-	let b = _.join(a, "tsconfig.src.json"), x = JSON.parse(g.readFileSync(b, "utf-8")), S = `${l}/tsconfig.src__${u}.tsbuildinfo`;
-	g.existsSync(S) && g.unlinkSync(S), x.compilerOptions.tsBuildInfoFile = S, x.compilerOptions.noEmit = !1, x.compilerOptions.outDir = _.join(s, u), x.exclude = [
+}, A = async () => {
+	let { packageJsonPath: e, rootDir: t, cacheDir: a } = f();
+	k(a);
+	let l = JSON.parse(g.readFileSync(e, "utf-8"));
+	if (!l["pistonight/mono-dev"]?.lib) return c("package.json mono dev option 'lib' must be true to build library"), 1;
+	let p = await T(l, e);
+	if ("err" in p) return c("failed to config package: " + p.err), 1;
+	await D(l);
+	let h = m(t, l, !0);
+	if ("err" in h) return c("failed to parse exports: " + h.err), 1;
+	let v = _.join(a, "lib-build.config.js");
+	g.writeFileSync(v, "import { configure } from \"mono-dev/lib-build-config\"; export default configure();");
+	let y = _.join(t, "tsconfig.src.json"), b = JSON.parse(g.readFileSync(y, "utf-8")), x = `${a}/tsconfig.src__${u}.tsbuildinfo`;
+	g.existsSync(x) && g.unlinkSync(x), b.compilerOptions.tsBuildInfoFile = x, b.compilerOptions.noEmit = !1, b.compilerOptions.outDir = _.join(s, u), b.exclude = [
 		"**/*.test.ts",
 		"**/*.test.mts",
 		"**/*.test.cts",
 		"**/*.test.tsx"
 	];
-	let C = _.join(a, "tsconfig.src__" + u + ".json");
-	g.writeFileSync(C, n(d(x) || ""));
-	let w = i("vite", a, [
+	let S = _.join(t, "tsconfig.src__" + u + ".json");
+	g.writeFileSync(S, n(d(b) || ""));
+	let C = i("vite", t, [
 		"build",
 		"--config",
-		y
+		v
 	]);
-	if ("err" in w) return c("bundle with vite failed: " + w.err), 21;
+	if ("err" in C) return c("bundle with vite failed: " + C.err), 21;
 	o("generating dts...");
-	let E = Date.now(), O = !!p["pistonight/mono-dev"]?.tsc, A = O ? "tsc" : "tsgo";
-	O && r("warning: using tsc instead of tsgo for generating declarations");
-	let j = i(A, a, ["-p", C]);
-	return "err" in j ? (c("dts generation with tsc failed: " + j.err), 31) : (o(`dts generated (${Math.floor(Date.now() - E)}ms)`), 0);
+	let w = Date.now(), E = !!l["pistonight/mono-dev"]?.tsc, O = E ? "tsc" : "tsgo";
+	E && r("warning: using tsc instead of tsgo for generating declarations");
+	let A = i(O, t, ["-p", S]);
+	return "err" in A ? (c("dts generation with tsc failed: " + A.err), 31) : (o(`dts generated (${Math.floor(Date.now() - w)}ms)`), 0);
 }, j = async (e) => {
 	let { packageJsonPath: t, rootDir: n, cacheDir: r } = f();
 	k(r);
@@ -308,16 +308,21 @@ var w = (e) => {
 		}
 	}
 	S && (o("adding 'dist/**/*' to files in package.json"), v.files ? v.files.push("dist/**/*") : v.files = ["dist/**/*"]), g.writeFileSync(h, n(JSON.stringify(v, void 0, 2)));
-	let C = _.join(d, "pnpm-packed.tgz");
+	let C = _.join(p, "package", "dist");
+	g.existsSync(C) && g.rmSync(C, {
+		recursive: !0,
+		force: !0
+	}), g.cpSync(_.join(i, "dist"), C, { recursive: !0 });
+	let w = _.join(d, "pnpm-packed.tgz");
 	return (await l("tar", d, [
 		"-czf",
 		"pnpm-packed.tgz",
 		"-C",
 		"pnpm-pack.temp",
 		"package"
-	])).err ? (c("tgz creation failed!"), 91) : (o("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), o("packed at: " + C), t ? (o("dry-run, stopping"), 0) : b ? (await l("pnpm", i, [
+	])).err ? (c("tgz creation failed!"), 91) : (o("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), o("packed at: " + w), t ? (o("dry-run, stopping"), 0) : b ? (await l("pnpm", i, [
 		"publish",
-		C,
+		w,
 		"--access",
 		"public"
 	])).err ? (c("pnpm publish failed!"), 101) : 0 : (c("please set mono-dev option \"publish\": true"), 1));
@@ -416,11 +421,16 @@ var W = () => {
 		case "version": return console.log("mono-dev " + a()), process.exit(0);
 		case "config": return process.exit(await F(n));
 		case "check": return process.exit(await j(n));
-		case "build": return process.exit(await A(n));
+		case "build": return process.exit(await A());
 		case "test": return process.exit(await G(n));
 		case "doc": return process.exit(await I(n));
 		case "taskfile": return process.exit(W());
-		case "publish": return process.exit(await L(n));
+		case "publish":
+			if (!n.includes("--skip-build")) {
+				let e = await A();
+				e && process.exit(e);
+			}
+			return process.exit(await L(n));
 	}
 	c("unknown command " + t), q(), process.exit(1);
 }, q = () => {

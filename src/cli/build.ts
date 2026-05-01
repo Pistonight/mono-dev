@@ -17,7 +17,7 @@ import {
 } from "#util";
 import { parseExports } from "#project";
 
-export const runBuild = async (_args: string[]): Promise<number> => {
+export const runBuild = async (): Promise<number> => {
     const { packageJsonPath, rootDir, cacheDir } = getProjectLocations();
     checkMonodevVersion(cacheDir);
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));

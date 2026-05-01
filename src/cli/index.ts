@@ -36,7 +36,7 @@ export const main = async (args: string[]): Promise<never> => {
             return process.exit(await runCheck(rest));
         }
         case "build": {
-            return process.exit(await runBuild(rest));
+            return process.exit(await runBuild());
         }
         case "test": {
             return process.exit(await runTest(rest));
@@ -48,6 +48,12 @@ export const main = async (args: string[]): Promise<never> => {
             return process.exit(runTaskfile());
         }
         case "publish": {
+            if (!rest.includes("--skip-build")) {
+                const buildErrorCode = await runBuild();
+                if (buildErrorCode) {
+                    process.exit(buildErrorCode);
+                }
+            }
             return process.exit(await runPublish(rest));
         }
     }
