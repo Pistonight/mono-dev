@@ -68,6 +68,12 @@ tasks:
       - rm -rf website/book
       - mdbook build website
 
+  package:
+    desc: Package the package using publish --dry-run
+    cmds:
+      - task: build
+      - node bin/mono.js publish --dry-run
+
   publish:
     desc: Publish to the dist branch
     vars:

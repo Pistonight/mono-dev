@@ -9,7 +9,15 @@ import {
     genPrettierConfig,
     genTypeScriptConfig,
 } from "#config";
-import { executeNode, getProjectLocations, MONO_DEV_PATH, type PackageJson } from "#util";
+import {
+    executeNode,
+    getProjectLocations,
+    logError,
+    logInfo,
+    logWarn,
+    MONO_DEV_PATH,
+    type PackageJson,
+} from "#util";
 
 export const runCheck = async (args: string[]): Promise<number> => {
     const { packageJsonPath, rootDir, cacheDir } = getProjectLocations();
@@ -18,7 +26,7 @@ export const runCheck = async (args: string[]): Promise<number> => {
 
     const result = await genPackageConfig(packageJson, packageJsonPath);
     if ("err" in result) {
-        console.error(`[mono] failed to config package: ` + result.err);
+        logError(`failed to config package: ` + result.err);
         return 1;
     }
     const ts = await genTypeScriptConfig(packageJson);
@@ -59,15 +67,15 @@ const runTypeck = (rootDir: string, useTsc: boolean): boolean => {
     const tscStartTime = Date.now();
     const bin = useTsc ? "tsc" : "tsgo";
     if (useTsc) {
-        console.warn("[mono] warning: using tsc instead of tsgo for typeck");
+        logWarn("warning: using tsc instead of tsgo for typeck");
     }
     const tscResult = executeNode(bin, rootDir, ["--build", "--pretty"]);
     if ("err" in tscResult) {
-        console.error("[mono] typeck failed!");
+        logError("typeck failed!");
         return false;
     }
     const tscTime = Math.floor(Date.now() - tscStartTime);
-    console.log(`[mono] typeck passed (${tscTime}ms)`);
+    logInfo(`typeck passed (${tscTime}ms)`);
     return true;
 };
 
@@ -87,11 +95,11 @@ const runEslint = (rootDir: string, cacheDir: string, fix: boolean): boolean => 
     const eslintStartTime = Date.now();
     const eslintResult = executeNode("eslint", rootDir, args);
     if ("err" in eslintResult) {
-        console.error("[mono] eslint failed!");
+        logError("eslint failed!");
         return false;
     }
     const eslintTime = Math.floor(Date.now() - eslintStartTime);
-    console.log(`[mono] eslint passed (${eslintTime}ms)`);
+    logInfo(`eslint passed (${eslintTime}ms)`);
     return true;
 };
 
@@ -107,12 +115,12 @@ const runPrettier = (rootDir: string, cacheDir: string, fix: boolean) => {
         { cwd: rootDir, stdio: "pipe" },
     );
     if (child.error) {
-        console.error("[mono] failed to spawn prettier: " + child.error);
+        logError("failed to spawn prettier: " + child.error);
         return false;
     }
     if (child.status) {
         const text = child.stderr.toString("utf-8").trim();
-        console.error(
+        console.warn(
             text
                 .split("\n")
                 .map((x) => {
@@ -123,10 +131,10 @@ const runPrettier = (rootDir: string, cacheDir: string, fix: boolean) => {
                 })
                 .join("\n"),
         );
-        console.error("[mono] prettier failed!");
+        logError("prettier failed!");
         return false;
     }
     const prettierTime = Math.floor(Date.now() - prettierStartTime);
-    console.log(`[mono] prettier passed (${prettierTime}ms)`);
+    logInfo(`prettier passed (${prettierTime}ms)`);
     return true;
 };

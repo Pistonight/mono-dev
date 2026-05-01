@@ -89,9 +89,7 @@
             "/mdbook/theme"
         ],
         "compile": {
-            "./cli": "./src/cli/index.ts",
-            "./test-config": "./src/config/configure_vitest.ts",
-            "./app-build-config": "./src/config/configure_app_build.ts"
+            "./cli": "./src/cli/index.ts"
         }
     }
 }

@@ -1,4 +1,4 @@
-import { getMonodevVersion } from "#util";
+import { getMonodevVersion, logError } from "#util";
 
 import { runBuild } from "./build.ts";
 import { runCheck } from "./check.ts";
@@ -52,7 +52,7 @@ export const main = async (args: string[]): Promise<never> => {
         }
     }
 
-    console.error("[mono] unknown command " + command);
+    logError("unknown command " + command);
     logHelp();
     process.exit(1);
 };

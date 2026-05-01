@@ -4,11 +4,9 @@ import fs_promises from "node:fs/promises";
 
 // note: not using subpath imports because they won't work in bootstrap
 // if package.json does not already have the correct exports
-import { normalizeLineEnds } from "../util/string.ts";
-import type { PackageJson } from "../util/types.ts";
+import { normalizeLineEnds, type PackageJson, SRC, logInfo } from "../util/misc.ts";
 import type { Result, Void } from "../util/result.ts";
 import { stringifySortedIndent, stringifySorted } from "../util/json.ts";
-import { SRC } from "../util/constants.ts";
 
 export const ensureSubpathImports = async (
     packageJson: PackageJson,
@@ -20,9 +18,7 @@ export const ensureSubpathImports = async (
             return {};
         }
     }
-    const mappings = await createSubpathImports(
-        path.dirname(path.resolve(jsonPath)),
-    );
+    const mappings = await createSubpathImports(path.dirname(path.resolve(jsonPath)));
     if (mappings.err) {
         return mappings;
     }
@@ -36,7 +32,7 @@ const createSubpathImports = async (
     const rest: [string, string][] = [];
     const srcRoot = path.join(root, SRC);
     const cleanDirPath = (x: string): string => {
-        return x.replace(/[\\/]+$/, "")
+        return x.replace(/[\\/]+$/, "");
     };
     try {
         const top = await fs_promises.readdir(srcRoot);
@@ -51,7 +47,7 @@ const createSubpathImports = async (
     }
 
     const mappings: Record<string, string> = {};
-    const SRC_REGEX = new RegExp("^"+SRC+"/");
+    const SRC_REGEX = new RegExp("^" + SRC + "/");
 
     while (rest.length) {
         const next = rest.pop();
@@ -98,7 +94,7 @@ const writeSubpathImports = async (
     if (packageJson.imports) {
         const currentImports = stringifySortedIndent(packageJson.imports, 4);
         if (currentImports === newImports) {
-            console.log("[mono] subpath import mapping is up-to-date");
+            logInfo("subpath import mapping is up-to-date");
             return {};
         }
     }
@@ -171,7 +167,7 @@ const writeSubpathImports = async (
                 oldContentWithoutClosing.trimEnd() + `,\n    "imports": ${newImports}\n}`,
             );
         } else {
-            console.log("[mono] subpath import mapping is up-to-date");
+            logInfo("subpath import mapping is up-to-date");
             return {};
         }
     }
@@ -202,6 +198,6 @@ const writeSubpathImports = async (
     } else {
         packageJson.imports = mappings;
     }
-    console.log("[mono] updated subpath import mapping");
+    logInfo("updated subpath import mapping");
     return {};
 };

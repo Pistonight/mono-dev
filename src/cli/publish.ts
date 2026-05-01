@@ -9,6 +9,8 @@ import {
     executeNative,
     SRC,
     DIST,
+    logError,
+    logInfo,
 } from "#util";
 import { parseExports } from "#project";
 
@@ -23,7 +25,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
 
     const r = await executeNative("pnpm", rootDir, ["pack", "--out", tempTar]);
     if (r.err) {
-        console.error("[mono] pnpm pack failed!");
+        logError("pnpm pack failed!");
         return 81;
     }
 
@@ -38,7 +40,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
     fs.mkdirSync(tempDir, { recursive: true });
     const tarXResult = await executeNative("tar", tempDir, ["-xzf", "../pnpm-pack.temp.tgz"]);
     if (tarXResult.err) {
-        console.error("[mono] tgz extract failed!");
+        logError("tgz extract failed!");
         return 91;
     }
 
@@ -51,7 +53,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
 
     const libExports = parseExports(rootDir, packageJson);
     if ("err" in libExports) {
-        console.error("[mono] failed to parse exports: " + libExports.err);
+        logError("failed to parse exports: " + libExports.err);
         return 1;
     }
 
@@ -61,11 +63,11 @@ export const runPublish = async (args: string[]): Promise<number> => {
     // }
     if (packageJson.exports) {
         if (typeof packageJson.exports === "string") {
-            console.error("[mono] failed to parse exports: 'exports' field must be an object");
+            logError("failed to parse exports: 'exports' field must be an object");
             return 1;
         }
         const compile = packageJson["pistonight/mono-dev"]?.compile || {};
-        for (const {entryName, distPathRel, distDtsPathRel} of libExports.val.exports) {
+        for (const { entryName, distPathRel, distDtsPathRel } of libExports.val.exports) {
             const key = entryName === "." ? "." : "./" + entryName;
             if (key in compile) {
                 // skip the manually-configured to compile ones, since the exports
@@ -73,9 +75,9 @@ export const runPublish = async (args: string[]): Promise<number> => {
                 continue;
             }
             packageJson.exports[key] = {
-                import: "./"+DIST + "/" + distPathRel,
-                types: "./"+DIST+"/"+distDtsPathRel
-            }
+                import: "./" + DIST + "/" + distPathRel,
+                types: "./" + DIST + "/" + distDtsPathRel,
+            };
         }
     }
 
@@ -110,18 +112,18 @@ export const runPublish = async (args: string[]): Promise<number> => {
         "package",
     ]);
     if (tarCResult.err) {
-        console.error("[mono] tgz creation failed!");
+        logError("tgz creation failed!");
         return 91;
     }
 
-    console.log("[mono] unpacked at: node_modules/.mono/pnpm-pack.temp/package");
-    console.log("[mono] packed at: " + outTar);
+    logInfo("unpacked at: node_modules/.mono/pnpm-pack.temp/package");
+    logInfo("packed at: " + outTar);
     if (dryRun) {
-        console.log("[mono] dry-run, stopping");
+        logInfo("dry-run, stopping");
         return 0;
     }
     if (!allowPublish) {
-        console.error('[mono] please set mono-dev option "publish": true');
+        logError('please set mono-dev option "publish": true');
         return 1;
     }
 
@@ -132,7 +134,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
         "public",
     ]);
     if (publishResult.err) {
-        console.error("[mono] pnpm publish failed!");
+        logError("pnpm publish failed!");
         return 101;
     }
 
