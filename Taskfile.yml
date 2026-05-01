@@ -71,7 +71,6 @@ tasks:
   package:
     desc: Package the package using publish --dry-run
     cmds:
-      - task: build
       - node bin/mono.js publish --dry-run
 
   publish:
@@ -80,7 +79,6 @@ tasks:
       VERSION:
         sh: jq '.version' package.json | tr -d '"'
     cmds:
-      - task: build
       - node bin/mono.js check
       - node bin/mono.js test run
       - node bin/mono.js publish --dry-run

@@ -129,6 +129,18 @@ export const runPublish = async (args: string[]): Promise<number> => {
 
     fs.writeFileSync(packageJsonPath, normalizeLineEnds(JSON.stringify(packageJson, undefined, 2)));
 
+    // replace/add dist dir with the package dist dir
+    const tempDistDir = path.join(tempDir, "package", "dist");
+    if (fs.existsSync(tempDistDir)) {
+        fs.rmSync(tempDistDir, {
+            recursive: true,
+            force: true,
+        });
+    }
+    fs.cpSync(path.join(rootDir, "dist"), tempDistDir, {
+        recursive: true,
+    });
+
     const outTar = path.join(cacheDir, "pnpm-packed.tgz");
     const tarCResult = await executeNative("tar", cacheDir, [
         "-czf",
