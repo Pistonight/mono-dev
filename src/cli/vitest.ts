@@ -2,7 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 
 import { checkMonodevVersion, genPackageConfig, genTypeScriptConfig } from "#config";
-import { executeNode, getProjectLocations, type PackageJson } from "#util";
+import { executeNode, getProjectLocations, logError, type PackageJson } from "#util";
 
 export const runTest = async (args: string[]): Promise<number> => {
     const { packageJsonPath, rootDir, cacheDir } = getProjectLocations();
@@ -11,7 +11,7 @@ export const runTest = async (args: string[]): Promise<number> => {
 
     const packageResult = await genPackageConfig(packageJson, packageJsonPath);
     if ("err" in packageResult) {
-        console.error(`[mono] failed to config package: ` + packageResult.err);
+        logError("failed to config package: " + packageResult.err);
         return 1;
     }
     await genTypeScriptConfig(packageJson);

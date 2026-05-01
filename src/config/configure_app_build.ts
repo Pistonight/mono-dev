@@ -5,7 +5,13 @@ import type { ConfigEnv, UserConfig, UserConfigFnPromise } from "vite";
 import { defineConfig } from "vite";
 import type { OutputOptions as RolldownOutputOptions } from "rolldown";
 
-import { getProjectPackageJsonPath, hasDependency, type PackageJson } from "#util";
+import {
+    getProjectPackageJsonPath,
+    hasDependency,
+    logInfo,
+    logWarn,
+    type PackageJson,
+} from "#util";
 
 import { genViteDefines, genVitePlugins } from "./gen_vite.ts";
 
@@ -47,7 +53,7 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
     const monodevOptions = packageJson["pistonight/mono-dev"] || {};
 
-    console.log("[mono] injecting mono-dev configuration");
+    logInfo("injecting mono-dev configuration");
     // === Plugins ===
     if (!config.plugins) {
         config.plugins = [];
@@ -100,10 +106,10 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     if (!("sourcemap" in config.build)) {
         config.build.sourcemap = sourcemapOption;
     } else {
-        console.warn("[mono] not setting sourcemap option because it is already specified");
+        logWarn("not setting sourcemap option because it is already specified");
     }
     if (config.build.chunkSizeWarningLimit) {
-        console.warn("[mono] not setting chunk size warning limit because it is already specified");
+        logWarn("not setting chunk size warning limit because it is already specified");
     } else {
         config.build.chunkSizeWarningLimit = ChunkSizeWarningLimit;
     }
@@ -129,7 +135,7 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     }
     if (enableHttps) {
         if (config.server.https) {
-            console.warn("[mono] not searching for HTTPS config because it is already specified");
+            logWarn("not searching for HTTPS config because it is already specified");
         } else {
             const https = findHttps();
             if (https) {
@@ -137,9 +143,7 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
                 config.server.https = { key, cert };
                 if (hostname) {
                     if (config.server.host) {
-                        console.warn(
-                            `[mono] not setting server.host to because it is already specified`,
-                        );
+                        logWarn(`not setting server.host to because it is already specified`);
                     } else {
                         config.server.host = hostname;
                     }
@@ -198,9 +202,9 @@ const findHttps = () => {
                     }
                 }
             } catch (e) {
-                console.warn(`[mono] failed to read cert.pem: ${e}`);
+                logWarn(`failed to read cert.pem: ${e}`);
             }
-            console.log(`[mono] using HTTPS key and cert from "${directory}"`);
+            logInfo(`using HTTPS key and cert from "${directory}"`);
             return { key, cert, hostname };
         } catch {
             // ignore
@@ -219,7 +223,7 @@ const findHttps = () => {
     if (config) {
         return config;
     }
-    console.warn("[mono] HTTPS key and cert not found, not using HTTPS.");
+    logWarn("HTTPS key and cert not found, not using HTTPS.");
     return undefined;
 };
 

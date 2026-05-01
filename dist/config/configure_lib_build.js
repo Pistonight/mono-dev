@@ -1,42 +1,42 @@
-import { f as e } from "../util-jaKMGCTu.js";
-import { r as t } from "../project-D6N976kT.js";
-import { n, t as r } from "../gen_vite-Ba512xlQ.js";
-import i from "node:fs";
-import a from "node:path";
-import { defineConfig as o } from "vite";
+import { d as e, p as t } from "../util-DECbB0Go.js";
+import { r as n } from "../project-BLoD2pU7.js";
+import { n as r, t as i } from "../gen_vite-BRMYiUJX.js";
+import a from "node:fs";
+import o from "node:path";
+import { defineConfig as s } from "vite";
 //#region src/config/configure_lib_build.ts
-var s = () => {
-	let s = e(), l = a.dirname(s), u = JSON.parse(i.readFileSync(s, "utf-8")), d = u["pistonight/mono-dev"] || {}, f = "sourcemap" in d ? d.sourcemap : !0, p = t(l, u);
-	"err" in p && (console.error("[mono] failed to parse exports: " + p.err), process.exit(1));
-	let { exports: m } = p.val, h = new Set(d.external || []);
-	if (u.dependencies) for (let e in u.dependencies) c(l, e, h);
-	if (u.peerDependencies) for (let e in u.peerDependencies) c(l, e, h);
-	let g = Object.fromEntries(m.map(({ entry_name: e, source_path_abs: t }) => [e === "." ? "index" : e, t])), _ = Object.fromEntries(m.map(({ entry_name: e, dist_path_rel: t }) => [e === "." ? "index" : e, t]));
-	return o({
-		plugins: n(u),
+var c = () => {
+	let c = e(), u = o.dirname(c), d = JSON.parse(a.readFileSync(c, "utf-8")), f = d["pistonight/mono-dev"] || {}, p = "sourcemap" in f ? f.sourcemap : !0, m = n(u, d);
+	"err" in m && (t("failed to parse exports: " + m.err), process.exit(1));
+	let { exports: h } = m.val, g = new Set(f.external || []);
+	if (d.dependencies) for (let e in d.dependencies) l(u, e, g);
+	if (d.peerDependencies) for (let e in d.peerDependencies) l(u, e, g);
+	let _ = Object.fromEntries(h.map(({ entryName: e, sourcePathAbs: t }) => [e === "." ? "index" : e, t])), v = Object.fromEntries(h.map(({ entryName: e, distPathRel: t }) => [e === "." ? "index" : e, t]));
+	return s({
+		plugins: r(d),
 		define: {
-			...r(u),
+			...i(d),
 			"import.meta.vitest": "undefined"
 		},
 		build: {
-			sourcemap: f,
+			sourcemap: p,
 			lib: {
-				entry: g,
+				entry: _,
 				fileName: (e, t) => {
-					if (!(t in _)) throw Error("unexpected unknown entry point: " + t);
-					return _[t];
+					if (!(t in v)) throw Error("unexpected unknown entry point: " + t);
+					return v[t];
 				},
 				formats: ["es"]
 			},
-			rolldownOptions: { external: Array.from(h) }
+			rolldownOptions: { external: Array.from(g) }
 		}
 	});
-}, c = (e, t, n) => {
-	n.add(t);
-	let r = a.join(e, "node_modules", t), o = a.join(r, "package.json"), s = JSON.parse(i.readFileSync(o, "utf-8"));
-	if (!(!s.exports || typeof s.exports == "string")) for (let e in s.exports) e !== "." && (e === "import" || e === "require" || (e.startsWith("./") || (console.error(`[mono] unconventional package exports found for package '${t}'`), process.exit(1)), n.add(t + e.substring(1))));
+}, l = (e, n, r) => {
+	r.add(n);
+	let i = o.join(e, "node_modules", n), s = o.join(i, "package.json"), c = JSON.parse(a.readFileSync(s, "utf-8"));
+	if (!(!c.exports || typeof c.exports == "string")) for (let e in c.exports) e !== "." && (e === "import" || e === "require" || (e.startsWith("./") || (t(`unconventional package exports found for package '${n}'`), process.exit(1)), r.add(n + e.substring(1))));
 };
 //#endregion
-export { s as configure };
+export { c as configure };
 
 //# sourceMappingURL=configure_lib_build.js.map

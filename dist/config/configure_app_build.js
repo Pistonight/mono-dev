@@ -1,10 +1,10 @@
-import { f as e, r as t } from "../util-jaKMGCTu.js";
-import { n, t as r } from "../gen_vite-Ba512xlQ.js";
-import i from "node:fs";
-import a from "node:path";
-import { defineConfig as o } from "vite";
+import { d as e, f as t, h as n, m as r } from "../util-DECbB0Go.js";
+import { n as i, t as a } from "../gen_vite-BRMYiUJX.js";
+import o from "node:fs";
+import s from "node:path";
+import { defineConfig as c } from "vite";
 //#region src/config/configure_app_build.ts
-var s = 4096, c = [
+var l = 4096, u = [
 	"react",
 	"react-dom",
 	"@fluentui/react-components",
@@ -14,60 +14,60 @@ var s = 4096, c = [
 	"@pistonite/workex",
 	"i18next",
 	"react-i18next"
-], l = async (e) => {
+], d = async (e) => {
 	let t = await e;
-	return o(typeof t == "function" ? async (e) => u(e, await t(e)) : async (e) => u(e, t));
-}, u = (t, a) => {
-	let o = e(), l = JSON.parse(i.readFileSync(o, "utf-8")), u = l["pistonight/mono-dev"] || {};
-	if (console.log("[mono] injecting mono-dev configuration"), a.plugins ||= [], a.plugins.push(...n(l)), "worker" in u) {
-		a.worker ||= {};
-		let e = a.worker.plugins;
-		a.worker.plugins = () => {
+	return c(typeof t == "function" ? async (e) => f(e, await t(e)) : async (e) => f(e, t));
+}, f = (t, s) => {
+	let c = e(), d = JSON.parse(o.readFileSync(c, "utf-8")), f = d["pistonight/mono-dev"] || {};
+	if (r("injecting mono-dev configuration"), s.plugins ||= [], s.plugins.push(...i(d)), "worker" in f) {
+		s.worker ||= {};
+		let e = s.worker.plugins;
+		s.worker.plugins = () => {
 			let t = e ? e() : [];
-			return t.push(...n(l)), t;
-		}, u.worker !== "default" && (a.worker.format = u.worker);
+			return t.push(...i(d)), t;
+		}, f.worker !== "default" && (s.worker.format = f.worker);
 	}
-	a.define ||= {}, a.define = {
-		...r(l),
+	s.define ||= {}, s.define = {
+		...a(d),
 		"import.meta.vitest": "undefined",
-		...a.define
-	}, a.resolve ||= {}, a.resolve.dedupe || (a.resolve.dedupe = []);
-	for (let e of d(l, c)) a.resolve.dedupe.push(e);
-	let m = "sourcemap" in u ? u.sourcemap : !0;
-	a.build ||= {}, "sourcemap" in a.build ? console.warn("[mono] not setting sourcemap option because it is already specified") : a.build.sourcemap = m, a.build.chunkSizeWarningLimit ? console.warn("[mono] not setting chunk size warning limit because it is already specified") : a.build.chunkSizeWarningLimit = s, a.build.rolldownOptions || (a.build.rolldownOptions = {}), a.build.rolldownOptions.output || (a.build.rolldownOptions.output = {});
-	let h = a.build.rolldownOptions.output;
-	if (Array.isArray(h)) for (let e = 0; e < h.length; e++) h[e] = p(h[e]);
-	else a.build.rolldownOptions.output = p(h);
-	let g = u.https && t.command === "serve";
-	if (a.server ||= {}, g) if (a.server.https) console.warn("[mono] not searching for HTTPS config because it is already specified");
+		...s.define
+	}, s.resolve ||= {}, s.resolve.dedupe || (s.resolve.dedupe = []);
+	for (let e of p(d, u)) s.resolve.dedupe.push(e);
+	let g = "sourcemap" in f ? f.sourcemap : !0;
+	s.build ||= {}, "sourcemap" in s.build ? n("not setting sourcemap option because it is already specified") : s.build.sourcemap = g, s.build.chunkSizeWarningLimit ? n("not setting chunk size warning limit because it is already specified") : s.build.chunkSizeWarningLimit = l, s.build.rolldownOptions || (s.build.rolldownOptions = {}), s.build.rolldownOptions.output || (s.build.rolldownOptions.output = {});
+	let _ = s.build.rolldownOptions.output;
+	if (Array.isArray(_)) for (let e = 0; e < _.length; e++) _[e] = h(_[e]);
+	else s.build.rolldownOptions.output = h(_);
+	let v = f.https && t.command === "serve";
+	if (s.server ||= {}, v) if (s.server.https) n("not searching for HTTPS config because it is already specified");
 	else {
-		let e = f();
+		let e = m();
 		if (e) {
-			let { key: t, cert: n, hostname: r } = e;
-			if (a.server.https = {
+			let { key: t, cert: r, hostname: i } = e;
+			if (s.server.https = {
 				key: t,
-				cert: n
-			}, r && (a.server.host ? console.warn("[mono] not setting server.host to because it is already specified") : a.server.host = r), a.server.hmr) {
+				cert: r
+			}, i && (s.server.host ? n("not setting server.host to because it is already specified") : s.server.host = i), s.server.hmr) {
 				let e = {
-					host: r,
+					host: i,
 					protocol: "wss"
 				};
-				typeof a.server.hmr == "boolean" ? a.server.hmr = e : a.server.hmr = {
-					...a.server.hmr,
+				typeof s.server.hmr == "boolean" ? s.server.hmr = e : s.server.hmr = {
+					...s.server.hmr,
 					...e
 				};
 			}
 		}
 	}
-	return a;
-}, d = (e, n) => n.filter((n) => t(e, n)), f = () => {
+	return s;
+}, p = (e, n) => n.filter((n) => t(e, n)), m = () => {
 	let e = (e) => {
 		try {
-			let t = a.join(e, ".cert", "cert.key"), n = a.join(e, ".cert", "cert.pem");
-			if (!i.existsSync(t) || !i.existsSync(n)) return;
-			let r = "";
+			let t = s.join(e, ".cert", "cert.key"), i = s.join(e, ".cert", "cert.pem");
+			if (!o.existsSync(t) || !o.existsSync(i)) return;
+			let a = "";
 			try {
-				let e = i.readFileSync(n, "utf-8");
+				let e = o.readFileSync(i, "utf-8");
 				for (let t of e.split("\n")) {
 					let e = t.trim();
 					if (e.toLowerCase().startsWith("subject=")) {
@@ -75,7 +75,7 @@ var s = 4096, c = [
 						for (let e of t.split(",")) {
 							let [t, n] = e.split("=");
 							if (t.trim().toLowerCase() === "cn") {
-								r = n.trim();
+								a = n.trim();
 								break;
 							}
 						}
@@ -83,19 +83,19 @@ var s = 4096, c = [
 					}
 				}
 			} catch (e) {
-				console.warn(`[mono] failed to read cert.pem: ${e}`);
+				n(`failed to read cert.pem: ${e}`);
 			}
-			return console.log(`[mono] using HTTPS key and cert from "${e}"`), {
+			return r(`using HTTPS key and cert from "${e}"`), {
 				key: t,
-				cert: n,
-				hostname: r
+				cert: i,
+				hostname: a
 			};
 		} catch {}
 	}, t = e(".");
 	if (t || (t = e(".."), t) || (t = e("../.."), t)) return t;
-	console.warn("[mono] HTTPS key and cert not found, not using HTTPS.");
-}, p = (e) => e;
+	n("HTTPS key and cert not found, not using HTTPS.");
+}, h = (e) => e;
 //#endregion
-export { l as configure };
+export { d as configure };
 
 //# sourceMappingURL=configure_app_build.js.map

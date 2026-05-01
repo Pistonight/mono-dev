@@ -4,6 +4,8 @@ import fs from "node:fs";
 import { execSync } from "node:child_process";
 import YAML from "js-yaml";
 
+import { logInfo, logWarn } from "#util";
+
 const COMMON_DESCRIPTIONS: Record<string, string> = {
     "install-cargo-extra-tools":
         "Install or upgrade extra tools needed for development using cargo onto the system",
@@ -114,7 +116,7 @@ function process_file(filepath: string): boolean {
 
         const desc = COMMON_DESCRIPTIONS[name];
         if (!desc) {
-            console.warn(`[mono] ${filepath}: unknown task "${name}" — add a desc manually`);
+            logWarn(`${filepath}: unknown task "${name}" — add a desc manually`);
             had_warning = true;
         }
 
@@ -123,22 +125,22 @@ function process_file(filepath: string): boolean {
             // Convert `  name:\n    - cmd` to `  name:\n    cmds:\n      - cmd`
             const updated = convert_shorthand_task(current_text, name, desc ?? null);
             if (updated === null) {
-                console.warn(`[mono] ${filepath}: could not locate task "${name}" in file`);
+                logWarn(`${filepath}: could not locate task "${name}" in file`);
                 had_warning = true;
                 continue;
             }
-            console.log(
-                `[mono] ${filepath}: converted shorthand for "${name}"${desc ? ` and added desc` : ""}`,
+            logInfo(
+                `${filepath}: converted shorthand for "${name}"${desc ? ` and added desc` : ""}`,
             );
             current_text = updated;
         } else if (desc) {
             const updated = insert_desc(current_text, name, desc);
             if (updated === null) {
-                console.warn(`[mono] ${filepath}: could not locate task "${name}" in file`);
+                logWarn(`${filepath}: could not locate task "${name}" in file`);
                 had_warning = true;
                 continue;
             }
-            console.log(`[mono] ${filepath}: added desc for "${name}"`);
+            logInfo(`${filepath}: added desc for "${name}"`);
             current_text = updated;
         }
     }
@@ -153,7 +155,7 @@ function process_file(filepath: string): boolean {
 export const runTaskfile = (): number => {
     const files = find_taskfiles();
     if (files.length === 0) {
-        console.log("[mono] no Taskfile.yml files found");
+        logInfo("no Taskfile.yml files found");
         return 0;
     }
 

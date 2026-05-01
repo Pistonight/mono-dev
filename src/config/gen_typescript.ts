@@ -2,7 +2,7 @@ import fs_promises from "node:fs/promises";
 import fs from "node:fs";
 import path from "node:path";
 
-import { DTS, normalizeLineEnds, type PackageJson, stringifySorted } from "#util";
+import { DTS, normalizeLineEnds, type PackageJson, stringifySorted, logWarn, logInfo } from "#util";
 
 export const genTypeScriptConfig = async (packageJson: PackageJson) => {
     const existingTsConfigs = new Set<string>();
@@ -11,8 +11,9 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
     const nonTsDirectories: string[] = [];
 
     const ignore_paths = new Set<string>();
-    if (packageJson.nocheck) {
-        for (const path of packageJson.nocheck) {
+    const nocheck = packageJson["pistonight/mono-dev"]?.nocheck;
+    if (nocheck) {
+        for (const path of nocheck) {
             if (path.startsWith("/") && !path.substring(1).includes("/")) {
                 // /foo
                 ignore_paths.add(path.substring(1));
@@ -37,7 +38,7 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
             stats = await fs_promises.stat(p);
         } catch (e) {
             console.error(e);
-            console.warn(`[mono] cannot stat ${p}, skipping`);
+            logWarn(`cannot stat ${p}, skipping`);
             return;
         }
         if (stats.isDirectory()) {
@@ -90,7 +91,7 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
 
     const removeExisting = (async () => {
         for (const tsconfig of existingTsConfigsToRemove) {
-            console.log(`[mono] removing ${tsconfig}`);
+            logInfo(`removing ${tsconfig}`);
             await fs_promises.unlink(tsconfig);
         }
     })();
@@ -140,7 +141,7 @@ export const genTypeScriptConfig = async (packageJson: PackageJson) => {
         );
     } else {
         if (fs.existsSync("tsconfig.json")) {
-            console.log("[mono] removing tsconfig.json");
+            logInfo("removing tsconfig.json");
             await fs_promises.unlink("tsconfig.json");
         }
     }

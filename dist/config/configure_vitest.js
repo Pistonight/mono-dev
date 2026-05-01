@@ -1,22 +1,20 @@
-import { f as e } from "../util-jaKMGCTu.js";
-import { r as t } from "../project-D6N976kT.js";
-import { n, t as r } from "../gen_vite-Ba512xlQ.js";
-import i from "node:fs";
-import a from "node:path";
-import { defineConfig as o } from "vitest/config";
+import { d as e } from "../util-DECbB0Go.js";
+import { n as t, t as n } from "../gen_vite-BRMYiUJX.js";
+import r from "node:fs";
+import { defineConfig as i } from "vitest/config";
 //#region src/config/configure_vitest.ts
-var s = () => {
-	let s = e(), c = a.dirname(s), l = JSON.parse(i.readFileSync(s, "utf-8")), u = t(c, l), d = "src";
-	return u.val && (d = u.val.src), o({
-		plugins: n(l),
-		define: r(l),
+var a = () => {
+	let a = e(), o = JSON.parse(r.readFileSync(a, "utf-8"));
+	return i({
+		plugins: t(o),
+		define: n(o),
 		test: {
 			passWithNoTests: !0,
-			includeSource: [d + "/**/*.{ts,mts,cts,tsx}"]
+			includeSource: ["src/**/*.{ts,mts,cts,tsx}"]
 		}
 	});
 };
 //#endregion
-export { s as configure };
+export { a as configure };
 
 //# sourceMappingURL=configure_vitest.js.map

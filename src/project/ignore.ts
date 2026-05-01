@@ -14,8 +14,9 @@ export const getIgnoreConfig = (packageJson: PackageJson, rootDir: string): stri
     } catch {
         checkIgnoreLines = [];
     }
-    if (packageJson.nocheck) {
-        checkIgnoreLines.push(...packageJson.nocheck);
+    const nocheck = packageJson["pistonight/mono-dev"]?.nocheck;
+    if (nocheck) {
+        checkIgnoreLines.push(...nocheck);
     }
     return checkIgnoreLines;
 };

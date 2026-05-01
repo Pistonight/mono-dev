@@ -2,7 +2,9 @@ import path from "node:path";
 import fs from "node:fs";
 import { defineConfig as viteDefineConfig } from "vite";
 
-import { getProjectPackageJsonPath, type PackageJson } from "#util";
+// note: not using subpath imports because they won't work in bootstrap
+// if package.json does not already have the correct exports
+import { getProjectPackageJsonPath, logError, type PackageJson } from "#util";
 import { parseExports } from "#project";
 
 import { genViteDefines, genVitePlugins } from "./gen_vite.ts";
@@ -17,7 +19,7 @@ export const configure = () => {
 
     const libExports = parseExports(rootDir, packageJson);
     if ("err" in libExports) {
-        console.error("[mono] failed to parse exports: " + libExports.err);
+        logError("failed to parse exports: " + libExports.err);
         process.exit(1);
     }
     const { exports } = libExports.val;
@@ -36,12 +38,14 @@ export const configure = () => {
     // console.log(external_deps);
 
     const entry_config = Object.fromEntries(
-        exports.map(({ entry_name, source_path_abs }) => {
+        exports.map(({ entryName: entry_name, sourcePathAbs: source_path_abs }) => {
+            // substring to remove "./"
             return [entry_name === "." ? "index" : entry_name, source_path_abs];
         }),
     );
     const file_name_config = Object.fromEntries(
-        exports.map(({ entry_name, dist_path_rel }) => {
+        exports.map(({ entryName: entry_name, distPathRel: dist_path_rel }) => {
+            // substring to remove "./"
             return [entry_name === "." ? "index" : entry_name, dist_path_rel];
         }),
     );
@@ -94,9 +98,7 @@ const addExternalModules = (rootDir: string, packageName: string, out: Set<strin
             continue; // built-in names
         }
         if (!exportName.startsWith("./")) {
-            console.error(
-                `[mono] unconventional package exports found for package '${packageName}'`,
-            );
+            logError(`unconventional package exports found for package '${packageName}'`);
             process.exit(1);
         }
         out.add(packageName + exportName.substring(1));

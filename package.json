@@ -1,19 +1,8 @@
 {
   "name": "mono-dev",
-  "version": "0.3.32",
+  "version": "0.4.0",
   "description": "NPM module for mono-dev utilities",
   "type": "module",
-  "files": [
-    "bin/**/*",
-    "dist/**/*",
-    "lib/**/*",
-    "mdbook/**/*",
-    "scripts/**/*",
-    "src/**/*",
-    "task/**/*",
-    "toolsets/**/*",
-    "types/**/*"
-  ],
   "dependencies": {
     "@babel/core": "^7.29.0",
     "@eslint/js": "^9.39.4",
@@ -53,6 +42,17 @@
     "vite": "./bin/vite.js",
     "mono": "./bin/mono.js"
   },
+  "files": [
+    "bin/**/*",
+    "dist/**/*",
+    "lib/**/*",
+    "mdbook/**/*",
+    "scripts/**/*",
+    "src/**/*",
+    "task/**/*",
+    "toolsets/**/*",
+    "types/**/*"
+  ],
   "exports": {
     "./vite": "./lib/vite.js",
     "./vitest": "./lib/vitest.js",
@@ -85,9 +85,5 @@
     "#plugins": "./dist/_dts_/src/plugins/index.d.ts",
     "#project": "./dist/_dts_/src/project/index.d.ts",
     "#util": "./dist/_dts_/src/util/index.d.ts"
-  },
-  "nocheck": [
-    "/mdbook/css",
-    "/mdbook/theme"
-  ]
+  }
 }
