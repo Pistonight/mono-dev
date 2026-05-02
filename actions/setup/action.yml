@@ -119,3 +119,4 @@ runs:
 
     - if: ${{ inputs.mono-dev == 'pnpm' }}
       run: pnpm install --frozen-lockfile
+      shell: bash
