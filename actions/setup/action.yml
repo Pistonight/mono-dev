@@ -45,7 +45,7 @@ runs:
         repository: Pistonight/mono-dev
         path: ${{ inputs.mono-dev-path }}
         persist-credentials: false
-    - if: ${{ inputs.mono-dev != 'false' && inputs.mono-dev != 'true' }}
+    - if: ${{ inputs.mono-dev != 'false' && inputs.mono-dev != 'true' && inputs.mono-dev != 'pnpm' }}
       uses: actions/checkout@v6
       with:
         repository: Pistonight/mono-dev
@@ -116,3 +116,6 @@ runs:
       shell: bash
       env:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_install_config }}
+
+    - if: ${{ inputs.mono-dev == 'pnpm' }}
+      run: pnpm install --frozen-lockfile

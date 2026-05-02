@@ -13,6 +13,8 @@ jobs:
           # ALL VALUES BELOW ARE OPTIONAL
           # clone mono-dev in the repo
           # Set to `false` to not clone - `true` is the default.
+          # Set to "pnpm" as a special value - `pnpm install` will be called automatically
+          #   at the end of the setup to install mono-dev as part of PNPM install
           # Set to anything else to use a different reference than the main branch
           mono-dev: true
           # Where to clone mono-dev, /mono-dev is the default
