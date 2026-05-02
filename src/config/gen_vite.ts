@@ -114,11 +114,11 @@ export const genViteDefines = (
             }
             const version = String(parsed.version);
             logInfo("import.meta.env.VERSION: " + version);
-            defines.VERSION = JSON.stringify(version);
+            defines["import.meta.env.VERSION"] = JSON.stringify(version);
         } else {
             const version = String(packageJson.version);
             logInfo("import.meta.env.VERSION: " + version);
-            defines.VERSION = JSON.stringify(version);
+            defines["import.meta.env.VERSION"] = JSON.stringify(version);
         }
     }
 
@@ -129,7 +129,7 @@ export const genViteDefines = (
             })
             .stdout.trim();
         logInfo("import.meta.env.COMMIT: " + commit);
-        defines.COMMIT = JSON.stringify(commit);
+        defines["import.meta.env.COMMIT"] = JSON.stringify(commit);
     }
 
     return defines;
