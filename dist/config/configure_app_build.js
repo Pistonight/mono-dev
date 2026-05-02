@@ -22,9 +22,8 @@ var f = async (e) => {
 	}
 	d.resolve ||= {}, d.resolve.dedupe || (d.resolve.dedupe = []);
 	for (let e of t(p, c)) d.resolve.dedupe.push(e);
-	o(d, h);
-	let g = h.https && u.command === "serve";
-	if (d.server ||= {}, g) {
+	if (o(d, h), h.https && u.command === "serve" && !process.env.VITEST) {
+		d.server ||= {};
 		let e = m();
 		if (e) {
 			d.server.https || (d.server.https = {});
