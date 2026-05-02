@@ -1,6 +1,6 @@
-import { _ as e, a as t, c as n, f as r, g as i, l as a, o, p as s, r as c, s as l, u, v as d, y as f } from "../plugins-Bv51fYNd.js";
-import { o as p } from "../gen_vite-CaD4Mixq.js";
-import { n as m, r as h, t as g } from "../project-DDixD-Qx.js";
+import { _ as e, a as t, c as n, f as r, g as i, l as a, o, p as s, r as c, s as l, u, v as d, y as f } from "../plugins-C_LJcWHR.js";
+import { o as p } from "../gen_vite-Bp_RtBC9.js";
+import { n as m, r as h, t as g } from "../project-BD6IVGBS.js";
 import _ from "node:fs";
 import v from "node:path";
 import y, { execSync as b } from "node:child_process";
@@ -133,7 +133,7 @@ var T = (e) => {
 	emitDeclarationOnly: !0,
 	stableTypeOrdering: !0
 } }, A = (t) => {
-	let n = /* @__PURE__ */ r();
+	let n = r();
 	if (n) if (!_.existsSync(t)) _.mkdirSync(t, { recursive: !0 }), _.writeFileSync(`${t}/version`, n);
 	else {
 		let r = !1;
@@ -423,7 +423,7 @@ var G = () => {
 		case "--help":
 		case "?":
 		case "-h": return J(), process.exit(0);
-		case "version": return console.log("mono-dev " + /* @__PURE__ */ r()), process.exit(0);
+		case "version": return console.log("mono-dev " + r()), process.exit(0);
 		case "config": return process.exit(await I(n));
 		case "check": return process.exit(await M(n));
 		case "build": return process.exit(await j());
