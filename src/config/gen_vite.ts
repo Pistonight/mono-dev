@@ -90,7 +90,7 @@ export const genViteDefines = (
     const defines: Record<string, string> = {
         // vitest will delete this define, so it's fine to include it
         // unconditionally
-        "import.meta.vitest": "false",
+        "import.meta.vitest": "undefined",
     };
     if (importMetaEnvOptions.VERSION) {
         if (typeof importMetaEnvOptions.VERSION === "string") {
@@ -114,11 +114,11 @@ export const genViteDefines = (
             }
             const version = String(parsed.version);
             logInfo("import.meta.env.VERSION: " + version);
-            defines.VERSION = version;
+            defines.VERSION = JSON.stringify(version);
         } else {
             const version = String(packageJson.version);
             logInfo("import.meta.env.VERSION: " + version);
-            defines.VERSION = version;
+            defines.VERSION = JSON.stringify(version);
         }
     }
 
@@ -129,7 +129,7 @@ export const genViteDefines = (
             })
             .stdout.trim();
         logInfo("import.meta.env.COMMIT: " + commit);
-        defines.COMMIT = commit;
+        defines.COMMIT = JSON.stringify(commit);
     }
 
     return defines;
