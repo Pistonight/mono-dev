@@ -87,7 +87,7 @@ tasks:
              mkdir -p node_modules/.mono/publish;
              git -C node_modules/.mono/publish init;
              git -C node_modules/.mono/publish remote add origin git@github.com:Pistonight/mono-dev;
-             git -C node_modules/.mono/publish fetch origin dist;
+             git -C node_modules/.mono/publish fetch --depth=1 origin dist;
              git -C node_modules/.mono/publish checkout dist;
              lastversion=$(jq '.version' node_modules/.mono/publish/package.json | tr -d '"');
              nextversion="{{.VERSION}}";
