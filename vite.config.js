@@ -8,4 +8,7 @@ export default configure({
             external: ["node:fs", "node:path", "path", "node:fs/promises", "node:child_process"],
         },
     },
+    test: {
+        passWithNoTests: true,
+    },
 });
