@@ -111,11 +111,11 @@ const patchUserConfigWithMonodev = (env: ConfigEnv, config: UserConfig): UserCon
     // }
 
     // === Server Config ===
-    const enableHttps = monodevOptions.https && env.command === "serve";
-    if (!config.server) {
-        config.server = {};
-    }
+    const enableHttps = monodevOptions.https && env.command === "serve" && !process.env.VITEST;
     if (enableHttps) {
+        if (!config.server) {
+            config.server = {};
+        }
         const https = findHttps();
         if (https) {
             if (!config.server.https) {
