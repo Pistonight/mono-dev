@@ -7,7 +7,7 @@ import { defineConfig } from "vite";
 import { getProjectPackageJsonPath, logError, logInfo, logWarn, type PackageJson } from "#util";
 import { parseExports } from "#project";
 
-import { genViteBuildConfig, genViteDefines, genVitePlugins } from "./gen_vite.ts";
+import { genViteBuildConfig, genViteDefines, genVitePlugins, genVitest } from "./gen_vite.ts";
 
 export const configure = async (
     config:
@@ -146,6 +146,9 @@ export const patchUserConfigWithMonodev = (_env: ConfigEnv, config: UserConfig) 
     } else {
         build.rolldownOptions.external = externals;
     }
+
+    // === Test Config ===
+    genVitest(config, monodevOptions);
 
     return config;
 };
