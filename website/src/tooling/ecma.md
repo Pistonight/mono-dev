@@ -252,6 +252,10 @@ Define vite types in `src/env.d.ts`:
 Use the `ecma:app-dev` and `ecma:app-build` tasks to execute vite
 dev server and build.
 
+## `import.meta.env`
+Mono-dev options can be used to specify auto `import.meta.env` values.
+See [MonoDevOptions](https://github.com/Pistonight/mono-dev/blob/main/src/util/misc.ts#L24C1-L25C1)
+
 ## Publish
 The tool need to zap the `package.json` before publishing.
 Therefore, `private` must be `true` to prevent accidental

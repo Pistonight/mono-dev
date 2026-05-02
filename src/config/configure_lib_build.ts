@@ -1,106 +1,151 @@
 import path from "node:path";
 import fs from "node:fs";
-import { defineConfig as viteDefineConfig } from "vite";
 
-// note: not using subpath imports because they won't work in bootstrap
-// if package.json does not already have the correct exports
-import { getProjectPackageJsonPath, logError, type PackageJson } from "#util";
+import type { ConfigEnv, UserConfig, UserConfigFnPromise } from "vite";
+import { defineConfig } from "vite";
+
+import { getProjectPackageJsonPath, logError, logInfo, logWarn, type PackageJson } from "#util";
 import { parseExports } from "#project";
 
-import { genViteDefines, genVitePlugins } from "./gen_vite.ts";
+import { genViteBuildConfig, genViteDefines, genVitePlugins } from "./gen_vite.ts";
 
-export const configure = () => {
+export const configure = async (
+    config:
+        | UserConfig
+        | Promise<UserConfig>
+        | ((env: ConfigEnv) => UserConfig | Promise<UserConfig>),
+): Promise<UserConfig | UserConfigFnPromise> => {
+    const configA = await config;
+    if (typeof configA === "function") {
+        return defineConfig(async (env) => {
+            const innerConfig = await configA(env);
+            return patchUserConfigWithMonodev(env, innerConfig);
+        });
+    }
+    return defineConfig(async (env) => patchUserConfigWithMonodev(env, configA));
+};
+
+export const patchUserConfigWithMonodev = (_env: ConfigEnv, config: UserConfig) => {
     const packageJsonPath = getProjectPackageJsonPath();
     const rootDir = path.dirname(packageJsonPath);
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
-
     const monodevOptions = packageJson["pistonight/mono-dev"] || {};
-    const sourcemapOption = "sourcemap" in monodevOptions ? monodevOptions.sourcemap : true;
 
+    logInfo("injecting lib-build configuration to vite");
+    // === Plugins ===
+    if (!config.plugins) {
+        config.plugins = genVitePlugins(packageJson);
+    } else {
+        config.plugins.push(...genVitePlugins(packageJson));
+    }
+
+    // === Defines ===
+    if (!config.define) {
+        config.define = genViteDefines(packageJson, packageJsonPath);
+    } else {
+        config.define = {
+            ...genViteDefines(packageJson, packageJsonPath),
+            ...config.define,
+        };
+    }
+
+    const build = genViteBuildConfig(config, monodevOptions);
+    // === Exports (Entry) ===
     const libExports = parseExports(rootDir, packageJson);
     if ("err" in libExports) {
         logError("failed to parse exports: " + libExports.err);
         process.exit(1);
     }
     const { exports } = libExports.val;
-    const externalDeps = new Set<string>(monodevOptions.external || []);
+    const entryConfig = Object.fromEntries(
+        exports.map(({ entryName: n, sourcePathAbs }) => {
+            return [n === "." ? "index" : n, sourcePathAbs];
+        }),
+    );
+    const fileNameConfig = Object.fromEntries(
+        exports.map(({ entryName: n, distPathRel }) => {
+            return [n === "." ? "index" : n, distPathRel];
+        }),
+    );
 
+    if (!build.lib) {
+        build.lib = {
+            entry: entryConfig,
+        };
+    } else {
+        if ("entry" in build.lib) {
+            logError(
+                "build.lib.entry must NOT be specified in vite; it is automatically determined based on exports",
+            );
+            process.exit(1);
+        }
+    }
+    if ("fileName" in build.lib) {
+        logError(
+            "build.lib.fileName must NOT be specified in vite; it is automatically determined based on exports",
+        );
+        process.exit(1);
+    }
+    build.lib.fileName = (_format, entryName) => {
+        if (!(entryName in fileNameConfig)) {
+            throw new Error("unexpected unknown entry point: " + entryName);
+        }
+        return fileNameConfig[entryName];
+    };
+    if (!build.lib.formats) {
+        build.lib.formats = ["es"];
+    }
+
+    // === Externalization ===
+    const externalDeps = new Set<string>();
     if (packageJson.dependencies) {
         for (const dep in packageJson.dependencies) {
-            addExternalModules(rootDir, dep, externalDeps);
+            externalDeps.add(dep);
         }
     }
     if (packageJson.peerDependencies) {
         for (const dep in packageJson.peerDependencies) {
-            addExternalModules(rootDir, dep, externalDeps);
+            externalDeps.add(dep);
         }
     }
-    // console.log(external_deps);
+    if (packageJson.optionalDependencies) {
+        for (const dep in packageJson.optionalDependencies) {
+            externalDeps.add(dep);
+        }
+    }
+    const externals: (string | RegExp)[] = Array.from(externalDeps);
+    // also include <package>/* exports
+    for (const dep of externalDeps) {
+        externals.push(new RegExp("^" + dep + "/"));
+    }
 
-    const entry_config = Object.fromEntries(
-        exports.map(({ entryName: entry_name, sourcePathAbs: source_path_abs }) => {
-            // substring to remove "./"
-            return [entry_name === "." ? "index" : entry_name, source_path_abs];
-        }),
-    );
-    const file_name_config = Object.fromEntries(
-        exports.map(({ entryName: entry_name, distPathRel: dist_path_rel }) => {
-            // substring to remove "./"
-            return [entry_name === "." ? "index" : entry_name, dist_path_rel];
-        }),
-    );
-
-    const plugins = genVitePlugins(packageJson);
-
-    return viteDefineConfig({
-        plugins,
-        define: {
-            ...genViteDefines(packageJson),
-            "import.meta.vitest": "undefined",
-        },
-        build: {
-            sourcemap: sourcemapOption,
-            lib: {
-                entry: entry_config,
-                fileName: (_format, entry_name) => {
-                    if (!(entry_name in file_name_config)) {
-                        throw new Error("unexpected unknown entry point: " + entry_name);
+    if (!build.rolldownOptions) {
+        build.rolldownOptions = {};
+    }
+    if (typeof build.rolldownOptions.external === "function") {
+        logWarn("build.rolldownOptions.external is a function which is REALLY BAD for perf");
+        const original = build.rolldownOptions.external;
+        build.rolldownOptions.external = (id, parentId, isResolved) => {
+            for (const e of externals) {
+                if (typeof e === "string") {
+                    if (e === id) {
+                        return true;
                     }
-                    return file_name_config[entry_name];
-                },
-                formats: ["es"],
-            },
-            rolldownOptions: {
-                external: Array.from(externalDeps),
-            },
-        },
-    });
-};
-
-/**
- * Collect exports from the package and mark them as external (adding to out)
- */
-const addExternalModules = (rootDir: string, packageName: string, out: Set<string>) => {
-    // add the default output no matter what
-    out.add(packageName);
-
-    const package_Path = path.join(rootDir, "node_modules", packageName);
-    const packageJsonPath = path.join(package_Path, "package.json");
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
-    if (!packageJson.exports || typeof packageJson.exports === "string") {
-        return;
+                } else {
+                    if (id.match(e)) {
+                        return true;
+                    }
+                }
+            }
+            return original(id, parentId, isResolved);
+        };
+    } else if (Array.isArray(build.rolldownOptions.external)) {
+        build.rolldownOptions.external.push(...externals);
+    } else if (build.rolldownOptions.external) {
+        build.rolldownOptions.external = [build.rolldownOptions.external, ...externals];
+    } else {
+        build.rolldownOptions.external = externals;
     }
-    for (const exportName in packageJson.exports) {
-        if (exportName === ".") {
-            continue; // already added above
-        }
-        if (exportName === "import" || exportName === "require") {
-            continue; // built-in names
-        }
-        if (!exportName.startsWith("./")) {
-            logError(`unconventional package exports found for package '${packageName}'`);
-            process.exit(1);
-        }
-        out.add(packageName + exportName.substring(1));
-    }
+
+    return config;
 };

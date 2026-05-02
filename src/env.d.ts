@@ -1,8 +1,7 @@
 /// <reference types="node" />
-interface ImportMeta {
-    url: string;
-    readonly version: string;
-}
+/// <reference types="vite/client" />
+/// <reference types="vitest/config" />
+
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 @modyfi/vite-plugin-yaml
 declare module "*.yaml" {

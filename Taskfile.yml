@@ -33,11 +33,10 @@ tasks:
     cmds:
       - rm -rf dist
       - bun scripts/bootstrap-stage1.ts
-      - bun scripts/bootstrap-stage2.ts
-      - cmd: "echo 'bootstrap: re-running vite build with node'"
+      - pnpm exec vite build
+      - cmd: "echo 'bootstrap: re-running vite build with mono'"
         silent: true
-      - cmd: node bin/mono.js build
-        silent: true
+      - node bin/mono.js build
       - node bin/mono.js config
 
   check:
@@ -112,7 +111,6 @@ tasks:
         pnpm up
         @types/bun @types/node
         vite @babel/core @rolldown/plugin-babel @types/babel__core babel-plugin-react-compiler
-        react react-dom @types/react @types/react-dom
         @vitejs/plugin-react
         vite-plugin-wasm
         @eslint/js eslint eslint-plugin-react-hooks eslint-plugin-react-refresh eslint-plugin-react-compiler

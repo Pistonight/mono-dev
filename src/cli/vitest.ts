@@ -1,8 +1,12 @@
-import path from "node:path";
 import fs from "node:fs";
 
-import { checkMonodevVersion, genPackageConfig, genTypeScriptConfig } from "#config";
-import { executeNode, getProjectLocations, logError, type PackageJson } from "#util";
+import {
+    checkMonodevVersion,
+    genPackageConfig,
+    genTypeScriptConfig,
+    resolveViteLibConfig,
+} from "#config";
+import { executeNode, getProjectLocations, logError, logInfo, type PackageJson } from "#util";
 
 export const runTest = async (args: string[]): Promise<number> => {
     const { packageJsonPath, rootDir, cacheDir } = getProjectLocations();
@@ -15,13 +19,15 @@ export const runTest = async (args: string[]): Promise<number> => {
         return 1;
     }
     await genTypeScriptConfig(packageJson);
-    const configPath = path.join(cacheDir, "vitest.config.js");
-    fs.writeFileSync(
-        configPath,
-        `import { configure } from "mono-dev/test-config"; export default configure();`,
-    );
 
-    const result = executeNode("vitest", rootDir, ["--config", configPath, ...args]);
+    const viteConfigPath = resolveViteLibConfig(cacheDir, rootDir);
+    if (!viteConfigPath) {
+        logInfo("using vite config from project root directly");
+    }
+
+    const result = viteConfigPath
+        ? executeNode("vitest", rootDir, ["--config", viteConfigPath, ...args])
+        : executeNode("vitest", rootDir, args);
     if (result.err) {
         return 1;
     }
