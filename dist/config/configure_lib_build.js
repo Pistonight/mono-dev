@@ -1,45 +1,45 @@
 import { _ as e, g as t, m as n, v as r } from "../plugins-Bv51fYNd.js";
-import { i, n as a, r as o } from "../gen_vite-CaD4Mixq.js";
-import { r as s } from "../project-DDixD-Qx.js";
-import c from "node:fs";
-import l from "node:path";
-import { defineConfig as u } from "vite";
+import { a as i, i as a, n as o, r as s } from "../gen_vite-CaD4Mixq.js";
+import { r as c } from "../project-DDixD-Qx.js";
+import l from "node:fs";
+import u from "node:path";
+import { defineConfig as d } from "vite";
 //#region src/config/configure_lib_build.ts
-var d = async (e) => {
+var f = async (e) => {
 	let t = await e;
-	return u(typeof t == "function" ? async (e) => f(e, await t(e)) : async (e) => f(e, t));
-}, f = (u, d) => {
-	let f = n(), p = l.dirname(f), m = JSON.parse(c.readFileSync(f, "utf-8")), h = m["pistonight/mono-dev"] || {};
-	e("injecting lib-build configuration to vite"), d.plugins ? d.plugins.push(...i(m)) : d.plugins = i(m), d.define ? d.define = {
-		...o(m, f),
-		...d.define
-	} : d.define = o(m, f);
-	let g = a(d, h), _ = s(p, m);
-	"err" in _ && (t("failed to parse exports: " + _.err), process.exit(1));
-	let { exports: v } = _.val, y = Object.fromEntries(v.map(({ entryName: e, sourcePathAbs: t }) => [e === "." ? "index" : e, t])), b = Object.fromEntries(v.map(({ entryName: e, distPathRel: t }) => [e === "." ? "index" : e, t]));
-	g.lib ? "entry" in g.lib && (t("build.lib.entry must NOT be specified in vite; it is automatically determined based on exports"), process.exit(1)) : g.lib = { entry: y }, "fileName" in g.lib && (t("build.lib.fileName must NOT be specified in vite; it is automatically determined based on exports"), process.exit(1)), g.lib.fileName = (e, t) => {
-		if (!(t in b)) throw Error("unexpected unknown entry point: " + t);
-		return b[t];
-	}, g.lib.formats || (g.lib.formats = ["es"]);
-	let x = /* @__PURE__ */ new Set();
-	if (m.dependencies) for (let e in m.dependencies) x.add(e);
-	if (m.peerDependencies) for (let e in m.peerDependencies) x.add(e);
-	if (m.optionalDependencies) for (let e in m.optionalDependencies) x.add(e);
-	let S = Array.from(x);
-	for (let e of x) S.push(RegExp("^" + e + "/"));
-	if (g.rolldownOptions ||= {}, typeof g.rolldownOptions.external == "function") {
+	return d(typeof t == "function" ? async (e) => p(e, await t(e)) : async (e) => p(e, t));
+}, p = (d, f) => {
+	let p = n(), m = u.dirname(p), h = JSON.parse(l.readFileSync(p, "utf-8")), g = h["pistonight/mono-dev"] || {};
+	e("injecting lib-build configuration to vite"), f.plugins ? f.plugins.push(...a(h)) : f.plugins = a(h), f.define ? f.define = {
+		...s(h, p),
+		...f.define
+	} : f.define = s(h, p);
+	let _ = o(f, g), v = c(m, h);
+	"err" in v && (t("failed to parse exports: " + v.err), process.exit(1));
+	let { exports: y } = v.val, b = Object.fromEntries(y.map(({ entryName: e, sourcePathAbs: t }) => [e === "." ? "index" : e, t])), x = Object.fromEntries(y.map(({ entryName: e, distPathRel: t }) => [e === "." ? "index" : e, t]));
+	_.lib ? "entry" in _.lib && (t("build.lib.entry must NOT be specified in vite; it is automatically determined based on exports"), process.exit(1)) : _.lib = { entry: b }, "fileName" in _.lib && (t("build.lib.fileName must NOT be specified in vite; it is automatically determined based on exports"), process.exit(1)), _.lib.fileName = (e, t) => {
+		if (!(t in x)) throw Error("unexpected unknown entry point: " + t);
+		return x[t];
+	}, _.lib.formats || (_.lib.formats = ["es"]);
+	let S = /* @__PURE__ */ new Set();
+	if (h.dependencies) for (let e in h.dependencies) S.add(e);
+	if (h.peerDependencies) for (let e in h.peerDependencies) S.add(e);
+	if (h.optionalDependencies) for (let e in h.optionalDependencies) S.add(e);
+	let C = Array.from(S);
+	for (let e of S) C.push(RegExp("^" + e + "/"));
+	if (_.rolldownOptions ||= {}, typeof _.rolldownOptions.external == "function") {
 		r("build.rolldownOptions.external is a function which is REALLY BAD for perf");
-		let e = g.rolldownOptions.external;
-		g.rolldownOptions.external = (t, n, r) => {
-			for (let e of S) if (typeof e == "string") {
+		let e = _.rolldownOptions.external;
+		_.rolldownOptions.external = (t, n, r) => {
+			for (let e of C) if (typeof e == "string") {
 				if (e === t) return !0;
 			} else if (t.match(e)) return !0;
 			return e(t, n, r);
 		};
-	} else Array.isArray(g.rolldownOptions.external) ? g.rolldownOptions.external.push(...S) : g.rolldownOptions.external ? g.rolldownOptions.external = [g.rolldownOptions.external, ...S] : g.rolldownOptions.external = S;
-	return d;
+	} else Array.isArray(_.rolldownOptions.external) ? _.rolldownOptions.external.push(...C) : _.rolldownOptions.external ? _.rolldownOptions.external = [_.rolldownOptions.external, ...C] : _.rolldownOptions.external = C;
+	return i(f, g), f;
 };
 //#endregion
-export { d as configure, f as patchUserConfigWithMonodev };
+export { f as configure, p as patchUserConfigWithMonodev };
 
 //# sourceMappingURL=configure_lib_build.js.map
