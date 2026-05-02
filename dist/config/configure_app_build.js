@@ -1,73 +1,46 @@
-import { d as e, f as t, h as n, m as r } from "../util-CZb1AxZa.js";
-import { n as i, t as a } from "../gen_vite-55xxG9iy.js";
-import o from "node:fs";
-import s from "node:path";
-import { defineConfig as c } from "vite";
+import { _ as e, d as t, m as n, v as r } from "../plugins-Bv51fYNd.js";
+import { a as i, i as a, n as o, r as s, t as c } from "../gen_vite-CaD4Mixq.js";
+import l from "node:fs";
+import u from "node:path";
+import { defineConfig as d } from "vite";
 //#region src/config/configure_app_build.ts
-var l = 4096, u = [
-	"react",
-	"react-dom",
-	"@fluentui/react-components",
-	"@fluentui/react-icons",
-	"@pistonite/pure",
-	"@pistonite/celera",
-	"@pistonite/workex",
-	"i18next",
-	"react-i18next"
-], d = async (e) => {
+var f = async (e) => {
 	let t = await e;
-	return c(typeof t == "function" ? async (e) => f(e, await t(e)) : async (e) => f(e, t));
-}, f = (t, s) => {
-	let c = e(), d = JSON.parse(o.readFileSync(c, "utf-8")), f = d["pistonight/mono-dev"] || {};
-	if (r("injecting mono-dev configuration"), s.plugins ||= [], s.plugins.push(...i(d)), "worker" in f) {
-		s.worker ||= {};
-		let e = s.worker.plugins;
-		s.worker.plugins = () => {
+	return d(typeof t == "function" ? async (e) => p(e, await t(e)) : async (e) => p(e, t));
+}, p = (u, d) => {
+	let f = n(), p = JSON.parse(l.readFileSync(f, "utf-8")), h = p["pistonight/mono-dev"] || {};
+	if (e("injecting app-build configuration to vite"), d.plugins ? d.plugins.push(...a(p)) : d.plugins = a(p), d.define ? d.define = {
+		...s(p, f),
+		...d.define
+	} : d.define = s(p, f), "worker" in h) {
+		d.worker ||= {};
+		let e = d.worker.plugins;
+		d.worker.plugins = () => {
 			let t = e ? e() : [];
-			return t.push(...i(d)), t;
-		}, f.worker !== "default" && (s.worker.format = f.worker);
+			return t.push(...a(p)), t;
+		}, h.worker !== "default" && (d.worker.format = h.worker);
 	}
-	s.define ||= {}, s.define = {
-		...a(d),
-		"import.meta.vitest": "undefined",
-		...s.define
-	}, s.resolve ||= {}, s.resolve.dedupe || (s.resolve.dedupe = []);
-	for (let e of p(d, u)) s.resolve.dedupe.push(e);
-	let g = "sourcemap" in f ? f.sourcemap : !0;
-	s.build ||= {}, "sourcemap" in s.build ? n("not setting sourcemap option because it is already specified") : s.build.sourcemap = g, s.build.chunkSizeWarningLimit ? n("not setting chunk size warning limit because it is already specified") : s.build.chunkSizeWarningLimit = l, s.build.rolldownOptions || (s.build.rolldownOptions = {}), s.build.rolldownOptions.output || (s.build.rolldownOptions.output = {});
-	let _ = s.build.rolldownOptions.output;
-	if (Array.isArray(_)) for (let e = 0; e < _.length; e++) _[e] = h(_[e]);
-	else s.build.rolldownOptions.output = h(_);
-	let v = f.https && t.command === "serve";
-	if (s.server ||= {}, v) if (s.server.https) n("not searching for HTTPS config because it is already specified");
-	else {
+	d.resolve ||= {}, d.resolve.dedupe || (d.resolve.dedupe = []);
+	for (let e of t(p, c)) d.resolve.dedupe.push(e);
+	o(d, h);
+	let g = h.https && u.command === "serve";
+	if (d.server ||= {}, g) {
 		let e = m();
 		if (e) {
-			let { key: t, cert: r, hostname: i } = e;
-			if (s.server.https = {
-				key: t,
-				cert: r
-			}, i && (s.server.host ? n("not setting server.host to because it is already specified") : s.server.host = i), s.server.hmr) {
-				let e = {
-					host: i,
-					protocol: "wss"
-				};
-				typeof s.server.hmr == "boolean" ? s.server.hmr = e : s.server.hmr = {
-					...s.server.hmr,
-					...e
-				};
-			}
+			d.server.https || (d.server.https = {});
+			let { key: t, cert: n, hostname: i } = e;
+			d.server.https.key = t, d.server.https.cert = n, i && d.server.host !== i && (r("overriding server.host to " + i), d.server.host = i), d.server.hmr !== !1 && ((!d.server.hmr || typeof d.server.hmr == "boolean") && (d.server.hmr = {}), i && d.server.hmr.host !== i && (r("overriding server.hmr.host to " + i), d.server.hmr.host = i), d.server.hmr.protocol = "wss");
 		}
 	}
-	return s;
-}, p = (e, n) => n.filter((n) => t(e, n)), m = () => {
-	let e = (e) => {
+	return i(d, h), d;
+}, m = () => {
+	let t = (t) => {
 		try {
-			let t = s.join(e, ".cert", "cert.key"), i = s.join(e, ".cert", "cert.pem");
-			if (!o.existsSync(t) || !o.existsSync(i)) return;
+			let n = u.join(t, ".cert", "cert.key"), i = u.join(t, ".cert", "cert.pem");
+			if (!l.existsSync(n) || !l.existsSync(i)) return;
 			let a = "";
 			try {
-				let e = o.readFileSync(i, "utf-8");
+				let e = l.readFileSync(i, "utf-8");
 				for (let t of e.split("\n")) {
 					let e = t.trim();
 					if (e.toLowerCase().startsWith("subject=")) {
@@ -83,19 +56,19 @@ var l = 4096, u = [
 					}
 				}
 			} catch (e) {
-				n(`failed to read cert.pem: ${e}`);
+				r(`failed to read cert.pem: ${e}`);
 			}
-			return r(`using HTTPS key and cert from "${e}"`), {
-				key: t,
+			return e(`using HTTPS key and cert from "${t}"`), {
+				key: n,
 				cert: i,
 				hostname: a
 			};
 		} catch {}
-	}, t = e(".");
-	if (t || (t = e(".."), t) || (t = e("../.."), t)) return t;
-	n("HTTPS key and cert not found, not using HTTPS.");
-}, h = (e) => e;
+	}, n = t(".");
+	if (n || (n = t(".."), n) || (n = t("../.."), n)) return n;
+	r("HTTPS key and cert not found, not using HTTPS.");
+};
 //#endregion
-export { d as configure };
+export { f as configure };
 
 //# sourceMappingURL=configure_app_build.js.map

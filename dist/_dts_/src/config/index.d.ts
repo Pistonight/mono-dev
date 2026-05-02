@@ -1,3 +1,4 @@
+export * from "./gen_vite.ts";
 export * from "./gen_eslint.ts";
 export * from "./gen_package.ts";
 export * from "./gen_prettier.ts";

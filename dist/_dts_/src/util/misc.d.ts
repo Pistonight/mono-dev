@@ -29,12 +29,14 @@ export interface MonoDevOptions {
     publish?: boolean;
     /** if lib mode should be used, which adds more rules to eslint. default is true */
     lib?: boolean;
-    /** Additional modules to be externalized */
-    external?: string[];
+    /** Skip emitting .d.ts files when building library */
+    nodts?: boolean;
     /** undefined = true */
     sourcemap?: boolean | "inline" | "hidden";
     /** undefined = true, set to false to disable zapping "imports" field in package.json */
     importmap?: false;
+    /** should jsdom be used in test environments */
+    jsdom?: boolean;
     /**
      * When running vite dev server,
      * look for .cert/cert.key and .cert/cert.pem 2 levels
@@ -54,6 +56,16 @@ export interface MonoDevOptions {
      * - other: set the same plugins for worker, and set the format to the value
      */
     worker?: "default" | "es";
+    /** Define import.meta.env values */
+    ["import.meta.env"]?: {
+        /**
+         * VERSION pointing to version field in package.json.
+         * Can also be a relative path pointing to another package.json
+         */
+        VERSION?: boolean | string;
+        /** COMMIT by running git rev-parse HEAD */
+        COMMIT?: boolean;
+    };
 }
 export interface LibExportConfig {
     exports: ParsedExport[];
@@ -84,6 +96,10 @@ export interface ProjectLocation {
     rootDir: string;
     cacheDir: string;
 }
+/**
+ * Filter to dependencies inside package.json
+ */
+export declare const filterDependencies: (packageJson: PackageJson, toFilter: string[]) => string[];
 export declare const hasDependency: (packageJson: PackageJson, dep: string) => boolean;
 export declare const logInfo: (...args: unknown[]) => void;
 export declare const logWarn: (...args: unknown[]) => void;

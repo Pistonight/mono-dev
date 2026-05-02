@@ -1,18 +1,19 @@
-import { a as e, c as t, g as n, h as r, i, l as a, m as o, o as s, p as c, r as l, s as u, t as d, u as f } from "../util-CZb1AxZa.js";
-import { n as p, r as m, t as h } from "../project-Czg3-_8M.js";
-import g from "node:fs";
-import _ from "node:path";
-import v, { execSync as y } from "node:child_process";
-import b from "node:fs/promises";
-import { Application as x } from "typedoc";
-import { load as S } from "typedoc-theme-oxide";
-import C from "js-yaml";
+import { _ as e, a as t, c as n, f as r, g as i, l as a, o, p as s, r as c, s as l, u, v as d, y as f } from "../plugins-Bv51fYNd.js";
+import { o as p } from "../gen_vite-CaD4Mixq.js";
+import { n as m, r as h, t as g } from "../project-DDixD-Qx.js";
+import _ from "node:fs";
+import v from "node:path";
+import y, { execSync as b } from "node:child_process";
+import x from "js-yaml";
+import S from "node:fs/promises";
+import { Application as C } from "typedoc";
+import { load as w } from "typedoc-theme-oxide";
 //#region src/config/gen_eslint.ts
-var w = (e) => {
-	let t = _.join(e, "eslint.config.js");
-	g.writeFileSync(t, n("import { configure } from \"mono-dev/eslint-config\"; export default configure();"));
-}, T = async (e, t) => e.private ? await h(e, t) : { err: "'private' must be set to true to prevent accidental publishing; to pack for publishing please use mono publish" }, E = (e, t) => {
-	let r = [
+var T = (e) => {
+	let t = v.join(e, "eslint.config.js");
+	_.writeFileSync(t, f("import { configure } from \"mono-dev/eslint-config\"; export default configure();"));
+}, E = async (e, t) => e.private ? await g(e, t) : { err: "'private' must be set to true to prevent accidental publishing; to pack for publishing please use mono publish" }, D = (e, t) => {
+	let n = [
 		"*.yml",
 		"*.yaml",
 		"*.toml",
@@ -21,90 +22,90 @@ var w = (e) => {
 		"*.hbs",
 		"tsconfig*.json",
 		"eslint.config.js"
-	], i = p(e, t);
-	for (let e of i) e.includes("tsconfig") || e.includes("eslint.config.js") || r.push(e);
-	g.writeFileSync(_.join(t, ".prettierignore"), n(r.join("\n")));
-}, D = async (e) => {
-	let t = /* @__PURE__ */ new Set(), i = [], a = [], s = [], c = /* @__PURE__ */ new Set(), l = e["pistonight/mono-dev"]?.nocheck;
+	], r = m(e, t);
+	for (let e of r) e.includes("tsconfig") || e.includes("eslint.config.js") || n.push(e);
+	_.writeFileSync(v.join(t, ".prettierignore"), f(n.join("\n")));
+}, O = async (t) => {
+	let n = /* @__PURE__ */ new Set(), r = [], i = [], o = [], s = /* @__PURE__ */ new Set(), l = t["pistonight/mono-dev"]?.nocheck;
 	if (l) for (let e of l) {
 		if (e.startsWith("/") && !e.substring(1).includes("/")) {
-			c.add(e.substring(1));
+			s.add(e.substring(1));
 			continue;
 		}
 		if (!e.includes("/")) {
-			c.add(e);
+			s.add(e);
 			continue;
 		}
 	}
-	let f = (await b.readdir(".")).map(async (e) => {
-		let n = _.basename(e);
-		if (c.has(n)) {
-			s.push(e);
+	let u = (await S.readdir(".")).map(async (e) => {
+		let t = v.basename(e);
+		if (s.has(t)) {
+			o.push(e);
 			return;
 		}
-		let o;
+		let a;
 		try {
-			o = await b.stat(e);
+			a = await S.stat(e);
 		} catch (t) {
-			console.error(t), r(`cannot stat ${e}, skipping`);
+			console.error(t), d(`cannot stat ${e}, skipping`);
 			return;
 		}
-		if (o.isDirectory()) {
-			let t = _.join(e, "env.d.ts");
-			g.existsSync(t) ? i.push(e) : s.push(e);
+		if (a.isDirectory()) {
+			let t = v.join(e, "env.d.ts");
+			_.existsSync(t) ? r.push(e) : o.push(e);
 			return;
 		}
 		if (e !== "tsconfig.json" && e.startsWith("tsconfig.") && e.endsWith(".json")) {
-			t.add(e);
+			n.add(e);
 			return;
 		}
-		e.match(/\.(c|m)?tsx?$/) && a.push(e);
+		e.match(/\.(c|m)?tsx?$/) && i.push(e);
 	});
-	await Promise.all(f);
-	let p = new Set(t);
-	a.length && p.delete("tsconfig._.json"), i.forEach((e) => {
-		p.delete(`tsconfig.${e}.json`), p.delete(`tsconfig.${e}__${u}.json`);
+	await Promise.all(u);
+	let p = new Set(n);
+	i.length && p.delete("tsconfig._.json"), r.forEach((e) => {
+		p.delete(`tsconfig.${e}.json`), p.delete(`tsconfig.${e}__${a}.json`);
 	});
-	let m = i.map(async (e) => {
-		let t = `tsconfig.${e}.json`, r = {
+	let m = r.map(async (e) => {
+		let t = `tsconfig.${e}.json`, n = {
 			compilerOptions: {
-				...O.compilerOptions,
+				...k.compilerOptions,
 				tsBuildInfoFile: `node_modules/.mono/tsconfig.${e}.tsbuildinfo`,
 				rootDir: "."
 			},
 			include: [e]
 		};
-		await b.writeFile(t, n(d(r) || ""));
+		await S.writeFile(t, f(c(n) || ""));
 	}), h = (async () => {
-		for (let e of p) o(`removing ${e}`), await b.unlink(e);
+		for (let t of p) e(`removing ${t}`), await S.unlink(t);
 	})();
-	if (a.length) {
+	if (i.length) {
 		let e = {
 			compilerOptions: {
-				...O.compilerOptions,
+				...k.compilerOptions,
 				tsBuildInfoFile: "node_modules/.mono/tsconfig._.tsbuildinfo",
 				rootDir: "."
 			},
-			include: a
+			include: i
 		};
-		await b.writeFile("tsconfig._.json", n(d(e) || ""));
+		await S.writeFile("tsconfig._.json", f(c(e) || ""));
 	}
-	let v = a.length + i.length;
-	if (await h, await Promise.all(m), v) {
-		let e = i.map((e) => ({ path: `./tsconfig.${e}.json` }));
-		a.length && e.push({ path: "./tsconfig._.json" });
+	let g = i.length + r.length;
+	if (await h, await Promise.all(m), g) {
+		let e = r.map((e) => ({ path: `./tsconfig.${e}.json` }));
+		i.length && e.push({ path: "./tsconfig._.json" });
 		let t = {
 			compilerOptions: {},
 			files: [],
 			references: e
 		};
-		await b.writeFile("tsconfig.json", n(d(t) || ""));
-	} else g.existsSync("tsconfig.json") && (o("removing tsconfig.json"), await b.unlink("tsconfig.json"));
+		await S.writeFile("tsconfig.json", f(c(t) || ""));
+	} else _.existsSync("tsconfig.json") && (e("removing tsconfig.json"), await S.unlink("tsconfig.json"));
 	return {
-		projectCount: v,
-		nonTsDirectories: s
+		projectCount: g,
+		nonTsDirectories: o
 	};
-}, O = { compilerOptions: {
+}, k = { compilerOptions: {
 	noEmit: !0,
 	composite: !0,
 	incremental: !0,
@@ -131,132 +132,136 @@ var w = (e) => {
 	declarationMap: !0,
 	emitDeclarationOnly: !0,
 	stableTypeOrdering: !0
-} }, k = (e) => {
-	let t = a();
-	if (t) if (!g.existsSync(e)) g.mkdirSync(e, { recursive: !0 }), g.writeFileSync(`${e}/version`, t);
+} }, A = (t) => {
+	let n = /* @__PURE__ */ r();
+	if (n) if (!_.existsSync(t)) _.mkdirSync(t, { recursive: !0 }), _.writeFileSync(`${t}/version`, n);
 	else {
-		let n = !1;
+		let r = !1;
 		try {
-			let r = g.readFileSync(`${e}/version`, "utf-8").trim();
-			r !== t && (o(`cleaning cache because of version update: ${r} -> ${t}`), n = !0);
+			let i = _.readFileSync(`${t}/version`, "utf-8").trim();
+			i !== n && (e(`cleaning cache because of version update: ${i} -> ${n}`), r = !0);
 		} catch {
-			n = !0;
+			r = !0;
 		}
-		if (n) {
-			g.rmSync(e, {
+		if (r) {
+			_.rmSync(t, {
 				recursive: !0,
 				force: !0
-			}), g.mkdirSync(e, { recursive: !0 });
+			}), _.mkdirSync(t, { recursive: !0 });
 			try {
-				g.writeFileSync(`${e}/version`, t);
+				_.writeFileSync(`${t}/version`, n);
 			} catch {
-				r("failed to write version file, will retry next time");
+				d("failed to write version file, will retry next time");
 			}
 		}
 	}
-}, A = async () => {
-	let { packageJsonPath: e, rootDir: t, cacheDir: a } = f();
-	k(a);
-	let l = JSON.parse(g.readFileSync(e, "utf-8"));
-	if (!l["pistonight/mono-dev"]?.lib) return c("package.json mono dev option 'lib' must be true to build library"), 1;
-	let p = await T(l, e);
-	if ("err" in p) return c("failed to config package: " + p.err), 1;
-	await D(l);
-	let h = m(t, l, !0);
-	if ("err" in h) return c("failed to parse exports: " + h.err), 1;
-	let v = _.join(a, "lib-build.config.js");
-	g.writeFileSync(v, "import { configure } from \"mono-dev/lib-build-config\"; export default configure();");
-	let y = _.join(t, "tsconfig.src.json"), b = JSON.parse(g.readFileSync(y, "utf-8")), x = `${a}/tsconfig.src__${u}.tsbuildinfo`;
-	g.existsSync(x) && g.unlinkSync(x), b.compilerOptions.tsBuildInfoFile = x, b.compilerOptions.noEmit = !1, b.compilerOptions.outDir = _.join(s, u), b.exclude = [
+}, j = async () => {
+	let { packageJsonPath: t, rootDir: r, cacheDir: l } = s();
+	A(l);
+	let u = JSON.parse(_.readFileSync(t, "utf-8")), m = u["pistonight/mono-dev"] || {};
+	if (!m.lib) return i("package.json mono dev option 'lib' must be true to build library"), 1;
+	let g = await E(u, t);
+	if ("err" in g) return i("failed to config package: " + g.err), 1;
+	await O(u);
+	let y = h(r, u, !0);
+	if ("err" in y) return i("failed to parse exports: " + y.err), 1;
+	let b = p(l, r);
+	b || e("using vite config from project root directly");
+	let x = v.join(r, "tsconfig.src.json"), S = JSON.parse(_.readFileSync(x, "utf-8")), C = `${l}/tsconfig.src__${a}.tsbuildinfo`;
+	_.existsSync(C) && _.unlinkSync(C);
+	let w = m.nodts, T = v.join(r, "tsconfig.src__" + a + ".json");
+	w || (S.compilerOptions.tsBuildInfoFile = C, S.compilerOptions.noEmit = !1, S.compilerOptions.outDir = v.join(n, a), S.exclude = [
 		"**/*.test.ts",
 		"**/*.test.mts",
 		"**/*.test.cts",
 		"**/*.test.tsx"
-	];
-	let S = _.join(t, "tsconfig.src__" + u + ".json");
-	g.writeFileSync(S, n(d(b) || ""));
-	let C = i("vite", t, [
+	], _.writeFileSync(T, f(c(S) || "")));
+	let D = b ? o("vite", r, [
 		"build",
 		"--config",
-		v
-	]);
-	if ("err" in C) return c("bundle with vite failed: " + C.err), 21;
-	o("generating dts...");
-	let w = Date.now(), E = !!l["pistonight/mono-dev"]?.tsc, O = E ? "tsc" : "tsgo";
-	E && r("warning: using tsc instead of tsgo for generating declarations");
-	let A = i(O, t, ["-p", S]);
-	return "err" in A ? (c("dts generation with tsc failed: " + A.err), 31) : (o(`dts generated (${Math.floor(Date.now() - w)}ms)`), 0);
-}, j = async (e) => {
-	let { packageJsonPath: t, rootDir: n, cacheDir: r } = f();
-	k(r);
-	let i = JSON.parse(g.readFileSync(t, "utf-8")), a = await T(i, t);
-	if ("err" in a) return c("failed to config package: " + a.err), 1;
-	(await D(i)).projectCount && w(n), E(i, n);
-	let o = !!i["pistonight/mono-dev"]?.tsc, s = e.includes("--fix") || e.includes("-f");
-	if (s) {
-		if (!N(n, r, s)) return 41;
-		if (!P(n, r, s)) return 51;
-		if (!M(n, o)) return 31;
-	} else {
-		if (!M(n, o)) return 31;
-		if (!N(n, r, s)) return 41;
-		if (!P(n, r, s)) return 51;
+		b
+	]) : o("vite", r, ["build"]);
+	if ("err" in D) return i("bundle with vite failed: " + D.err), 21;
+	if (w) d("skipping dts since nodts is true");
+	else {
+		let t = Date.now(), n = !!u["pistonight/mono-dev"]?.tsc, a = n ? "tsc" : "tsgo";
+		n && d("warning: using tsc instead of tsgo for generating declarations");
+		let s = o(a, r, ["-p", T]);
+		if ("err" in s) return i("dts generation with tsc failed: " + s.err), 31;
+		e(`dts generated (${Math.floor(Date.now() - t)}ms)`);
 	}
 	return 0;
-}, M = (e, t) => {
-	let n = Date.now(), a = t ? "tsc" : "tsgo";
-	return t && r("warning: using tsc instead of tsgo for typeck"), "err" in i(a, e, ["--build", "--pretty"]) ? (c("typeck failed!"), !1) : (o(`typeck passed (${Math.floor(Date.now() - n)}ms)`), !0);
-}, N = (e, t, n) => {
-	let r = [
+}, M = async (e) => {
+	let { packageJsonPath: t, rootDir: n, cacheDir: r } = s();
+	A(r);
+	let a = JSON.parse(_.readFileSync(t, "utf-8")), o = await E(a, t);
+	if ("err" in o) return i("failed to config package: " + o.err), 1;
+	(await O(a)).projectCount && T(n), D(a, n);
+	let c = !!a["pistonight/mono-dev"]?.tsc, l = e.includes("--fix") || e.includes("-f");
+	if (l) {
+		if (!P(n, r, l)) return 41;
+		if (!F(n, r, l)) return 51;
+		if (!N(n, c)) return 31;
+	} else {
+		if (!N(n, c)) return 31;
+		if (!P(n, r, l)) return 41;
+		if (!F(n, r, l)) return 51;
+	}
+	return 0;
+}, N = (t, n) => {
+	let r = Date.now(), a = n ? "tsc" : "tsgo";
+	return n && d("warning: using tsc instead of tsgo for typeck"), "err" in o(a, t, ["--build", "--pretty"]) ? (i("typeck failed!"), !1) : (e(`typeck passed (${Math.floor(Date.now() - r)}ms)`), !0);
+}, P = (t, n, r) => {
+	let a = [
 		".",
 		"--color",
 		"--report-unused-disable-directives",
 		"--max-warnings=0",
 		"--cache",
 		"--cache-location",
-		_.join(t, ".eslint-cache")
+		v.join(n, ".eslint-cache")
 	];
-	n && r.push("--fix");
-	let a = Date.now();
-	return "err" in i("eslint", e, r) ? (c("eslint failed!"), !1) : (o(`eslint passed (${Math.floor(Date.now() - a)}ms)`), !0);
-}, P = (e, n, r) => {
-	let i = _.join(e, ".prettierignore"), a = _.join(n, ".prettier-cache"), s = _.join(t, "bin", "prettier-wrapper.js"), l = Date.now(), u = v.spawnSync(process.argv[0], [
+	r && a.push("--fix");
+	let s = Date.now();
+	return "err" in o("eslint", t, a) ? (i("eslint failed!"), !1) : (e(`eslint passed (${Math.floor(Date.now() - s)}ms)`), !0);
+}, F = (t, n, r) => {
+	let a = v.join(t, ".prettierignore"), o = v.join(n, ".prettier-cache"), s = v.join(u, "bin", "prettier-wrapper.js"), c = Date.now(), l = y.spawnSync(process.argv[0], [
 		s,
-		i,
 		a,
+		o,
 		r ? "-f" : "-c"
 	], {
-		cwd: e,
+		cwd: t,
 		stdio: "pipe"
 	});
-	if (u.error) return c("failed to spawn prettier: " + u.error), !1;
-	if (u.status) {
-		let e = u.stderr.toString("utf-8").trim();
-		return console.warn(e.split("\n").map((e) => (e.startsWith("[warn]") && (e = e.substring(6)), e.replace("Run Prettier with --write to fix.", "").trimEnd())).join("\n")), c("prettier failed!"), !1;
+	if (l.error) return i("failed to spawn prettier: " + l.error), !1;
+	if (l.status) {
+		let e = l.stderr.toString("utf-8").trim();
+		return console.warn(e.split("\n").map((e) => (e.startsWith("[warn]") && (e = e.substring(6)), e.replace("Run Prettier with --write to fix.", "").trimEnd())).join("\n")), i("prettier failed!"), !1;
 	}
-	return o(`prettier passed (${Math.floor(Date.now() - l)}ms)`), !0;
-}, F = async (e) => {
-	let { packageJsonPath: t, rootDir: n, cacheDir: r } = f();
-	k(r);
-	let i = JSON.parse(g.readFileSync(t, "utf-8")), a = await T(i, t);
-	return "err" in a ? (c("failed to config package: " + a.err), 1) : ((await D(i)).projectCount ? w(n) : o("not generating eslint config because no typescript directories exist"), o("config generated"), 0);
-}, I = async (e) => {
-	let t = e.includes("--json"), { packageJsonPath: n, rootDir: r, cacheDir: i } = f();
-	k(i);
-	let a = JSON.parse(g.readFileSync(n, "utf-8")), o = await T(a, n);
-	if ("err" in o) return c("failed to config package: " + o.err), 1;
-	if (!(await D(a)).projectCount) return c("no typescript directory, cannot generate doc"), 1;
-	let s = m(r, a, !0);
-	if ("err" in s) return c("failed to parse exports: " + s.err), 1;
-	let { exports: l } = s.val;
-	if (!l.length) return c("exports are empty, cannot generate doc"), 1;
-	let u = _.join(r, "tsconfig.src.json"), d = {
-		entryPoints: l.map(({ sourcePathAbs: e }) => e),
+	return e(`prettier passed (${Math.floor(Date.now() - c)}ms)`), !0;
+}, I = async (t) => {
+	let { packageJsonPath: n, rootDir: r, cacheDir: a } = s();
+	A(a);
+	let o = JSON.parse(_.readFileSync(n, "utf-8")), c = await E(o, n);
+	return "err" in c ? (i("failed to config package: " + c.err), 1) : ((await O(o)).projectCount ? T(r) : e("not generating eslint config because no typescript directories exist"), e("config generated"), 0);
+}, L = async (e) => {
+	let t = e.includes("--json"), { packageJsonPath: n, rootDir: r, cacheDir: a } = s();
+	A(a);
+	let o = JSON.parse(_.readFileSync(n, "utf-8")), c = await E(o, n);
+	if ("err" in c) return i("failed to config package: " + c.err), 1;
+	if (!(await O(o)).projectCount) return i("no typescript directory, cannot generate doc"), 1;
+	let l = h(r, o, !0);
+	if ("err" in l) return i("failed to parse exports: " + l.err), 1;
+	let { exports: u } = l.val;
+	if (!u.length) return i("exports are empty, cannot generate doc"), 1;
+	let d = v.join(r, "tsconfig.src.json"), f = {
+		entryPoints: u.map(({ sourcePathAbs: e }) => e),
 		entryPointStrategy: "resolve",
-		out: _.join(r, t ? "docs.json" : "docs"),
+		out: v.join(r, t ? "docs.json" : "docs"),
 		theme: "oxide",
-		plugin: [S],
-		tsconfig: u,
+		plugin: [w],
+		tsconfig: d,
 		highlightLanguages: [
 			"typescript",
 			"css",
@@ -264,69 +269,69 @@ var w = (e) => {
 			"bash",
 			"tsx"
 		]
-	}, p = await x.bootstrapWithPlugins(d), h = await p.convert();
-	return h ? (t ? await p.generateJson(h, d.out) : await p.generateDocs(h, d.out), 0) : (c("failed to process project with typedoc"), 61);
-}, L = async (e) => {
-	let t = e.includes("-n") || e.includes("--dry-run"), { rootDir: i, packageJsonPath: a, cacheDir: d } = f();
-	if (g.existsSync(d) || g.mkdirSync(d, { recursive: !0 }), (await l("pnpm", i, [
+	}, p = await C.bootstrapWithPlugins(f), m = await p.convert();
+	return m ? (t ? await p.generateJson(m, f.out) : await p.generateDocs(m, f.out), 0) : (i("failed to process project with typedoc"), 61);
+}, R = async (r) => {
+	let o = r.includes("-n") || r.includes("--dry-run"), { rootDir: c, packageJsonPath: l, cacheDir: u } = s();
+	if (_.existsSync(u) || _.mkdirSync(u, { recursive: !0 }), (await t("pnpm", c, [
 		"pack",
 		"--out",
-		_.join(d, "pnpm-pack.temp.tgz")
-	])).err) return c("pnpm pack failed!"), 81;
-	let p = _.join(d, "pnpm-pack.temp");
-	if (g.existsSync(p) && g.rmSync(p, {
+		v.join(u, "pnpm-pack.temp.tgz")
+	])).err) return i("pnpm pack failed!"), 81;
+	let p = v.join(u, "pnpm-pack.temp");
+	if (_.existsSync(p) && _.rmSync(p, {
 		recursive: !0,
 		force: !0
-	}), g.mkdirSync(p, { recursive: !0 }), (await l("tar", p, ["-xzf", "../pnpm-pack.temp.tgz"])).err) return c("tgz extract failed!"), 91;
-	let h = _.join(p, "package", "package.json"), v = JSON.parse(g.readFileSync(h, "utf8")), y = JSON.parse(g.readFileSync(a, "utf8")), b = !!v["pistonight/mono-dev"]?.publish;
-	delete v["pistonight/mono-dev"], delete v.private;
-	let x = m(i, y);
-	if ("err" in x) return c("failed to parse exports: " + x.err), 1;
-	if (v.exports) {
-		if (typeof v.exports == "string") return c("failed to parse exports: 'exports' field must be an object"), 1;
-		let e = v["pistonight/mono-dev"]?.compile || {};
-		for (let { entryName: t, distPathRel: n, distDtsPathRel: r } of x.val.exports) {
-			let i = t === "." ? "." : "./" + t;
-			i in e || (v.exports[i] = {
-				import: "./" + s + "/" + n,
-				types: "./" + s + "/" + r
+	}), _.mkdirSync(p, { recursive: !0 }), (await t("tar", p, ["-xzf", "../pnpm-pack.temp.tgz"])).err) return i("tgz extract failed!"), 91;
+	let m = v.join(p, "package", "package.json"), g = JSON.parse(_.readFileSync(m, "utf8")), y = JSON.parse(_.readFileSync(l, "utf8")), b = !!g["pistonight/mono-dev"]?.publish;
+	delete g["pistonight/mono-dev"], delete g.private;
+	let x = h(c, y);
+	if ("err" in x) return i("failed to parse exports: " + x.err), 1;
+	if (g.exports) {
+		if (typeof g.exports == "string") return i("failed to parse exports: 'exports' field must be an object"), 1;
+		let e = g["pistonight/mono-dev"]?.compile || {};
+		for (let { entryName: t, distPathRel: r, distDtsPathRel: i } of x.val.exports) {
+			let a = t === "." ? "." : "./" + t;
+			a in e || (g.exports[a] = {
+				import: "./" + n + "/" + r,
+				types: "./" + n + "/" + i
 			});
 		}
 	}
-	if (v.imports) for (let e in v.imports) {
+	if (g.imports) for (let e in g.imports) {
 		if (!e.startsWith("#")) continue;
-		let t = v.imports[e];
+		let t = g.imports[e];
 		if (!t.startsWith("./src") || !t.match(/\.(c|m)?tsx?$/)) continue;
-		let n = t.lastIndexOf("."), r = t.substring(2, n), i = "./" + s + "/" + u + "/" + r + ".d.ts";
-		v.imports[e] = i;
+		let r = t.lastIndexOf("."), i = t.substring(2, r), o = "./" + n + "/" + a + "/" + i + ".d.ts";
+		g.imports[e] = o;
 	}
 	let S = !0;
-	if (v.files) {
-		for (let e in v.files) if (e.startsWith("dist")) {
-			r("not adding 'dist/**/*' to files since there are dist paths specified in original package.json"), S = !1;
+	if (g.files) {
+		for (let e in g.files) if (e.startsWith("dist")) {
+			d("not adding 'dist/**/*' to files since there are dist paths specified in original package.json"), S = !1;
 			break;
 		}
 	}
-	S && (o("adding 'dist/**/*' to files in package.json"), v.files ? v.files.push("dist/**/*") : v.files = ["dist/**/*"]), g.writeFileSync(h, n(JSON.stringify(v, void 0, 2)));
-	let C = _.join(p, "package", "dist");
-	g.existsSync(C) && g.rmSync(C, {
+	S && (e("adding 'dist/**/*' to files in package.json"), g.files ? g.files.push("dist/**/*") : g.files = ["dist/**/*"]), _.writeFileSync(m, f(JSON.stringify(g, void 0, 2)));
+	let C = v.join(p, "package", "dist");
+	_.existsSync(C) && _.rmSync(C, {
 		recursive: !0,
 		force: !0
-	}), g.cpSync(_.join(i, "dist"), C, { recursive: !0 });
-	let w = _.join(d, "pnpm-packed.tgz");
-	return (await l("tar", d, [
+	}), _.cpSync(v.join(c, "dist"), C, { recursive: !0 });
+	let w = v.join(u, "pnpm-packed.tgz");
+	return (await t("tar", u, [
 		"-czf",
 		"pnpm-packed.tgz",
 		"-C",
 		"pnpm-pack.temp",
 		"package"
-	])).err ? (c("tgz creation failed!"), 91) : (o("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), o("packed at: " + w), t ? (o("dry-run, stopping"), 0) : b ? (await l("pnpm", i, [
+	])).err ? (i("tgz creation failed!"), 91) : (e("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), e("packed at: " + w), o ? (e("dry-run, stopping"), 0) : b ? (await t("pnpm", c, [
 		"publish",
 		w,
 		"--access",
 		"public"
-	])).err ? (c("pnpm publish failed!"), 101) : 0 : (c("please set mono-dev option \"publish\": true"), 1));
-}, R = {
+	])).err ? (i("pnpm publish failed!"), 101) : 0 : (i("please set mono-dev option \"publish\": true"), 1));
+}, z = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
 	setup: "One-time setup for the project",
 	install: "Install or sync project dependencies",
@@ -344,18 +349,18 @@ var w = (e) => {
 	release: "Publish a release",
 	publish: "Publish a release"
 };
-function z() {
-	return y("git ls-files --cached --others --exclude-standard", { encoding: "utf8" }).split("\n").filter((e) => e === "Taskfile.yml" || e.endsWith("/Taskfile.yml"));
+function B() {
+	return b("git ls-files --cached --others --exclude-standard", { encoding: "utf8" }).split("\n").filter((e) => e === "Taskfile.yml" || e.endsWith("/Taskfile.yml"));
 }
-function B(e, t) {
+function V(e, t) {
 	let n = t + 1;
 	for (; n < e.length && !/^ {2}\S/.test(e[n]);) n++;
 	return n;
 }
-function V(e, t, n) {
+function H(e, t, n) {
 	let r = e.split("\n"), i = RegExp(`^  ${t}\\s*:`), a = r.findIndex((e) => i.test(e));
 	if (a === -1) return null;
-	let o = B(r, a), s = r.slice(a + 1, o).map((e) => e.trim() === "" ? e : "  " + e), c = [
+	let o = V(r, a), s = r.slice(a + 1, o).map((e) => e.trim() === "" ? e : "  " + e), c = [
 		r[a],
 		...n ? [`    desc: ${n}`] : [],
 		"    cmds:",
@@ -363,80 +368,80 @@ function V(e, t, n) {
 	];
 	return r.splice(a, o - a, ...c), r.join("\n");
 }
-function H(e, t, n) {
+function U(e, t, n) {
 	let r = e.split("\n"), i = RegExp(`^  ${t}\\s*:`), a = r.findIndex((e) => i.test(e));
 	return a === -1 ? null : (r.splice(a + 1, 0, `    desc: ${n}`), r.join("\n"));
 }
-function U(e) {
-	let t = g.readFileSync(e, "utf8"), n = C.load(t)?.tasks;
-	if (!n || typeof n != "object") return !1;
-	let i = t, a = !1;
-	for (let [t, s] of Object.entries(n)) {
-		if (!s || typeof s != "object" || s.internal || s.desc) continue;
-		let n = R[t];
-		if (n || (r(`${e}: unknown task "${t}" — add a desc manually`), a = !0), Array.isArray(s)) {
-			let s = V(i, t, n ?? null);
-			if (s === null) {
-				r(`${e}: could not locate task "${t}" in file`), a = !0;
+function W(t) {
+	let n = _.readFileSync(t, "utf8"), r = x.load(n)?.tasks;
+	if (!r || typeof r != "object") return !1;
+	let i = n, a = !1;
+	for (let [n, o] of Object.entries(r)) {
+		if (!o || typeof o != "object" || o.internal || o.desc) continue;
+		let r = z[n];
+		if (r || (d(`${t}: unknown task "${n}" — add a desc manually`), a = !0), Array.isArray(o)) {
+			let o = H(i, n, r ?? null);
+			if (o === null) {
+				d(`${t}: could not locate task "${n}" in file`), a = !0;
 				continue;
 			}
-			o(`${e}: converted shorthand for "${t}"${n ? " and added desc" : ""}`), i = s;
-		} else if (n) {
-			let s = H(i, t, n);
-			if (s === null) {
-				r(`${e}: could not locate task "${t}" in file`), a = !0;
+			e(`${t}: converted shorthand for "${n}"${r ? " and added desc" : ""}`), i = o;
+		} else if (r) {
+			let o = U(i, n, r);
+			if (o === null) {
+				d(`${t}: could not locate task "${n}" in file`), a = !0;
 				continue;
 			}
-			o(`${e}: added desc for "${t}"`), i = s;
+			e(`${t}: added desc for "${n}"`), i = o;
 		}
 	}
-	return i !== t && g.writeFileSync(e, i, "utf8"), a;
+	return i !== n && _.writeFileSync(t, i, "utf8"), a;
 }
-var W = () => {
-	let e = z();
-	if (e.length === 0) return o("no Taskfile.yml files found"), 0;
-	let t = !1;
-	for (let n of e) U(n) && (t = !0);
-	return +!!t;
-}, G = async (e) => {
-	let { packageJsonPath: t, rootDir: n, cacheDir: r } = f();
-	k(r);
-	let a = JSON.parse(g.readFileSync(t, "utf-8")), o = await T(a, t);
-	if ("err" in o) return c("failed to config package: " + o.err), 1;
-	await D(a);
-	let s = _.join(r, "vitest.config.js");
-	return g.writeFileSync(s, "import { configure } from \"mono-dev/test-config\"; export default configure();"), +!!i("vitest", n, [
+var G = () => {
+	let t = B();
+	if (t.length === 0) return e("no Taskfile.yml files found"), 0;
+	let n = !1;
+	for (let e of t) W(e) && (n = !0);
+	return +!!n;
+}, K = async (t) => {
+	let { packageJsonPath: n, rootDir: r, cacheDir: a } = s();
+	A(a);
+	let c = JSON.parse(_.readFileSync(n, "utf-8")), l = await E(c, n);
+	if ("err" in l) return i("failed to config package: " + l.err), 1;
+	await O(c);
+	let u = p(a, r);
+	return u || e("using vite config from project root directly"), +!!(u ? o("vitest", r, [
 		"--config",
-		s,
-		...e
-	]).err;
-}, K = async (e) => {
-	e.length || (q(), process.exit(0));
+		u,
+		...t
+	]) : o("vitest", r, t)).err;
+}, q = async (e) => {
+	e.length || (J(), process.exit(0));
 	let [t, ...n] = e;
 	switch (t) {
 		case "help":
 		case "--help":
 		case "?":
-		case "-h": return q(), process.exit(0);
-		case "version": return console.log("mono-dev " + a()), process.exit(0);
-		case "config": return process.exit(await F(n));
-		case "check": return process.exit(await j(n));
-		case "build": return process.exit(await A());
-		case "test": return process.exit(await G(n));
-		case "doc": return process.exit(await I(n));
-		case "taskfile": return process.exit(W());
+		case "-h": return J(), process.exit(0);
+		case "version": return console.log("mono-dev " + /* @__PURE__ */ r()), process.exit(0);
+		case "config": return process.exit(await I(n));
+		case "check": return process.exit(await M(n));
+		case "build": return process.exit(await j());
+		case "test": return process.exit(await K(n));
+		case "doc": return process.exit(await L(n));
+		case "taskfile": return process.exit(G());
 		case "publish":
 			if (!n.includes("--skip-build")) {
-				let e = await A();
+				let e = await j();
 				e && process.exit(e);
 			}
-			return process.exit(await L(n));
+			return process.exit(await R(n));
 	}
-	c("unknown command " + t), q(), process.exit(1);
-}, q = () => {
+	i("unknown command " + t), J(), process.exit(1);
+}, J = () => {
 	console.log("mono-dev CLI\n  config           Generate typeck and eslint config, for language servers\n  check [-f]       Run typeck, prettier, eslint\n  build            Build library (for bundling app run vite directly)\n  test  ARGS...    Run test (with vitest)\n  doc   [--json]   Build documentation \n  taskfile         Fixup taskfiles\n  publish [-n]     Publish the package (-n for dry-run)\n  version          Print the version\n");
 };
 //#endregion
-export { e as executeShim, K as main };
+export { l as executeShim, q as main };
 
 //# sourceMappingURL=index.js.map
