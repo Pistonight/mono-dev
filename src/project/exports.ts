@@ -41,6 +41,13 @@ export const parseExports = (
 
     const parsedExports: ParsedExport[] = [];
     for (const name in exports) {
+        // only process exports not marked with nocompile
+        if (nocompile.has(name)) {
+            if (print) {
+                logWarn(`skipping nocompile export '${name}'`);
+            }
+            continue;
+        }
         let entryFileName = name;
         if (name !== ".") {
             if (!name.startsWith("./")) {
@@ -57,13 +64,6 @@ export const parseExports = (
             }
         }
         const target = exports[name];
-        // only process exports not marked with nocompile
-        if (nocompile.has(name)) {
-            if (print) {
-                logWarn(`skipping nocompile export '${name}'`);
-            }
-            continue;
-        }
 
         if (typeof target !== "string") {
             const distPath = target.import;
