@@ -57,6 +57,13 @@ export const parseExports = (
             }
         }
         const target = exports[name];
+        // only process exports not marked with nocompile
+        if (nocompile.has(name)) {
+            if (print) {
+                logWarn(`skipping nocompile export '${name}'`);
+            }
+            continue;
+        }
 
         if (typeof target !== "string") {
             const distPath = target.import;
@@ -122,13 +129,6 @@ export const parseExports = (
             // raw decalaration export, skip processing
             if (print) {
                 logWarn(`skipping raw .d.ts export '${name}'`);
-            }
-            continue;
-        }
-        // only process typescript exports, which will be compiled
-        if (nocompile.has(name)) {
-            if (print) {
-                logWarn(`skipping nocompile export '${name}'`);
             }
             continue;
         }
