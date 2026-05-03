@@ -5,6 +5,9 @@ import { configure } from "./src/config/configure_lib_build.ts";
 export default configure({
     build: {
         rolldownOptions: {
+            output: {
+                chunkFileNames: "[name].js",
+            },
             external: ["node:fs", "node:path", "path", "node:fs/promises", "node:child_process"],
         },
     },

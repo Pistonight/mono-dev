@@ -1,5 +1,6 @@
 /// <reference types="node" />
 /// <reference types="vite/client" />
+/// <reference types="vitest/importMeta" />
 /// <reference types="vitest/config" />
 
 // SPDX-License-Identifier: MIT

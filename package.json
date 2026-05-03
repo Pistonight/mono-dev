@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.4.11",
+    "version": "0.4.12",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -33,7 +33,7 @@
         "@types/js-yaml": "^4.0.9",
         "@types/node": "^25.6.0",
         "@types/which": "^3.0.4",
-        "rolldown": "1.0.0-rc.12",
+        "rolldown": "1.0.0-rc.18",
         "which": "^6.0.1"
     },
     "bin": {
@@ -63,7 +63,8 @@
         },
         "./eslint-config": "./src/config/configure_eslint.ts",
         "./lib-build-config": "./src/config/configure_lib_build.ts",
-        "./app-build-config": "./src/config/configure_app_build.ts"
+        "./app-build-config": "./src/config/configure_app_build.ts",
+        "./rolldown": "./src/rolldown.ts"
     },
     "imports": {
         "#cli": "./src/cli/index.ts",
