@@ -1,5 +1,5 @@
-import { _ as e, d as t, m as n, v as r } from "../plugins-DS1l0m1k.js";
-import { a as i, i as a, n as o, r as s, t as c } from "../gen_vite-CBaoXN8s.js";
+import { _ as e, d as t, m as n, v as r } from "../plugins.js";
+import { a as i, i as a, n as o, r as s, t as c } from "../gen_vite.js";
 import l from "node:fs";
 import u from "node:path";
 import { defineConfig as d } from "vite";
