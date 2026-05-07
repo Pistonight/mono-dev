@@ -312,7 +312,7 @@ var T = (e) => {
 			break;
 		}
 	}
-	S && (e("adding 'dist/**/*' to files in package.json"), g.files ? g.files.push("dist/**/*") : g.files = ["dist/**/*"]), g.dependencies && z(g.dependencies), _.writeFileSync(m, f(JSON.stringify(g, void 0, 2)));
+	S && (e("adding 'dist/**/*' to files in package.json"), g.files ? g.files.push("dist/**/*") : g.files = ["dist/**/*"]), g.devDependencies && z(g.devDependencies), _.writeFileSync(m, f(JSON.stringify(g, void 0, 2)));
 	let C = v.join(p, "package", "dist");
 	_.existsSync(C) && _.rmSync(C, {
 		recursive: !0,
@@ -337,7 +337,7 @@ var T = (e) => {
 		let n = e[t];
 		if (typeof n != "string") continue;
 		let [r, i] = n.split("#", 2), a = r.toLowerCase();
-		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#61300d5c41787911ff0c8b298b5eef9784663e20");
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#097cb73266093ec0dbacd40f577cbe905b842102");
 	}
 }, B = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",

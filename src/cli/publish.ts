@@ -128,8 +128,8 @@ export const runPublish = async (args: string[]): Promise<number> => {
     }
 
     // zap mono-dev reference - should only exist in dev dependencies
-    if (packageJson.dependencies) {
-        zapMonodevDependencyVersion(packageJson.dependencies);
+    if (packageJson.devDependencies) {
+        zapMonodevDependencyVersion(packageJson.devDependencies);
     }
 
     fs.writeFileSync(packageJsonPath, normalizeLineEnds(JSON.stringify(packageJson, undefined, 2)));
