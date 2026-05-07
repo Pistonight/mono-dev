@@ -89,13 +89,13 @@ tasks:
              git -C node_modules/.mono/publish remote add origin git@github.com:Pistonight/mono-dev;
              git -C node_modules/.mono/publish fetch --depth=1 origin dist;
              git -C node_modules/.mono/publish checkout dist;
-             git -C node_modules/.mono/publish rm -r .;
              lastversion=$(jq '.version' node_modules/.mono/publish/package.json | tr -d '"');
              nextversion="{{.VERSION}}";
              if [ "$lastversion" = "$nextversion" ]; then
                echo "version $nextversion is already published";
                exit 2;
              fi;
+             git -C node_modules/.mono/publish rm -r .;
              cp -R node_modules/.mono/pnpm-pack.temp/package/* node_modules/.mono/publish;
              git -C node_modules/.mono/publish add .;
              git -C node_modules/.mono/publish commit -m "publish: $nextversion";
