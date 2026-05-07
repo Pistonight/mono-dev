@@ -1,6 +1,6 @@
 {
     "name": "mono-dev",
-    "version": "0.4.13",
+    "version": "0.4.14",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
@@ -83,7 +83,8 @@
             "./cli": "./src/cli/index.ts"
         },
         "import.meta.env": {
-            "VERSION": true
+            "VERSION": true,
+            "COMMIT": true
         }
     }
 }

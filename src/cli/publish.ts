@@ -70,7 +70,7 @@ export const runPublish = async (args: string[]): Promise<number> => {
             logError("failed to parse exports: 'exports' field must be an object");
             return 1;
         }
-        const compile = packageJson["pistonight/mono-dev"]?.compile || {};
+        const compile = originalPackageJson["pistonight/mono-dev"]?.compile || {};
         for (const { entryName, distPathRel, distDtsPathRel } of libExports.val.exports) {
             const key = entryName === "." ? "." : "./" + entryName;
             if (key in compile) {
@@ -127,6 +127,11 @@ export const runPublish = async (args: string[]): Promise<number> => {
         }
     }
 
+    // zap mono-dev reference - should only exist in dev dependencies
+    if (packageJson.dependencies) {
+        zapMonodevDependencyVersion(packageJson.dependencies);
+    }
+
     fs.writeFileSync(packageJsonPath, normalizeLineEnds(JSON.stringify(packageJson, undefined, 2)));
 
     // replace/add dist dir with the package dist dir
@@ -177,4 +182,23 @@ export const runPublish = async (args: string[]): Promise<number> => {
     }
 
     return 0;
+};
+
+// replace the ref of mono-dev with the specific commit of this build
+const zapMonodevDependencyVersion = (depObj: Record<string, unknown>) => {
+    for (const key in depObj) {
+        if (key !== "mono-dev") {
+            continue;
+        }
+        const spec = depObj[key];
+        if (typeof spec !== "string") {
+            continue;
+        }
+        const [repo, _] = spec.split("#", 2);
+        const repoLower = repo.toLowerCase();
+        if (!repoLower.startsWith("github:") || !repoLower.endsWith("/mono-dev")) {
+            continue;
+        }
+        depObj[key] = repo + "#" + import.meta.env.COMMIT;
+    }
 };
