@@ -289,7 +289,7 @@ var T = (e) => {
 	if ("err" in x) return i("failed to parse exports: " + x.err), 1;
 	if (g.exports) {
 		if (typeof g.exports == "string") return i("failed to parse exports: 'exports' field must be an object"), 1;
-		let e = g["pistonight/mono-dev"]?.compile || {};
+		let e = y["pistonight/mono-dev"]?.compile || {};
 		for (let { entryName: t, distPathRel: r, distDtsPathRel: i } of x.val.exports) {
 			let a = t === "." ? "." : "./" + t;
 			a in e || (g.exports[a] = {
@@ -312,7 +312,7 @@ var T = (e) => {
 			break;
 		}
 	}
-	S && (e("adding 'dist/**/*' to files in package.json"), g.files ? g.files.push("dist/**/*") : g.files = ["dist/**/*"]), _.writeFileSync(m, f(JSON.stringify(g, void 0, 2)));
+	S && (e("adding 'dist/**/*' to files in package.json"), g.files ? g.files.push("dist/**/*") : g.files = ["dist/**/*"]), g.dependencies && z(g.dependencies), _.writeFileSync(m, f(JSON.stringify(g, void 0, 2)));
 	let C = v.join(p, "package", "dist");
 	_.existsSync(C) && _.rmSync(C, {
 		recursive: !0,
@@ -331,7 +331,15 @@ var T = (e) => {
 		"--access",
 		"public"
 	])).err ? (i("pnpm publish failed!"), 101) : 0 : (i("please set mono-dev option \"publish\": true"), 1));
-}, z = {
+}, z = (e) => {
+	for (let t in e) {
+		if (t !== "mono-dev") continue;
+		let n = e[t];
+		if (typeof n != "string") continue;
+		let [r, i] = n.split("#", 2), a = r.toLowerCase();
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#61300d5c41787911ff0c8b298b5eef9784663e20");
+	}
+}, B = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
 	setup: "One-time setup for the project",
 	install: "Install or sync project dependencies",
@@ -349,18 +357,18 @@ var T = (e) => {
 	release: "Publish a release",
 	publish: "Publish a release"
 };
-function B() {
+function V() {
 	return b("git ls-files --cached --others --exclude-standard", { encoding: "utf8" }).split("\n").filter((e) => e === "Taskfile.yml" || e.endsWith("/Taskfile.yml"));
 }
-function V(e, t) {
+function H(e, t) {
 	let n = t + 1;
 	for (; n < e.length && !/^ {2}\S/.test(e[n]);) n++;
 	return n;
 }
-function H(e, t, n) {
+function U(e, t, n) {
 	let r = e.split("\n"), i = RegExp(`^  ${t}\\s*:`), a = r.findIndex((e) => i.test(e));
 	if (a === -1) return null;
-	let o = V(r, a), s = r.slice(a + 1, o).map((e) => e.trim() === "" ? e : "  " + e), c = [
+	let o = H(r, a), s = r.slice(a + 1, o).map((e) => e.trim() === "" ? e : "  " + e), c = [
 		r[a],
 		...n ? [`    desc: ${n}`] : [],
 		"    cmds:",
@@ -368,26 +376,26 @@ function H(e, t, n) {
 	];
 	return r.splice(a, o - a, ...c), r.join("\n");
 }
-function U(e, t, n) {
+function W(e, t, n) {
 	let r = e.split("\n"), i = RegExp(`^  ${t}\\s*:`), a = r.findIndex((e) => i.test(e));
 	return a === -1 ? null : (r.splice(a + 1, 0, `    desc: ${n}`), r.join("\n"));
 }
-function W(t) {
+function G(t) {
 	let n = _.readFileSync(t, "utf8"), r = x.load(n)?.tasks;
 	if (!r || typeof r != "object") return !1;
 	let i = n, a = !1;
 	for (let [n, o] of Object.entries(r)) {
 		if (!o || typeof o != "object" || o.internal || o.desc) continue;
-		let r = z[n];
+		let r = B[n];
 		if (r || (d(`${t}: unknown task "${n}" — add a desc manually`), a = !0), Array.isArray(o)) {
-			let o = H(i, n, r ?? null);
+			let o = U(i, n, r ?? null);
 			if (o === null) {
 				d(`${t}: could not locate task "${n}" in file`), a = !0;
 				continue;
 			}
 			e(`${t}: converted shorthand for "${n}"${r ? " and added desc" : ""}`), i = o;
 		} else if (r) {
-			let o = U(i, n, r);
+			let o = W(i, n, r);
 			if (o === null) {
 				d(`${t}: could not locate task "${n}" in file`), a = !0;
 				continue;
@@ -397,13 +405,13 @@ function W(t) {
 	}
 	return i !== n && _.writeFileSync(t, i, "utf8"), a;
 }
-var G = () => {
-	let t = B();
+var K = () => {
+	let t = V();
 	if (t.length === 0) return e("no Taskfile.yml files found"), 0;
 	let n = !1;
-	for (let e of t) W(e) && (n = !0);
+	for (let e of t) G(e) && (n = !0);
 	return +!!n;
-}, K = async (t) => {
+}, q = async (t) => {
 	let { packageJsonPath: n, rootDir: r, cacheDir: a } = s();
 	A(a);
 	let c = JSON.parse(_.readFileSync(n, "utf-8")), l = await E(c, n);
@@ -415,21 +423,21 @@ var G = () => {
 		u,
 		...t
 	]) : o("vitest", r, t)).err;
-}, q = async (e) => {
-	e.length || (J(), process.exit(0));
+}, J = async (e) => {
+	e.length || (Y(), process.exit(0));
 	let [t, ...n] = e;
 	switch (t) {
 		case "help":
 		case "--help":
 		case "?":
-		case "-h": return J(), process.exit(0);
+		case "-h": return Y(), process.exit(0);
 		case "version": return console.log("mono-dev " + r()), process.exit(0);
 		case "config": return process.exit(await I(n));
 		case "check": return process.exit(await M(n));
 		case "build": return process.exit(await j());
-		case "test": return process.exit(await K(n));
+		case "test": return process.exit(await q(n));
 		case "doc": return process.exit(await L(n));
-		case "taskfile": return process.exit(G());
+		case "taskfile": return process.exit(K());
 		case "publish":
 			if (!n.includes("--skip-build")) {
 				let e = await j();
@@ -437,11 +445,11 @@ var G = () => {
 			}
 			return process.exit(await R(n));
 	}
-	i("unknown command " + t), J(), process.exit(1);
-}, J = () => {
+	i("unknown command " + t), Y(), process.exit(1);
+}, Y = () => {
 	console.log("mono-dev CLI\n  config           Generate typeck and eslint config, for language servers\n  check [-f]       Run typeck, prettier, eslint\n  build            Build library (for bundling app run vite directly)\n  test  ARGS...    Run test (with vitest)\n  doc   [--json]   Build documentation \n  taskfile         Fixup taskfiles\n  publish [-n]     Publish the package (-n for dry-run)\n  version          Print the version\n");
 };
 //#endregion
-export { l as executeShim, q as main };
+export { l as executeShim, J as main };
 
 //# sourceMappingURL=index.js.map

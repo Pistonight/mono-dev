@@ -19,7 +19,7 @@ var o = "_dts_", s = "dist", c = import.meta.dirname, l = r.basename(c) === "dis
 		e = t, n = r.join(e, "package.json");
 	}
 	return r.resolve(n);
-}, p = () => "0.4.13", m = (e, t) => t.filter((t) => h(e, t)), h = (e, t) => !!(e.dependencies && t in e.dependencies || e.devDependencies && t in e.devDependencies || e.peerDependencies && t in e.peerDependencies || e.optionalDependencies && t in e.optionalDependencies || e.bundledDependencies && t in e.bundledDependencies), g = "[mono]", _ = (...e) => console.log(g, ...e), v = (...e) => console.warn("\x1B[33m" + g, ...e, "\x1B[0m"), y = (...e) => console.error("\x1B[31m" + g, ...e, "\x1B[0m"), b = (e) => e.split("\r").map((e) => e.trimEnd()).join("\n"), x = (e, t) => {
+}, p = () => "0.4.14", m = (e, t) => t.filter((t) => h(e, t)), h = (e, t) => !!(e.dependencies && t in e.dependencies || e.devDependencies && t in e.devDependencies || e.peerDependencies && t in e.peerDependencies || e.optionalDependencies && t in e.optionalDependencies || e.bundledDependencies && t in e.bundledDependencies), g = "[mono]", _ = (...e) => console.log(g, ...e), v = (...e) => console.warn("\x1B[33m" + g, ...e, "\x1B[0m"), y = (...e) => console.error("\x1B[31m" + g, ...e, "\x1B[0m"), b = (e) => e.split("\r").map((e) => e.trimEnd()).join("\n"), x = (e, t) => {
 	if (typeof e == "string") return e;
 	if (!e) return `${e}`;
 	if (typeof e == "object" && "message" in e) return t ? `${e.message}` : x(e.message, !0);
