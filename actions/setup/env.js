@@ -1,6 +1,7 @@
 import fs from "node:fs";
 
 const {
+    MONODEV_INSTALL_METHOD,
     MONODEV_RUNNER_OS,
     MONODEV_RUNNER_ARCH,
     MONODEV_ECMA_NODE,
@@ -25,8 +26,8 @@ const isWindows = MONODEV_RUNNER_OS === "Windows";
 const isLinux = MONODEV_RUNNER_OS === "Linux";
 const isMacOS = MONODEV_RUNNER_OS === "macOS";
 
+const monodev_ecma_pnpm = bool(MONODEV_ECMA_PNPM) || MONODEV_INSTALL_METHOD === "pnpm";
 const monodev_ecma_node = bool(MONODEV_ECMA_NODE);
-const monodev_ecma_pnpm = bool(MONODEV_ECMA_PNPM);
 const monodev_rust_wasm = bool(MONODEV_RUST_WASM);
 const monodev_rust_src = bool(MONODEV_RUST_SRC);
 

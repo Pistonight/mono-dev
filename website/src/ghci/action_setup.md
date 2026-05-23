@@ -12,11 +12,14 @@ jobs:
         with:
           # ALL VALUES BELOW ARE OPTIONAL
           # clone mono-dev in the repo
-          # Set to `false` to not clone - `true` is the default.
-          # Set to "pnpm" as a special value - `pnpm install` will be called automatically
-          #   at the end of the setup to install mono-dev as part of PNPM install
+          # Default: 'auto' - special value:
+          #   - if pnpm-lock.yaml exists at root, then pnpm install will run.
+          #     pnpm and node will also be installed without having to specify ecma-pnpm
+          #   - otherwise, cloned to `/mono-dev` of the repo
+          #
+          # Set to `false` to not clone
           # Set to anything else to use a different reference than the main branch
-          mono-dev: true
+          mono-dev: auto
           # Where to clone mono-dev, /mono-dev is the default
           mono-dev-path: mono-dev
 

@@ -5,7 +5,7 @@ inputs:
   skip-checkout:
     default: false
   mono-dev:
-    default: true
+    default: 'auto'
   mono-dev-path:
     default: mono-dev
   submodules:
@@ -39,30 +39,31 @@ runs:
       with:
         persist-credentials: false
         submodules: ${{ inputs.submodules }}
-    - if: ${{ inputs.mono-dev == 'true' }}
-      uses: actions/checkout@v6
-      with:
-        repository: Pistonight/mono-dev
-        path: ${{ inputs.mono-dev-path }}
-        persist-credentials: false
-    - if: ${{ inputs.mono-dev != 'false' && inputs.mono-dev != 'true' && inputs.mono-dev != 'pnpm' }}
-      uses: actions/checkout@v6
-      with:
-        repository: Pistonight/mono-dev
-        ref: ${{ inputs.mono-dev }}
-        path: ${{ inputs.mono-dev-path }}
-        persist-credentials: false
-    - uses: arduino/setup-task@v2
-      with:
-        version: 3.x
-        repo-token: ${{ github.token }}
     - run: node --version
       shell: bash
+    - run: node wkspenv.js
+      working-directory: ${{ github.action_path }}
+      id: wkspenvjs
+      shell: bash
+      env:
+        MONODEV_WORKSPACE: ${{ github.workspace }}
+        MONODEV_INPUT_MONO_DEV: ${{ inputs.mono-dev }}
+    - if: ${{ steps.wkspenvjs.mono_dev_install == 'checkout' }}
+      uses: actions/checkout@v6
+      with:
+        repository: Pistonight/mono-dev
+        ref: ${{ steps.wkspenvjs.mono_dev_ref }}
+        path: ${{ inputs.mono-dev-path }}
+        persist-credentials: false
+    - uses: go-task/setup-task@v2
+      with:
+        repo-token: ${{ github.token }}
     - run: node env.js
-      working-directory: ${{ github.action_path}}
+      working-directory: ${{ github.action_path }}
       id: envjs
       shell: bash
       env:
+        MONODEV_INSTALL_METHOD: ${{ steps.wkspenvjs.mono_dev_install }}
         MONODEV_RUNNER_OS: ${{ runner.os }}
         MONODEV_RUNNER_ARCH: ${{ runner.arch }}
         MONODEV_RUNNER: ${{ inputs.runner }}
@@ -80,7 +81,7 @@ runs:
     - if: ${{ inputs.ecma-pnpm == 'true' }}
       uses: pnpm/action-setup@v5
       with:
-        version: 10
+        version: 11
     - if: ${{ steps.envjs.outputs.setup_node != 'false' }}
       uses: actions/setup-node@v6 # blacksmith automatically changes to use its cache
       with:
@@ -117,6 +118,6 @@ runs:
       env:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_install_config }}
 
-    - if: ${{ inputs.mono-dev == 'pnpm' }}
+    - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'pnpm' }}
       run: pnpm install --frozen-lockfile
       shell: bash
