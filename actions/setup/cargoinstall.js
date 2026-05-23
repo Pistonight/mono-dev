@@ -56,7 +56,7 @@ const doInstall = (config) => {
             args.push("--rev", rev);
         }
     }
-    const binReal = `${HOME}/.cargo/bin/${isWindows ? bin + ".exe" : bin}`;
+    const binReal = `${HOME}/.cargo/bin/${isWindows ? (bin || crate) + ".exe" : bin || crate}`;
     if (!fs.existsSync(binReal)) {
         console.log(`${binReal} not found, forcing the install`);
         args.push("--force");
