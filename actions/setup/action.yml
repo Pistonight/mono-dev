@@ -48,11 +48,11 @@ runs:
       env:
         MONODEV_WORKSPACE: ${{ github.workspace }}
         MONODEV_INPUT_MONO_DEV: ${{ inputs.mono-dev }}
-    - if: ${{ steps.wkspenvjs.mono_dev_install == 'checkout' }}
+    - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'checkout' }}
       uses: actions/checkout@v6
       with:
         repository: Pistonight/mono-dev
-        ref: ${{ steps.wkspenvjs.mono_dev_ref }}
+        ref: ${{ steps.wkspenvjs.outputs.mono_dev_ref }}
         path: ${{ inputs.mono-dev-path }}
         persist-credentials: false
     - uses: go-task/setup-task@v2
