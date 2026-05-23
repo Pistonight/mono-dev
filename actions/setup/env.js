@@ -155,7 +155,7 @@ if (MONODEV_RUST_NATIVE) {
     for (const arch of nativeArgs) {
         addNativeRustTarget(arch);
     }
-    rust_cache_key = nativeArgs.join(",");
+    rust_cache_key = nativeArgs.join("__");
 }
 
 const output = {
