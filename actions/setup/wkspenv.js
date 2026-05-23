@@ -1,10 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const {
-    MONODEV_WORKSPACE,
-    MONODEV_INPUT_MONO_DEV,
-} = process.env;
+const { MONODEV_WORKSPACE, MONODEV_INPUT_MONO_DEV } = process.env;
 
 let mono_dev_ref = MONODEV_INPUT_MONO_DEV;
 let mono_dev_install = "checkout";
@@ -22,7 +19,8 @@ if (MONODEV_INPUT_MONO_DEV === "auto") {
 }
 
 const output = {
-    mono_dev_install, mono_dev_ref
+    mono_dev_install,
+    mono_dev_ref,
 };
 
 const outputString = Object.entries(output)
