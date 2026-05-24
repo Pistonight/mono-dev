@@ -6,7 +6,7 @@ version: '3'
 tasks:
   fmt-check:
     cmds:
-      - task: run-clang-format
+      - task: clang-format
         vars:
           CLANG_FORMAT_ARGS: -n -Werror
           SOURCE: '{{.SOURCE}}'
@@ -14,13 +14,13 @@ tasks:
 
   fmt-fix:
     cmds:
-      - task: run-clang-format
+      - task: clang-format
         vars:
           CLANG_FORMAT_ARGS: -i
           SOURCE: '{{.SOURCE}}'
           ADD_STYLES: '{{.ADD_STYLES}}'
           
-  run-clang-format:
+  clang-format:
     vars:
       SOURCE_RESOLVED: '{{.SOURCE | default "."}}'
       STYLES_RESOLVED: >
