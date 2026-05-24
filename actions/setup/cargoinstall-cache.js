@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import child_process from "node:child_process";
 import crypto from "node:crypto";
 import path from "node:path";
