@@ -18,13 +18,14 @@ tasks:
           
   run-clang-format:
     cmds:
-      - cmd: > 
-          fd "\.[ch](\+\+|pp|xx)?"
-          -x clang-format
+      - cmd: >
+          find . -regextype posix-extended
+          -regex ".*\.[ch](\+\+|pp|xx|c)?"
+          -exec clang-format
           --style="{
             IndentWidth: 4,
             AccessModifierOffset: -4,
             PointerAlignment: Left
-          }" {{.CLANG_FORMAT_ARGS}}
+          }" {{.CLANG_FORMAT_ARGS}} {} +
         silent: true
          
