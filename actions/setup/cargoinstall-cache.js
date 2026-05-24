@@ -3,6 +3,8 @@ import crypto from "node:crypto";
 import path from "node:path";
 import os from "node:os";
 
+const isWindows = process.platform === "win32";
+
 const { MONODEV_CARGO_INSTALL_CONFIG } = process.env;
 const hash = crypto.createHash("sha256");
 hash.update(MONODEV_CARGO_INSTALL_CONFIG);
