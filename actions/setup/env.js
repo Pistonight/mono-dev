@@ -163,11 +163,12 @@ if (MONODEV_RUST_NATIVE) {
 // C/C++ tooling
 const CCPP_VERSION = "22";
 const ccpp_cmake = bool(MONODEV_CCPP_CMAKE);
+const ccpp_lint = ccpp_cmake || bool(MONODEV_CCPP_CMAKE);
 
 let ccpp_lint_clang_format = "";
 let ccpp_lint_clang_tidy = "";
 let ccpp_lint_ext = "";
-if (bool(MONODEV_CCPP_LINT)) {
+if (ccpp_lint) {
     let platform;
     if (isLinux) {
         platform = MONODEV_RUNNER_ARCH === "ARM64" ? "linux-arm64" : "linux-amd64";
