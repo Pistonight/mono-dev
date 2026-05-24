@@ -17,15 +17,44 @@ tasks:
           CLANG_FORMAT_ARGS: -i
           
   run-clang-format:
+    vars:
+      SOURCE_RESOLVED: '{{.SOURCE | default "."}}'
+      STYLES_RESOLVED: >
+        '"{
+        IndentWidth: 4,
+        AccessModifierOffset: -4,
+        PointerAlignment: Left,
+        {{.ADD_STYLES}}
+        }"'
     cmds:
       - cmd: >
-          find . -regextype posix-extended
-          -regex ".*\.[ch](\+\+|pp|xx|c)?"
-          -exec clang-format
-          --style="{
-            IndentWidth: 4,
-            AccessModifierOffset: -4,
-            PointerAlignment: Left
-          }" {{.CLANG_FORMAT_ARGS}} {} +
-        silent: true
-         
+          clang-format
+          $(find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)')
+          --style={{.STYLES_RESOLVED | trim }}
+          {{.CLANG_FORMAT_ARGS}}
+
+  clang-tidy:
+    vars:
+      SOURCE_RESOLVED: '{{.SOURCE | default "."}}'
+      BUILD_RESOLVED: '{{.BUILD | default "."}}'
+      CHECKS_RESOLVED: >
+        '
+        clang-analyzer-*,
+        bugprone-*,
+        performance-*,
+        modernize-*,
+        -modernize-use-trailing-return-type,
+        readability-*,
+        {{.ADD_CHECKS}}
+        '
+
+    cmds:
+      - clang-tidy --dump-config --checks={{.CHECKS_RESOLVED | trim}} > .clang-tidy
+      - >
+        clang-tidy
+        $(find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)')
+        -p {{.BUILD_RESOLVED | trim }}
+        --checks={{.CHECKS_RESOLVED | trim }}
+
+
+
