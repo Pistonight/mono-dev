@@ -121,7 +121,7 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}
-        key: cargoinstall-cache-${{ runner.os }}-${{ steps.cargoinstall-cache-env.outputs.cache_key }}
+        key: cargoinstall-${{ runner.os }}-${{ runner.arch }}-${{ steps.cargoinstall-cache-env.outputs.cache_key }}
     - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' && steps.cargoinstall-cache-restore.outputs.cache-hit != 'true' }}
       run: node cargoinstall.js
       working-directory: ${{ github.action_path }}
