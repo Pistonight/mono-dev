@@ -3,33 +3,53 @@ description: Setup for mono-dev Standard Project
 
 inputs:
   skip-checkout:
+    description: Skip the checkout step
     default: false
   mono-dev:
+    description: Ref for cloning mono-dev, 'auto', 'false', or a specific ref
     default: 'auto'
   mono-dev-path:
+    description: Path to clone mono-dev into
     default: mono-dev
   submodules:
+    description: Whether to clone submodules
     default: false
   ecma-node:
+    description: Setup NodeJS
     default: false
   ecma-pnpm:
+    description: Setup PNPM (also sets up NodeJS)
     default: false
   ecma-bun:
+    description: Setup Bun
     default: false
   rust:
+    description: Setup Rust toolchain, 'stable' or 'nightly'
     default: false
   rust-wasm:
+    description: Setup wasm32-unknown-unknown target and install wasm-pack
     default: false
   rust-native:
+    description: Comma-separated native targets to setup, 'x64' and/or 'arm64'
     default: ""
   rust-src:
+    description: Install the rust-src component
     default: false
   tool-mdbook:
+    description: Install mdbook and mdbook-admonish
     default: false
   tool-cargo-binstall:
+    description: Comma-separated tools to install with cargo-binstall (not cached)
     default: ""
   tool-cargo-install:
+    description: Comma-separated tools to install with cargo install (cached by rust-cache)
     default: ""
+  ccpp-lint:
+    description: Setup clang-tidy and clang-format
+    default: false
+  ccpp-cmake:
+    description: Setup CMake
+    default: false
 
 runs:
   using: composite
@@ -76,6 +96,8 @@ runs:
         MONODEV_TOOL_MDBOOK: ${{ inputs.tool-mdbook }}
         MONODEV_TOOL_CARGO_BINSTALL: ${{ inputs.tool-cargo-binstall }}
         MONODEV_TOOL_CARGO_INSTALL: ${{ inputs.tool-cargo-install }}
+        MONODEV_CCPP_LINT: ${{ inputs.ccpp-lint }}
+        MONODEV_CCPP_CMAKE: ${{ inputs.ccpp-cmake }}
 
 
     - if: ${{ inputs.ecma-pnpm == 'true' }}
@@ -139,6 +161,42 @@ runs:
       uses: Swatinem/rust-cache@v2
       with:
         key: ${{ steps.envjs.outputs.rust_cache_key }}
+
+    - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' }}
+      id: ccpp-lint-cache-restore
+      uses: actions/cache/restore@v5
+      with:
+        path: ~/.local/bin/ccpp-lint
+        key: ccpp-lint-${{ steps.envjs.outputs.ccpp_lint_clang_format }}
+    - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' && steps.ccpp-lint-cache-restore.outputs.cache-hit != 'true' }}
+      shell: bash
+      run: |
+        BINDIR="$HOME/.local/bin/ccpp-lint"
+        mkdir -p "$BINDIR"
+        BASE_URL="https://github.com/cpp-linter/clang-tools-static-binaries/releases/latest/download"
+        curl -fsSL "$BASE_URL/${{ steps.envjs.outputs.ccpp_lint_clang_format }}" -o "$BINDIR/clang-format${{ steps.envjs.outputs.ccpp_lint_ext }}"
+        curl -fsSL "$BASE_URL/${{ steps.envjs.outputs.ccpp_lint_clang_tidy }}" -o "$BINDIR/clang-tidy${{ steps.envjs.outputs.ccpp_lint_ext }}"
+        if [[ "$RUNNER_OS" != "Windows" ]]; then
+          chmod +x "$BINDIR/clang-format" "$BINDIR/clang-tidy"
+        fi
+    - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' }}
+      shell: bash
+      run: echo "$HOME/.local/bin/ccpp-lint" >> "$GITHUB_PATH"
+    - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' }}
+      uses: actions/cache/save@v5
+      with:
+        path: ~/.local/bin/ccpp-lint
+        key: ${{ steps.ccpp-lint-cache-restore.outputs.cache-primary-key }}
+    - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' }}
+      shell: bash
+      run: |
+        clang-format --version
+        clang-tidy --version
+
+    - if: ${{ steps.envjs.outputs.ccpp_cmake == 'true' }}
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '4.x'
 
     - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'pnpm' }}
       run: pnpm install --frozen-lockfile

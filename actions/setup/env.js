@@ -13,6 +13,8 @@ const {
     MONODEV_TOOL_MDBOOK,
     MONODEV_TOOL_CARGO_BINSTALL,
     MONODEV_TOOL_CARGO_INSTALL,
+    MONODEV_CCPP_LINT,
+    MONODEV_CCPP_CMAKE,
 } = process.env;
 
 const bool = (value) => {
@@ -158,6 +160,29 @@ if (MONODEV_RUST_NATIVE) {
     rust_cache_key = nativeArgs.join("__");
 }
 
+// C/C++ tooling
+const CCPP_VERSION = "22";
+const ccpp_cmake = bool(MONODEV_CCPP_CMAKE);
+
+let ccpp_lint_clang_format = "";
+let ccpp_lint_clang_tidy = "";
+let ccpp_lint_ext = "";
+if (bool(MONODEV_CCPP_LINT)) {
+    let platform;
+    if (isLinux) {
+        platform = MONODEV_RUNNER_ARCH === "ARM64" ? "linux-arm64" : "linux-amd64";
+    } else if (isMacOS) {
+        platform = MONODEV_RUNNER_ARCH === "ARM64" ? "macos-arm64" : "macos-amd64";
+    } else if (isWindows) {
+        platform = "windows-amd64";
+        ccpp_lint_ext = ".exe";
+    } else {
+        throw new Error(`Unsupported OS for ccpp-lint: ${MONODEV_RUNNER_OS}`);
+    }
+    ccpp_lint_clang_format = `clang-format-${CCPP_VERSION}_${platform}${ccpp_lint_ext}`;
+    ccpp_lint_clang_tidy = `clang-tidy-${CCPP_VERSION}_${platform}${ccpp_lint_ext}`;
+}
+
 const output = {
     setup_node,
     node_cache,
@@ -171,6 +196,10 @@ const output = {
     need_cargo_install,
     cargo_install_config,
     cargo_binstall_config,
+
+    ccpp_cmake,
+    ccpp_lint_clang_format,
+    ccpp_lint_clang_tidy,
 };
 
 const outputString = Object.entries(output)

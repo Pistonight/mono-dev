@@ -75,7 +75,12 @@ jobs:
           # setup rust for the current OS/Arch if not already done
           tool-cargo-install: ...
 
-          # TODO: python support not here yet
+          # Setup C/CPP tooling
+          ccpp-lint: true # clang-tidy and clang-format
+          ccpp-cmake: true
+          # note ninja is installed by GH runners by default
+
+          # TODO: python support not here yet (uv will be used)
           # setup latest version of python
           # python: true
           # python_pip: package1,package2

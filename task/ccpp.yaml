@@ -29,19 +29,25 @@ tasks:
         AccessModifierOffset: -4,
         PointerAlignment: Left,
         ColumnLimit: 100,
-        {{.ADD_STYLES}}
-        }'
+        BreakBeforeBraces: Custom,
+        AllowShortFunctionsOnASingleLine: Inline,
+        AllowShortIfStatementsOnASingleLine: Never,
+        AllowShortNamespacesOnASingleLine: false,
+        AllowShortBlocksOnASingleLine: Never,
+        {{.ADD_STYLES | trim}} }'
     cmds:
       - cmd: >
+          find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+          | xargs -P $(nproc) -n 1
           clang-format
-          $(find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)')
           --style={{.STYLES_RESOLVED | trim }}
           {{.CLANG_FORMAT_ARGS}}
 
   clang-tidy:
     vars:
-      SOURCE_RESOLVED: '{{.SOURCE | default "."}}'
-      BUILD_RESOLVED: '{{.BUILD | default "."}}'
+      SOURCE_RESOLVED: '{{.SOURCE | default "." }}'
+      BUILD_RESOLVED: '{{.BUILD | default "." }}'
+      HEADER_RESOLVED: '{{.HEADER | default ".*" }}'
       CHECKS_RESOLVED: >
         '
         clang-analyzer-*,
@@ -50,16 +56,21 @@ tasks:
         modernize-*,
         -modernize-use-trailing-return-type,
         readability-*,
-        {{.ADD_CHECKS}}
-        '
+        -readability-magic-numbers,
+        {{.ADD_CHECKS | trim}}'
 
     cmds:
-      - clang-tidy --dump-config --checks={{.CHECKS_RESOLVED | trim}} > .clang-tidy
       - >
-        clang-tidy
-        $(find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)')
+        clang-tidy --dump-config 
+        --header-filter='{{.HEADER_RESOLVED}}'
+        --checks={{.CHECKS_RESOLVED | trim}} > .clang-tidy
+      - >
+        find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+        | xargs -P $(nproc) -n 1
+        clang-tidy --warnings-as-errors='*' --header-filter='{{.HEADER_RESOLVED}}'
         -p {{.BUILD_RESOLVED | trim }}
         --checks={{.CHECKS_RESOLVED | trim }}
+        --quiet
 
 
 
