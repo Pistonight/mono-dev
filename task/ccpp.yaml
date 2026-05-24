@@ -9,23 +9,28 @@ tasks:
       - task: run-clang-format
         vars:
           CLANG_FORMAT_ARGS: -n -Werror
+          SOURCE: '{{.SOURCE}}'
+          ADD_STYLES: '{{.ADD_STYLES}}'
 
   fmt-fix:
     cmds:
       - task: run-clang-format
         vars:
           CLANG_FORMAT_ARGS: -i
+          SOURCE: '{{.SOURCE}}'
+          ADD_STYLES: '{{.ADD_STYLES}}'
           
   run-clang-format:
     vars:
       SOURCE_RESOLVED: '{{.SOURCE | default "."}}'
       STYLES_RESOLVED: >
-        '"{
+        '{
         IndentWidth: 4,
         AccessModifierOffset: -4,
         PointerAlignment: Left,
+        ColumnLimit: 100,
         {{.ADD_STYLES}}
-        }"'
+        }'
     cmds:
       - cmd: >
           clang-format
