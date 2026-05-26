@@ -7,7 +7,7 @@ tasks:
   build:
     desc: Build docker image with buildx
     cmds:
-      - docker buildx build --load -t {{.DOCKER_IMAGE}} .
+      - docker buildx build --load {{.ARGS}} -t {{.DOCKER_IMAGE}} .
 
   run:
     cmds:
