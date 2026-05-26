@@ -32,8 +32,14 @@ tasks:
   clean:
     cmds:
       - docker container prune -f
-      - docker image rm $(docker image ls -q -a --filter reference={{.DOCKER_IMAGE}})
+      - cmd: docker image rm $(docker image ls -q -a --filter reference={{.DOCKER_IMAGE}})
+        ignore_error: true
 
   nuke:
+    - docker image prune -f # delete images which may help 'rm' pass
     - task: clean
-    - docker image prune -f # this also deletes image cache
+    - docker image prune -f
+    - cmd: "echo 'buildx cache not cleaned: run `docker buildx prune` to clean them [will slow down next docker build]'"
+      silent: true
+
+
