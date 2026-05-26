@@ -5,13 +5,20 @@ version: '3'
 
 tasks:
   build:
+    desc: Build docker image with buildx
     cmds:
-      - docker build -t {{.DOCKER_IMAGE}} .
+      - docker buildx build --load -t {{.DOCKER_IMAGE}} .
 
   run:
     cmds:
       - cmd: docker run {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}}
         ignore_error: true
+
+
+  run-rm:
+    desc: Run container with auto-remove
+    cmds:
+      - docker run --rm {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}} {{.ARGS}}
   
   connect:
     cmds:
@@ -24,5 +31,9 @@ tasks:
 
   clean:
     cmds:
-      - docker container prune
+      - docker container prune -f
       - docker image rm $(docker image ls -q -a --filter reference={{.DOCKER_IMAGE}})
+
+  nuke:
+    - task: clean
+    - docker image prune -f # this also deletes image cache
