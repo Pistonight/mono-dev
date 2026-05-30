@@ -6,19 +6,21 @@ version: '3'
 tasks:
   build:
     desc: Build docker image with buildx
+    vars:
+      DIR_RESOLVED: '{{.DIR | default "." }}'
     cmds:
-      - docker buildx build --load {{.ARGS}} -t {{.DOCKER_IMAGE}} .
+      - docker buildx build --load {{.ARGS}} -t {{.DOCKER_IMAGE}} {{.DIR_RESOLVED}}
 
   run:
     cmds:
-      - cmd: docker run {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}}
+      - cmd: docker run {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}} {{.COMMAND}}
         ignore_error: true
 
 
   run-rm:
     desc: Run container with auto-remove
     cmds:
-      - docker run --rm {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}} {{.ARGS}}
+      - docker run --rm {{.DOCKER_RUN_FLAGS}} {{.DOCKER_IMAGE}} {{.COMMAND}}
   
   connect:
     cmds:
@@ -30,16 +32,28 @@ tasks:
       - docker stop $(docker ps -q -a --filter ancestor={{.DOCKER_IMAGE}})
 
   clean:
+    desc: Clean resources related to one image (specified by DOCKER_IMAGE var)
     cmds:
+      # First prune DANGLING cache by buildx (this deletes the cache but not image,
+      # and will not delete cache that are still referenced by image
+      - docker buildx prune -f
+      # Delete stopped containers
       - docker container prune -f
-      - cmd: docker image rm $(docker image ls -q -a --filter reference={{.DOCKER_IMAGE}})
-        ignore_error: true
+      # Delete untagged images
+      - docker image prune -f
+      - task: clean-image
+        vars:
+          DOCKER_IMAGE: '{{.DOCKER_IMAGE}}'
 
-  nuke:
-    - docker image prune -f # delete images which may help 'rm' pass
-    - task: clean
-    - docker image prune -f
-    - cmd: "echo 'buildx cache not cleaned: run `docker buildx prune` to clean them [will slow down next docker build]'"
-      silent: true
-
-
+  clean-image:
+    desc: Delete image of a particular reference
+    cmds:
+      - silent: true
+        cmd: >
+          images=$(docker image ls -q -a --filter reference={{.DOCKER_IMAGE}});
+          if [ -z "$images" ]; then
+            echo '[docker] no image exists for {{.DOCKER_IMAGE}}';
+          else
+            echo '[docker] removing images for {{.DOCKER_IMAGE}}';
+            docker image rm -f $images;
+          fi
