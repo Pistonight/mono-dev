@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  pull-update:
+    desc: Update assets with current mdbook version
+    cmds:
+      - rm -rf template
+      - mkdir -p template
+      - cd template && mdbook init --ignore none --force --theme
+      - mkdir template/theme/extra-css
+      - cd template && mdbook-admonish install --css-dir theme/extra-css

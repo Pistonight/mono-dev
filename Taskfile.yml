@@ -4,6 +4,13 @@ includes:
   mdbook:
     taskfile: ./task/mdbook.yaml
     internal: true
+  mdbook-template:
+    taskfile: ./mdbook
+    dir: ./mdbook
+    internal: true
+  common:
+    taskfile: ./task/common.yaml
+    internal: true
 
 tasks:
   install:
@@ -12,14 +19,10 @@ tasks:
       - pnpm install
       - task: copy-website-theme
 
-        # blocker: mdbook-admonish does not support mdbook 0.5
-  # pull-book-update:
-  #   desc: Update the book assets using newer mdbook version
-  #   cmds:
-  #     # can comment this out for efficiency,
-  #     # but --force is needed so mdbook-admonish is built with latest mdbook
-  #     - cargo install mdbook mdbook-admonish --force 
-  #     - bun toolsets/mdbook/update.ts
+  install-cargo-extra-tools:
+    aliases: [icets]
+    cmds:
+      - task: common:install-mdbook-tools
 
   copy-website-theme:
     desc: Copy mdbook themes from the toolset to the website
