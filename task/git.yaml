@@ -6,12 +6,17 @@ version: '3'
 tasks:
   check-modification:
     - cmd: >
-        status="$(git status --porcelain=v1)";
-        if ! [ -z '{{.CHECK_PATH}}' ]; then
-          status="$(echo \"$status\" | rg '{{.CHECK_PATH}}' || true)";
+        if [ -z '{{.CHECK_PATH}}' ]; then
+          status="$(git status --porcelain=v1)";
+        else
+          status="$(git status --porcelain=v1 | rg '{{.CHECK_PATH}}' || true)";
         fi;
         if ! [ -z "$status" ]; then 
-          echo "$status";
+          if [ -z '{{.CHECK_PATH}}' ]; then
+            git status --porcelain=v1;
+          else
+            git status --porcelain=v1 || rg '{{.CHECK_PATH}}';
+          fi;
           echo '{{.CHECK_MESSAGE}}';
           exit 2;
         fi

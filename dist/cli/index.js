@@ -159,7 +159,7 @@ var T = (e) => {
 	let { packageJsonPath: t, rootDir: r, cacheDir: l } = s();
 	A(l);
 	let u = JSON.parse(_.readFileSync(t, "utf-8")), m = u["pistonight/mono-dev"] || {};
-	if (!m.lib) return i("package.json mono dev option 'lib' must be true to build library"), 1;
+	if (!m.lib) return i("package.json mono dev option 'lib' must be true or \"node\" to build library"), 1;
 	let g = await E(u, t);
 	if ("err" in g) return i("failed to config package: " + g.err), 1;
 	await O(u);
@@ -337,7 +337,7 @@ var T = (e) => {
 		let n = e[t];
 		if (typeof n != "string") continue;
 		let [r, i] = n.split("#", 2), a = r.toLowerCase();
-		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#e63d8ad073cf3c92f32c744ae1ce26d8ffaee3e3");
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#4f53a68445022f67236e52907d1b7b9b5d0aeefd");
 	}
 }, B = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",

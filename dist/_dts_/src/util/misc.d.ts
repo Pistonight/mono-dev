@@ -27,8 +27,14 @@ export interface MonoDevOptions {
     tsc?: boolean;
     /** Allow publishing (default false) */
     publish?: boolean;
-    /** if lib mode should be used, which adds more rules to eslint. default is true */
-    lib?: boolean;
+    /**
+     * if lib mode should be used, which adds more rules to eslint.
+     * default is true.
+     *
+     * `true` only allows portable library which does not depend on runtime-specific APIs
+     * (node:* ones). Use "node" to automatically externalize node:* modules
+     */
+    lib?: boolean | "node";
     /** Skip emitting .d.ts files when building library */
     nodts?: boolean;
     /** undefined = true */

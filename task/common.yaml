@@ -20,3 +20,9 @@ tasks:
     cmds:
       - which cargo-binstall || cargo install cargo-binstall
       - cargo binstall {{.PACKAGES}} -y
+
+  clone-mono-dev:
+    cmds:
+      - rm -rf packages/mono-dev
+      - rm -rf mono-dev
+      - git clone https://github.com/Pistonight/mono-dev --depth 1 mono-dev

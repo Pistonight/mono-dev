@@ -6,25 +6,71 @@ version: '3'
 tasks:
   fmt-check:
     cmds:
-      - task: run-clang-format
+      - task: clang-format
         vars:
           CLANG_FORMAT_ARGS: -n -Werror
+          SOURCE: '{{.SOURCE}}'
+          ADD_STYLES: '{{.ADD_STYLES}}'
 
   fmt-fix:
     cmds:
-      - task: run-clang-format
+      - task: clang-format
         vars:
           CLANG_FORMAT_ARGS: -i
+          SOURCE: '{{.SOURCE}}'
+          ADD_STYLES: '{{.ADD_STYLES}}'
           
-  run-clang-format:
+  clang-format:
+    vars:
+      SOURCE_RESOLVED: '{{.SOURCE | default "."}}'
+      STYLES_RESOLVED: >
+        '{
+        IndentWidth: 4,
+        AccessModifierOffset: -4,
+        PointerAlignment: Left,
+        ColumnLimit: 100,
+        BreakBeforeBraces: Custom,
+        AllowShortFunctionsOnASingleLine: Inline,
+        AllowShortIfStatementsOnASingleLine: Never,
+        AllowShortNamespacesOnASingleLine: false,
+        AllowShortBlocksOnASingleLine: Never,
+        {{.ADD_STYLES | trim}} }'
     cmds:
-      - cmd: > 
-          fd "\.[ch](\+\+|pp|xx)?"
-          -x clang-format
-          --style="{
-            IndentWidth: 4,
-            AccessModifierOffset: -4,
-            PointerAlignment: Left
-          }" {{.CLANG_FORMAT_ARGS}}
-        silent: true
-         
+      - cmd: >
+          find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+          | xargs -P $(nproc) -n 1
+          clang-format
+          --style={{.STYLES_RESOLVED | trim }}
+          {{.CLANG_FORMAT_ARGS}}
+
+  clang-tidy:
+    vars:
+      SOURCE_RESOLVED: '{{.SOURCE | default "." }}'
+      BUILD_RESOLVED: '{{.BUILD | default "." }}'
+      HEADER_RESOLVED: '{{.HEADER | default ".*" }}'
+      CHECKS_RESOLVED: >
+        '
+        clang-analyzer-*,
+        bugprone-*,
+        performance-*,
+        modernize-*,
+        -modernize-use-trailing-return-type,
+        readability-*,
+        -readability-magic-numbers,
+        {{.ADD_CHECKS | trim}}'
+
+    cmds:
+      - >
+        clang-tidy --dump-config 
+        --header-filter='{{.HEADER_RESOLVED}}'
+        --checks={{.CHECKS_RESOLVED | trim}} > .clang-tidy
+      - >
+        find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+        | xargs -P $(nproc) -n 1
+        clang-tidy --warnings-as-errors='*' --header-filter='{{.HEADER_RESOLVED}}'
+        -p {{.BUILD_RESOLVED | trim }}
+        --checks={{.CHECKS_RESOLVED | trim }}
+        --quiet
+
+
+
