@@ -6,9 +6,10 @@ export default configure({
     build: {
         rolldownOptions: {
             output: {
+                // generate files without hash to minimize diffs
+                // when publishing through git
                 chunkFileNames: "[name].js",
             },
-            external: ["node:fs", "node:path", "path", "node:fs/promises", "node:child_process"],
         },
     },
     test: {

@@ -28,7 +28,7 @@ export const runBuild = async (): Promise<number> => {
     const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
     const monoDevOptions = packageJson["pistonight/mono-dev"] || {};
     if (!monoDevOptions.lib) {
-        logError("package.json mono dev option 'lib' must be true to build library");
+        logError("package.json mono dev option 'lib' must be true or \"node\" to build library");
         return 1;
     }
 

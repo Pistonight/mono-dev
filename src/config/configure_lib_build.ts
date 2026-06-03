@@ -118,6 +118,34 @@ export const patchUserConfigWithMonodev = (_env: ConfigEnv, config: UserConfig) 
     for (const dep of externalDeps) {
         externals.push(new RegExp("^" + dep + "/"));
     }
+    if (monodevOptions.lib === "node") {
+        // when the lib is declared to only work with node, also externalize node:* modules
+        // this way we don't accidentally leave node:* imports in libs that are meant to run
+        // in the browser (which will break the app at runtime)
+        externals.push(/^node:/);
+        // curated list of node:* modules that are often used without the prefix
+        // this is a QoL feature to suppress warnings for those
+        // the reason why we are not using node:module to fetch this list at runtime
+        // is because the list could be different depending on the runtime
+        // that is used to build the package
+        const COMMON_OLD_FORMAT_NODE_MODULES = [
+            "buffer",
+            "child_process",
+            "crypto",
+            "fs",
+            "fs/promises",
+            "http",
+            "http2",
+            "https",
+            "os",
+            "path",
+            "path/posix",
+            "path/win32",
+        ];
+        externals.push(...COMMON_OLD_FORMAT_NODE_MODULES);
+        // to suppress node builtin modules not included here user would need
+        // to add it to vite.config.js, in build.rolldownOptions.external
+    }
 
     if (!build.rolldownOptions) {
         build.rolldownOptions = {};
