@@ -8,4 +8,15 @@ tasks:
       - mkdir -p template
       - cd template && mdbook init --ignore none --force --theme
       - mkdir template/theme/extra-css
-      - cd template && mdbook-admonish install --css-dir theme/extra-css
+      - cp css/catppuccin.css template/theme/extra-css
+      - cp css/patch.css template/theme/extra-css
+      # files that we don't modify
+      - rm template/theme/favicon.png
+      - rm template/theme/favicon.svg
+      - rm template/theme/highlight.css
+      - rm template/theme/highlight.js
+      - rm template/theme/book.js
+      - silent: true
+        cmd: echo 'please manually check book.toml and index.hbs changes'
+      - silent: true
+        cmd: echo 'then copy template/theme and template/book.toml to current dir'

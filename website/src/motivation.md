@@ -55,16 +55,15 @@ Well, that is exactly what `mono-dev` is. It's not a single tool or system or se
 But a combination of a set of tools, a set of documentations, a set of scripts and config files,
 and finally, this website to document everything for future-me to understand.
 
-```admonish danger
-Note that, this standard is possible because it's only used by me. I
-make assumptions about how a developer (me) works on the project.
-While all the source code are available on GitHub and you can feel free
-to use them or make PRs, I will not be implementing any fixes to support
-scenarios outside of what I use the tools for.
-
-As an example, I will not add a --config-path flag to some tool, because it
-assumes the project follows the standard, and the config is defined in the expected
-place.
-
-The standard is also unstable. Every update is a breaking update.
-```
+> [!CAUTION]
+> Note that, this standard is possible because it's only used by me. I
+> make assumptions about how a developer (me) works on the project.
+> While all the source code are available on GitHub and you can feel free
+> to use them or make PRs, I will not be implementing any fixes to support
+> scenarios outside of what I use the tools for.
+>
+> As an example, I will not add a --config-path flag to some tool, because it
+> assumes the project follows the standard, and the config is defined in the expected
+> place.
+>
+> The standard is also unstable. Every update is a breaking update.

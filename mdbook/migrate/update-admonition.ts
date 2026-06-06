@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-const WRITE_BEFORE = true;
+const WRITE_BEFORE = false;
 
 const TYPE_MAP: Record<string, string> = {
     note: "NOTE",

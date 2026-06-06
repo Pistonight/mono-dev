@@ -4,9 +4,8 @@ C/C++ codebase will typically have its own build system. `mono-dev`
 on the other hand, ships the formatting config
 
 ## Check and Fix
-```admonish note
-`fd` and `clang-format` are required
-```
+> [!NOTE]
+> `fd` and `clang-format` are required
 
 ```yaml
 version: '3'

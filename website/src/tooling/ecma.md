@@ -68,12 +68,11 @@ Running `pnpm up mono-dev` will resolve the latest commit and update it.
 - If root directory contain any TypeScript stuff, it will be checked as well
 - ESLint only checks the TypeScript projects. If you use ECMAScript, you opt-out of safety anyway
 
-```admonish note
-For LSP and compatibility with other tools, ESLint and tsconfig files
-will be generated at the project root (like how they are for a regular project).
-For eslint-lsp, you may need to add `eslint` dependency to downstream in order
-for the server to find the eslint library.
-```
+> [!NOTE]
+> For LSP and compatibility with other tools, ESLint and tsconfig files
+> will be generated at the project root (like how they are for a regular project).
+> For eslint-lsp, you may need to add `eslint` dependency to downstream in order
+> for the server to find the eslint library.
 
 ## Import Path remapping
 
@@ -90,35 +89,34 @@ This is why the field is mapped to the source typescript files instead of files 
 The mapping is always automatically generated for the `src` directory and 
 can be manuall disabled with mono-dev option `importmap: false`.
 
-~~~admonish example
-The following directory structure:
-   
-```
-    - src/
-      - app/
-      - util/
-        - image/
-          - index.ts
-        - data/
-          - index.ts
-      - lib/
-        - foo/
-          - index.ts
-        - index.ts
-```
-
-generates:
-
-```
-#lib ->  ./src/lib/index.ts
-#util/image -> ./src/util/image/index.ts
-#util/data -> ./src/util/data/index.ts
-```
-
-Note that in the published `package.json`, the imports will be replaced
-with the `.d.ts` files
-
-~~~
+> [!TIP]
+> For example, the following directory structure:
+>    
+> ```
+>     - src/
+>       - app/
+>       - util/
+>         - image/
+>           - index.ts
+>         - data/
+>           - index.ts
+>       - lib/
+>         - foo/
+>           - index.ts
+>         - index.ts
+> ```
+>
+> generates:
+>
+> ```
+> #lib ->  ./src/lib/index.ts
+> #util/image -> ./src/util/image/index.ts
+> #util/data -> ./src/util/data/index.ts
+> ```
+>
+> Note that in the published `package.json`, the imports will be replaced
+> with the `.d.ts` files
+>
 
 
 
@@ -150,14 +148,13 @@ The tooling supports 3 kinds of exports:
            }
        }
        ```
-       ```admonish info
-       In this configuration,
-       only the published package contains ESM + Type Declaration. Internal consumers
-       (like other packages in a monorepo) **consume the TS source directly**
-       for more streamlined dev experience. For example running vite dev server will not
-       require internal packages to be built into ESM first. Editing TS source
-       also does not require rebuilding the packages
-       ```
+       > [!NOTE]
+       > In this configuration,
+       > only the published package contains ESM + Type Declaration. Internal consumers
+       > (like other packages in a monorepo) **consume the TS source directly**
+       > for more streamlined dev experience. For example running vite dev server will not
+       > require internal packages to be built into ESM first. Editing TS source
+       > also does not require rebuilding the packages
    - Use the mono-dev `nocompile` option to exclude auto-configured compilation,
      which means the published package will also export the TS file directly.
 3. Manual-compiled: Object `exports` key of the form:
@@ -176,14 +173,12 @@ The tooling supports 3 kinds of exports:
        }
    }
    ```
-   ```admonish warning
-   the `compile` option must be specified to enable this.
-   ```
-   ```admonish info
-   This configuration is useful if the compiled ESM of the package needs to be consumed
-   as-is from within the monorepo. For example when testing bundling the package (importing
-   transpiled ESM vs. TS directly would not produce the same output)
-   ```
+   > [!WARNING]
+   > the `compile` option must be specified to enable this.
+   > [!TIP]
+   > This configuration is useful if the compiled ESM of the package needs to be consumed
+   > as-is from within the monorepo. For example when testing bundling the package (importing
+   > transpiled ESM vs. TS directly would not produce the same output)
 
 Note that `src` must be where TS files are exported from, and `dist` must be where
 output ESM is emitted. These 2 directory names are NOT configurable.
