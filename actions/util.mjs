@@ -1,16 +1,6 @@
 import fs from "node:fs";
 
 const EOF_DELIMITER = "#[#EOF#]#❌";
-fs.appendFileSync(
-    process.env.GITHUB_OUTPUT,
-    `packed_files=${outputFiles.join(" ")}
-signature_files=${signatureFiles.join(" ")}
-upload_files<<${EOF_DELIMITER}
-${uploadFiles.join("\n")}
-${EOF_DELIMITER}
-`,
-    "utf8",
-);
 
 export const writeGitHubOutput = (outputs) => {
     const file = process.env.GITHUB_OUTPUT;
