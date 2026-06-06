@@ -22,7 +22,9 @@ tasks:
   install-cargo-extra-tools:
     aliases: [icets]
     cmds:
-      - task: common:install-mdbook-tools
+      - task: common:cargo-binstall
+        vars:
+          PACKAGES: mdbook shwoop
 
   copy-website-theme:
     desc: Copy mdbook themes from the toolset to the website

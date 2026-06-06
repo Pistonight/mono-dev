@@ -2,7 +2,10 @@ import fs from "node:fs";
 import child_process from "node:child_process";
 import os from "node:os";
 
-const { MONODEV_CARGO_IS_BINSTALL, MONODEV_CARGO_INSTALL_CONFIG } = process.env;
+const { 
+    MONODEV_CARGO_INSTALL_CONFIG,
+    MONODEV_CARGO_BINSTALL_CONFIG,
+} = process.env;
 
 // type Config = {
 //     // binary name (for --bin, default is empty, no --bin)
@@ -19,12 +22,13 @@ const { MONODEV_CARGO_IS_BINSTALL, MONODEV_CARGO_INSTALL_CONFIG } = process.env;
 // Config[]
 const cargoInstallConfigs = JSON.parse(MONODEV_CARGO_INSTALL_CONFIG);
 console.log(cargoInstallConfigs);
-const isBinstall = `${MONODEV_CARGO_IS_BINSTALL}`.toLowerCase() === "true";
+const cargoBInstallConfigs = JSON.parse(MONODEV_CARGO_BINSTALL_CONFIG);
+console.log(cargoInstallConfigs);
 
 const HOME = os.homedir();
 
 const isWindows = process.platform === "win32";
-const doInstall = (config) => {
+const doInstall = (config, isBinstall) => {
     let { bin, crate, git, rev, version } = config || {};
     if (!crate) {
         throw new Error("crate not specified");
@@ -78,5 +82,8 @@ const doInstall = (config) => {
     }
 };
 for (const config of cargoInstallConfigs) {
-    doInstall(config);
+    doInstall(config, false);
+}
+for (const config of cargoBInstallConfigs) {
+    doInstall(config, true);
 }

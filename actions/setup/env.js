@@ -13,7 +13,7 @@ const {
     MONODEV_TOOL_MDBOOK,
     MONODEV_TOOL_CARGO_BINSTALL,
     MONODEV_TOOL_CARGO_INSTALL,
-    MONODEV_CCPP_LINT,
+    // MONODEV_CCPP_LINT,
     MONODEV_CCPP_CMAKE,
 } = process.env;
 
@@ -60,8 +60,7 @@ if (monodev_rust_wasm) {
     cargoBinaryInstallConfigs.push({ crate: "wasm-pack" });
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoBinaryInstallConfigs.push({ crate: "mdbook", version: "0.4.52" });
-    cargoBinaryInstallConfigs.push({ crate: "mdbook-admonish", version: "1.20.0" });
+    cargoBinaryInstallConfigs.push({ crate: "mdbook" });
 }
 const parseCargoInstallConfigOne = (configString) => {
     // format:
