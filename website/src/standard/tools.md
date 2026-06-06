@@ -17,10 +17,9 @@ that pain to the developer by assuming the System Tools already exists
 in `PATH`. These tools are usually cross-platform, so scripts don't
 need to deal with platform-specific commands.
 
-```admonish tip
-On Windows, the easiest way to meet the requirements is to install WSL,
-then install the tools inside WSL.
-```
+> [!TIP]
+> On Windows, the easiest way to meet the requirements is to install WSL,
+> then install the tools inside WSL.
 
 ## GNU Utils
 GNU Coreutils like `cp`, `rm`, `mkdir` should be available on the system.
@@ -62,13 +61,12 @@ I made a wrapper for `git submodule` called [`magoo`](https://github.com/Pistoni
 the process of updating submodules. (Rust needed for installation)
 
 ## Rust Toolchain
-```admonish note
-The Version (or MSRV - Minimum Supported Rust Version) for the standard,
-is always the latest stable release of Rust. Projects will also begin
-to be migrated to the latest edition of Rust as soon as it's released.
-
-Specific projects might require nightly features.
-```
+> [!NOTE]
+> The Version (or MSRV - Minimum Supported Rust Version) for the standard,
+> is always the latest stable release of Rust. Projects will also begin
+> to be migrated to the latest edition of Rust as soon as it's released.
+>
+> Specific projects might require nightly features.
 
 The Rust Toolchain is needed not only for Rust projects, but also to install
 various tools from `crates.io` - Rust's public registry.
@@ -76,18 +74,17 @@ various tools from `crates.io` - Rust's public registry.
 You can install Rust from [rustup.rs](https://rustup.rs) or from your distro's package
 manager.
 
-```admonish warning
-Windows users need to first install MSVC, which is included in the Visual Studio Build Tools (VSBT).
-This does not apply if you are using WSL.
-
-You can either:
-1. Follow the installation in the [Rustup Book](https://rust-lang.github.io/rustup/installation/windows-msvc.html),
-   which has a step-by-step walkthrough with images, but installs the whole Visual Studio IDE, or:
-2. Download and install just the build tools from [Microsoft](https://aka.ms/vs/17/release/vs_BuildTools.exe)
-
-Either way, be sure to select the latest `MSVC vXXX - VS XXXX C++ x64/x86` and `Windows 11 SDK` components
-when installing.
-```
+> [!WARNING]
+> Windows users need to first install MSVC, which is included in the Visual Studio Build Tools (VSBT).
+> This does not apply if you are using WSL.
+>
+> You can either:
+> 1. Follow the installation in the [Rustup Book](https://rust-lang.github.io/rustup/installation/windows-msvc.html),
+>    which has a step-by-step walkthrough with images, but installs the whole Visual Studio IDE, or:
+> 2. Download and install just the build tools from [Microsoft](https://aka.ms/vs/17/release/vs_BuildTools.exe)
+>
+> Either way, be sure to select the latest `MSVC vXXX - VS XXXX C++ x64/x86` and `Windows 11 SDK` components
+> when installing.
 
 For projects, the root should define a task called `install-cargo-extra-tools`
 with the alias `icets` to invoke `cargo install` for all tools needed
@@ -98,9 +95,8 @@ Most of the time, a Rust Toolchain is also the only thing you need
 to work on a Rust project, thanks to `cargo` also being a linter and formater for Rust.
 
 ## ECMAScript ecosystem
-```admonish note
-The current NodeJS version in the standard is v22
-```
+> [!NOTE]
+> The current NodeJS version in the standard is v22
 
 NodeJS is basically still the source of truth for the industry.
 You can install it from [NodeJS.org](https://nodejs.org), from your distro's package manager,
@@ -108,27 +104,16 @@ or use [NVM](https://github.com/nvm-sh/nvm) (or [NVM-Windows](https://github.com
 
 There are 2 additional tools needed globally:
 - `pnpm` - the package manager that works better with monorepos
-- `bun` - bun is a new tool that tries to be "everything you need to develop JS".
-  We use it for:
-  - Bundling with zero config
-  - Running TypeScript natively with zero config
-
-```admonish info
-Yes, I am aware NodeJS is adding TypeScript support natively. However,
-there are TypeScript-only features that node cannot run without transforming
-the source. TypeScript has added an option to disable those features.
-Time will tell who wins in the end
-```
+- `bun` - sometimes bun is nice for bundling everything without transpilation and weird module resolution quirks.
 
 Both of these tools should always be updated to the latest version.
 Fortunately, this is very easy with NPM:
 ```
 npm i -g pnpm bun
 ```
-```admonish warning
-If you are using NVM or other version managers, the global packages
-are usually tied to the node version.
-```
+> [!WARNING]
+> If you are using NVM or other version managers, the global packages
+> are usually tied to the node version.
 
 Other JS ecosystem tools used in development are managed as node dependencies,
 so they will automatically be installed local to the project.

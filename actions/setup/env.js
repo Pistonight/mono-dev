@@ -13,7 +13,7 @@ const {
     MONODEV_TOOL_MDBOOK,
     MONODEV_TOOL_CARGO_BINSTALL,
     MONODEV_TOOL_CARGO_INSTALL,
-    MONODEV_CCPP_LINT,
+    // MONODEV_CCPP_LINT,
     MONODEV_CCPP_CMAKE,
 } = process.env;
 
@@ -60,8 +60,7 @@ if (monodev_rust_wasm) {
     cargoBinaryInstallConfigs.push({ crate: "wasm-pack" });
 }
 if (bool(MONODEV_TOOL_MDBOOK)) {
-    cargoBinaryInstallConfigs.push({ crate: "mdbook", version: "0.4.52" });
-    cargoBinaryInstallConfigs.push({ crate: "mdbook-admonish", version: "1.20.0" });
+    cargoBinaryInstallConfigs.push({ crate: "mdbook" });
 }
 const parseCargoInstallConfigOne = (configString) => {
     // format:
@@ -109,6 +108,7 @@ if (MONODEV_TOOL_CARGO_INSTALL) {
 }
 let setup_cargo_binstall = cargoBinaryInstallConfigs.length > 0;
 let need_cargo_install = cargoInstallConfigs.length > 0;
+const need_cargo_install_or_binstall = setup_cargo_binstall || need_cargo_install;
 const cargo_install_config = JSON.stringify(cargoInstallConfigs);
 const cargo_binstall_config = JSON.stringify(cargoBinaryInstallConfigs);
 
@@ -195,6 +195,7 @@ const output = {
     rust_cache_key,
     setup_cargo_binstall,
     need_cargo_install,
+    need_cargo_install_or_binstall,
     cargo_install_config,
     cargo_binstall_config,
 

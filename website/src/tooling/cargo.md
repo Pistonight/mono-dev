@@ -34,10 +34,9 @@ tasks:
       - task: cargo:watch-serve-doc
 ```
 
-```admonish note
-Clippy fix is not automated, because IMO sometimes the suggestions
-lead to worse code style and should be ignored.
-```
+> [!NOTE]
+> Clippy fix is not automated, because IMO sometimes the suggestions
+> lead to worse code style and should be ignored.
 
 For other `clippy` options, including feature flags and targets,
 see the included Taskfile.
@@ -75,6 +74,5 @@ tasks:
 ## Test
 There's no wrapper for test - just run `cargo test`
 
-```admonish todo
-wasm-pack-build
-```
+> [!NOTE]
+> TODO - add section for wasm-pack-build task and WASM stuff in general

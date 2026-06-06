@@ -1,10 +1,9 @@
 # The `mono-dev` Standard
 
-```admonish note
-This section contains important information about working on projects that
-follows the standard. Please read it all and do the setup necessary if 
-you are directed here by contributing guides of my projects.
-```
+> [!NOTE]
+> This section contains important information about working on projects that
+> follows the standard. Please read it all and do the setup necessary if 
+> you are directed here by contributing guides of my projects.
 
 The `mono-dev` standard consists of:
 - Tools (i.e. binaries) that must be available globally on the system

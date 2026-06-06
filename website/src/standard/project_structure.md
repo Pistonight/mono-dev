@@ -12,12 +12,11 @@ or cloned directly into it during setup
 magoo install https://github.com/Pistonight/mono-dev mono-dev --name mono-dev --branch main
 ```
 
-```admonish important
-If the monorepo is meant to be a Rust crate that's cargo-installable/cargo-addable
-directly from git, don't use the submodule approach, as cargo will clone the submodules
-as well, but mono-dev should only be needed during development. The downside is that
-the version won't be tracked by the `.gitsubmodules` file.
-```
+> [!IMPORTANT]
+> If the monorepo is meant to be a Rust crate that's cargo-installable/cargo-addable
+> directly from git, don't use the submodule approach, as cargo will clone the submodules
+> as well, but mono-dev should only be needed during development. The downside is that
+> the version won't be tracked by the `.gitsubmodules` file.
 
 A typical monorepo should look like:
 ```
@@ -112,9 +111,8 @@ repo with the path `../../mono-dev`, or `./node_modules/mono-dev` if PNPM is use
 
 ## Singlerepo
 
-```admonish todo
-this section needs update with new_setup
-```
+> [!NOTE]
+> TODO - this section needs update with new_setup
 This is also a term I made up. This basically refers to simple projects
 that only have to deal with one ecosystem or one language, such as a CLI tool.
 Because the project structure is very simple, it doesn't justify creating
@@ -126,10 +124,9 @@ directly from `GitHub`.
 ```
 pnpm i -D https://github.com/Pistonight/mono-dev
 ```
-```admonish info
-It's important to install mono-dev this way, as the ECMAScript configs
-assumes mono-dev is found in node_modules!
-```
+> [!NOTE]
+> It's important to install mono-dev this way, as the ECMAScript configs
+> assumes mono-dev is found in node_modules!
 
 If PNPM is not involved, then there are 2 options:
 1. Add it as a git submodule:

@@ -55,7 +55,7 @@ jobs:
           # install the rust-src component, default false
           rust-src: true
 
-          # installs mdbook and mdbook-admonish
+          # install mdbook
           tool-mdbook: true
 
           # install extra tools with cargo-binstall
