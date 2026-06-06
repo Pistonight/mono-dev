@@ -124,7 +124,7 @@ runs:
 
       # cargo installs needs to be run before the rust-cache step
       # otherwise the rust-cache step clears the installed bins
-    - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' }}
+    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
       id: cargoinstall-cache-env
       run: node cargoinstall-cache.js
       working-directory: ${{ github.action_path }}
@@ -132,20 +132,20 @@ runs:
       env:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_install_config }}
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
-    - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' }}
+    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
       id: cargoinstall-cache-restore
       uses: actions/cache/restore@v5
       with:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}
         key: cargoinstall-${{ runner.os }}-${{ runner.arch }}-${{ steps.cargoinstall-cache-env.outputs.cache_key }}
-    - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' && steps.cargoinstall-cache-restore.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
       run: node cargoinstall.js
       working-directory: ${{ github.action_path }}
       shell: bash
       env:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_install_config }}
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
-    - if: ${{ steps.envjs.outputs.need_cargo_install == 'true' }}
+    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
       uses: actions/cache/save@v5
       with:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}

@@ -108,6 +108,7 @@ if (MONODEV_TOOL_CARGO_INSTALL) {
 }
 let setup_cargo_binstall = cargoBinaryInstallConfigs.length > 0;
 let need_cargo_install = cargoInstallConfigs.length > 0;
+const need_cargo_install_or_binstall = setup_cargo_binstall || need_cargo_install;
 const cargo_install_config = JSON.stringify(cargoInstallConfigs);
 const cargo_binstall_config = JSON.stringify(cargoBinaryInstallConfigs);
 
@@ -194,6 +195,7 @@ const output = {
     rust_cache_key,
     setup_cargo_binstall,
     need_cargo_install,
+    need_cargo_install_or_binstall,
     cargo_install_config,
     cargo_binstall_config,
 
