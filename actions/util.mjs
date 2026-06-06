@@ -11,8 +11,8 @@ export const writeGitHubOutput = (outputs) => {
     const lines = [];
 
     for (const key in outputs) {
-        const value = outputs[key];
-        if (value && (value.includes("\n") || value.includes("\r"))) {
+        const value = `${outputs[key]}`;
+        if (value.includes("\n") || value.includes("\r")) {
             lines.push(`${key}<<${EOF_DELIMITER}`);
             lines.push(value);
             lines.push(EOF_DELIMITER);
