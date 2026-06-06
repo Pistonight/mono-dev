@@ -138,14 +138,14 @@ runs:
       with:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}
         key: cargoinstall-${{ runner.os }}-${{ runner.arch }}-${{ steps.cargoinstall-cache-env.outputs.cache_key }}
-    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
+    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' && steps.cargoinstall-cache-restore.outputs.cache-hit != 'true' }}
       run: node cargoinstall.mjs
       working-directory: ${{ github.action_path }}
       shell: bash
       env:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_install_config }}
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
-    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
+    - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' && steps.cargoinstall-cache-restore.outputs.cache-hit != 'true' }}
       uses: actions/cache/save@v5
       with:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}
