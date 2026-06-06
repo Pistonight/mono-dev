@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { writeGitHubOutput } from "../util.mjs";
+
 const { MONODEV_WORKSPACE, MONODEV_INPUT_MONO_DEV } = process.env;
 
 let mono_dev_ref = MONODEV_INPUT_MONO_DEV;

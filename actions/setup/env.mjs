@@ -1,3 +1,5 @@
+import { writeGitHubOutput } from "../util.mjs";
+
 const {
     MONODEV_INSTALL_METHOD,
     MONODEV_RUNNER_OS,
