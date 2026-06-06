@@ -11,4 +11,3 @@ tasks:
     cmds:
       - rm -rf {{.MDBOOK_TARGET_RESOLVED}}/theme
       - cp -r {{.MONO_DEV}}/mdbook/theme {{.MDBOOK_TARGET_RESOLVED}}
-      - cp -r {{.MONO_DEV}}/mdbook/css {{.MDBOOK_TARGET_RESOLVED}}/theme/extra-css
