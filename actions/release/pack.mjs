@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import child_process from "node:child_process";
 
+import { writeGitHubOutput } from "../util.mjs";
+
 const {
     MONODEV_RELEASE_FILES,
     MONODEV_RELEASE_PACK,
@@ -122,14 +124,8 @@ for (const file of files) {
 const signatureFiles = hasMinisignKey ? outputFiles.map((file) => `${file}.sig`) : [];
 const uploadFiles = [...outputFiles, ...signatureFiles];
 
-const EOF_DELIMITER = "#[#EOF#]#❌";
-fs.appendFileSync(
-    process.env.GITHUB_OUTPUT,
-    `packed_files=${outputFiles.join(" ")}
-signature_files=${signatureFiles.join(" ")}
-upload_files<<${EOF_DELIMITER}
-${uploadFiles.join("\n")}
-${EOF_DELIMITER}
-`,
-    "utf8",
-);
+writeGitHubOutput({
+    packed_files: outputFiles.join(" "),
+    signature_files: signatureFiles.join(" "),
+    upload_files: uploadFiles.join("\n"),
+});

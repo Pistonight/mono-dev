@@ -1,5 +1,3 @@
-import fs from "node:fs";
-
 const {
     MONODEV_INSTALL_METHOD,
     MONODEV_RUNNER_OS,
@@ -184,7 +182,7 @@ if (ccpp_lint) {
     ccpp_lint_clang_tidy = `clang-tidy-${CCPP_VERSION}_${platform}${ccpp_lint_ext}`;
 }
 
-const output = {
+writeGitHubOutput({
     setup_node,
     node_cache,
 
@@ -202,11 +200,4 @@ const output = {
     ccpp_cmake,
     ccpp_lint_clang_format,
     ccpp_lint_clang_tidy,
-};
-
-const outputString = Object.entries(output)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("\n");
-console.log("Output:");
-console.log(outputString);
-fs.appendFileSync(process.env.GITHUB_OUTPUT, outputString + "\n", "utf8");
+});

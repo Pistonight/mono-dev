@@ -18,14 +18,7 @@ if (MONODEV_INPUT_MONO_DEV === "auto") {
     mono_dev_ref = "main";
 }
 
-const output = {
+writeGitHubOutput({
     mono_dev_install,
     mono_dev_ref,
-};
-
-const outputString = Object.entries(output)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("\n");
-console.log("Output:");
-console.log(outputString);
-fs.appendFileSync(process.env.GITHUB_OUTPUT, outputString + "\n", "utf8");
+});

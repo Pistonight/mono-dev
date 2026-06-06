@@ -1,8 +1,9 @@
-import fs from "node:fs";
 import child_process from "node:child_process";
 import crypto from "node:crypto";
 import path from "node:path";
 import os from "node:os";
+
+import { writeGitHubOutput } from "../util.mjs";
 
 const isWindows = process.platform === "win32";
 
@@ -41,13 +42,7 @@ for (const config of cargoBInstallConfigs) {
 }
 const cache_path = paths.join("\n");
 
-const output = {
+writeGitHubOutput({
     cache_key,
     cache_path,
-};
-const outputString = Object.entries(output)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("\n");
-console.log("Output:");
-console.log(outputString);
-fs.appendFileSync(process.env.GITHUB_OUTPUT, outputString + "\n", "utf8");
+});

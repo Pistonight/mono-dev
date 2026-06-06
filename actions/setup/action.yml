@@ -61,7 +61,7 @@ runs:
         submodules: ${{ inputs.submodules }}
     - run: node --version
       shell: bash
-    - run: node wkspenv.js
+    - run: node wkspenv.mjs
       working-directory: ${{ github.action_path }}
       id: wkspenvjs
       shell: bash
@@ -78,7 +78,7 @@ runs:
     - uses: go-task/setup-task@v2
       with:
         repo-token: ${{ github.token }}
-    - run: node env.js
+    - run: node env.mjs
       working-directory: ${{ github.action_path }}
       id: envjs
       shell: bash
@@ -126,7 +126,7 @@ runs:
       # otherwise the rust-cache step clears the installed bins
     - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
       id: cargoinstall-cache-env
-      run: node cargoinstall-cache.js
+      run: node cargoinstall-cache.mjs
       working-directory: ${{ github.action_path }}
       shell: bash
       env:
@@ -139,7 +139,7 @@ runs:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}
         key: cargoinstall-${{ runner.os }}-${{ runner.arch }}-${{ steps.cargoinstall-cache-env.outputs.cache_key }}
     - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
-      run: node cargoinstall.js
+      run: node cargoinstall.mjs
       working-directory: ${{ github.action_path }}
       shell: bash
       env:
