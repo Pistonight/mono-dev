@@ -6,10 +6,7 @@ import os from "node:os";
 
 const isWindows = process.platform === "win32";
 
-const {
-    MONODEV_CARGO_INSTALL_CONFIG,
-    MONODEV_CARGO_BINSTALL_CONFIG
-} = process.env;
+const { MONODEV_CARGO_INSTALL_CONFIG, MONODEV_CARGO_BINSTALL_CONFIG } = process.env;
 const hash = crypto.createHash("sha256");
 hash.update(MONODEV_CARGO_INSTALL_CONFIG || "");
 hash.update(MONODEV_CARGO_BINSTALL_CONFIG || "");
@@ -35,7 +32,7 @@ const addPathFromConfig = (config) => {
     } else {
         paths.push(path.resolve(HOME, ".cargo", "bin", bin || crate));
     }
-}
+};
 for (const config of cargoInstallConfigs) {
     addPathFromConfig(config);
 }

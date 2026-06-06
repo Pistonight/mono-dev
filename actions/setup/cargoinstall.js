@@ -2,10 +2,7 @@ import fs from "node:fs";
 import child_process from "node:child_process";
 import os from "node:os";
 
-const { 
-    MONODEV_CARGO_INSTALL_CONFIG,
-    MONODEV_CARGO_BINSTALL_CONFIG,
-} = process.env;
+const { MONODEV_CARGO_INSTALL_CONFIG, MONODEV_CARGO_BINSTALL_CONFIG } = process.env;
 
 // type Config = {
 //     // binary name (for --bin, default is empty, no --bin)
