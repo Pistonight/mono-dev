@@ -58,7 +58,7 @@ tasks:
       #   - uutils/findutils treats \ as escape so the path separators are nuked on Windows
       #   - built-in task one does not allow -P
       - >
-        $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+        $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
         | xargs -n 1
         clang-format
         --style={{.STYLES_RESOLVED | trim }}
@@ -67,7 +67,7 @@ tasks:
     platforms: [linux, darwin]
     cmds:
       - >
-        find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+        find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
         | xargs -P $(nproc) -n 1
         clang-format
         --style={{.STYLES_RESOLVED | trim }}
@@ -112,7 +112,7 @@ tasks:
     cmds:
       # see clang-format-windows
       - >
-        $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+        $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
         | xargs -n 1
         clang-tidy --warnings-as-errors='*' --header-filter='{{.HEADER_RESOLVED}}'
         -p {{.BUILD_RESOLVED | trim }}
@@ -122,7 +122,7 @@ tasks:
     platforms: [linux, darwin]
     cmds:
       - >
-        find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)'
+        find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
         | xargs -P $(nproc) -n 1
         clang-tidy --warnings-as-errors='*' --header-filter='{{.HEADER_RESOLVED}}'
         -p {{.BUILD_RESOLVED | trim }}
