@@ -7,6 +7,15 @@ Use this action to create release notes automatically and draft a release with a
 Uses `RELEASE_NOTES_HEADER.md` and `RELEASE_NOTES_FOOTER.md` in the `.github` directory
 
 ```yaml
+name: Release
+on:
+  push:
+    tags:
+      - v*.*.*
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
     # permission for publish release
     permissions:
       contents: write
