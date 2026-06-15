@@ -1,5 +1,4 @@
 # Taskfile include for C/C++
-#
 
 version: '3'
 
@@ -22,7 +21,7 @@ tasks:
           
   clang-format:
     vars:
-      SOURCE_RESOLVED: '{{.SOURCE | default "."}}'
+      SOURCE_RESOLVED: '{{.SOURCE | default "src"}}'
       STYLES_RESOLVED: >
         '{
         IndentWidth: 4,
@@ -57,12 +56,32 @@ tasks:
       #   - uutils/findutils allows -P but it's not implemented yet
       #   - uutils/findutils treats \ as escape so the path separators are nuked on Windows
       #   - built-in task one does not allow -P
-      - >
-        $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
-        | xargs -n 1
-        clang-format
-        --style={{.STYLES_RESOLVED | trim }}
-        {{.CLANG_FORMAT_ARGS}}
+      # since xargs -P is unavailable on Windows
+      # we use the script below to use as a temporary workaround until uutils supports it
+      # the scheduling is worse because it waits for the full batch to finish before spawning
+      # a new batch, but that's good enough for a hack
+      - cmd: echo 'clang-format {{.STYLES_RESOLVED | trim }} using windows xargs hack'
+      - silent: true
+        cmd: |
+          n=$(nproc 2>/dev/null || echo 4)
+          $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?' | {
+            rc=0
+            pids=
+            i=0
+            while read -r f; do
+              clang-format --style={{.STYLES_RESOLVED | trim }} {{.CLANG_FORMAT_ARGS}} "$f" &
+              pids="$pids $!"
+              i=$((i + 1))
+              if [ "$i" -ge "$n" ]; then
+                for p in $pids; do wait "$p" || rc=1; done
+                pids=
+                i=0
+              fi
+            done
+            for p in $pids; do wait "$p" || rc=1; done
+            exit $rc
+          }
+
   clang-format-unix:
     platforms: [linux, darwin]
     cmds:
@@ -75,7 +94,7 @@ tasks:
 
   clang-tidy:
     vars:
-      SOURCE_RESOLVED: '{{.SOURCE | default "." }}'
+      SOURCE_RESOLVED: '{{.SOURCE | default "src" }}'
       BUILD_RESOLVED: '{{.BUILD | default "." }}'
       HEADER_RESOLVED: '{{.HEADER | default ".*" }}'
       CHECKS_RESOLVED: >
@@ -111,13 +130,28 @@ tasks:
     platforms: [windows]
     cmds:
       # see clang-format-windows
-      - >
-        $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
-        | xargs -n 1
-        clang-tidy --warnings-as-errors='*' --header-filter='{{.HEADER_RESOLVED}}'
-        -p {{.BUILD_RESOLVED | trim }}
-        --checks={{.CHECKS_RESOLVED | trim }}
-        --quiet
+      - cmd: echo 'clang-tidy using windows xargs hack'
+      - silent: true
+        cmd: |
+          n=$(nproc 2>/dev/null || echo 4)
+          $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?' | {
+            rc=0
+            pids=
+            i=0
+            while read -r f; do
+              clang-tidy --warnings-as-errors='*' --header-filter='{{.HEADER_RESOLVED}}' -p {{.BUILD_RESOLVED | trim }} --checks={{.CHECKS_RESOLVED | trim }} --quiet "$f" &
+              pids="$pids $!"
+              i=$((i + 1))
+              if [ "$i" -ge "$n" ]; then
+                for p in $pids; do wait "$p" || rc=1; done
+                pids=
+                i=0
+              fi
+            done
+            for p in $pids; do wait "$p" || rc=1; done
+            exit $rc
+          }
+
   clang-tidy-unix:
     platforms: [linux, darwin]
     cmds:
