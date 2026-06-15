@@ -33,6 +33,7 @@ tasks:
         AllowShortIfStatementsOnASingleLine: Never,
         AllowShortNamespacesOnASingleLine: false,
         AllowShortBlocksOnASingleLine: Never,
+        InsertNewlineAtEOF: true,
         {{.ADD_STYLES | trim}} }'
     cmds:
       - task: clang-format-windows
