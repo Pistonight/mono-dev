@@ -23,7 +23,7 @@
         "typedoc-theme-oxide": "^0.3.0",
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.59.1",
-        "vite": "^8.0.10",
+        "vite": "^8.0.16",
         "vite-plugin-wasm": "^3.6.0",
         "vitest": "^4.1.5"
     },
