@@ -57,6 +57,10 @@ export const patchUserConfigWithMonodev = (_env: ConfigEnv, config: UserConfig) 
         process.exit(1);
     }
     const { exports } = libExports.val;
+    if (!exports.length) {
+        logError("must define at least one exports in 'exports' field to build library");
+        process.exit(1);
+    }
     const entryConfig = Object.fromEntries(
         exports.map(({ entryName: n, sourcePathAbs }) => {
             return [n === "." ? "index" : n, sourcePathAbs];
