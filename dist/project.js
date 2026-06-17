@@ -87,7 +87,7 @@ var d = (r, a, s = !1) => {
 			c.statSync(e).isDirectory() && t.push([r(e), r(`src/${i}`)]);
 		}
 	} catch {}
-	let i = {}, a = RegExp("^src/");
+	let i = {}, a = /* @__PURE__ */ RegExp("^src/");
 	for (; t.length;) {
 		let e = t.pop();
 		if (!e) break;

@@ -1,10 +1,10 @@
-import { n as e, t } from "./chunk.js";
+import { b as e, x as t } from "./plugins.js";
 //#region node_modules/.pnpm/isexe@4.0.0/node_modules/isexe/dist/commonjs/index.min.js
-var n = /* @__PURE__ */ t(((t) => {
-	var n = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), r = n((t) => {
-		Object.defineProperty(t, "__esModule", { value: !0 }), t.sync = t.isexe = void 0;
-		var n = e("node:fs"), r = e("node:fs/promises");
-		t.isexe = async (e, t = {}) => {
+var n = /* @__PURE__ */ e(((e) => {
+	var n = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), r = n((e) => {
+		Object.defineProperty(e, "__esModule", { value: !0 }), e.sync = e.isexe = void 0;
+		var n = t("node:fs"), r = t("node:fs/promises");
+		e.isexe = async (e, t = {}) => {
 			let { ignoreErrors: n = !1 } = t;
 			try {
 				return i(await (0, r.stat)(e), t);
@@ -13,7 +13,7 @@ var n = /* @__PURE__ */ t(((t) => {
 				if (n || t.code === "EACCES") return !1;
 				throw t;
 			}
-		}, t.sync = (e, t = {}) => {
+		}, e.sync = (e, t = {}) => {
 			let { ignoreErrors: r = !1 } = t;
 			try {
 				return i((0, n.statSync)(e), t);
@@ -29,10 +29,10 @@ var n = /* @__PURE__ */ t(((t) => {
 			let a = new Set([i, ...r]), o = e.mode, s = e.uid, c = e.gid;
 			return !!(o & 1 || o & 8 && a.has(c) || o & 64 && s === n || o & 72 && n === 0);
 		};
-	}), i = n((t) => {
-		Object.defineProperty(t, "__esModule", { value: !0 }), t.sync = t.isexe = void 0;
-		var n = e("node:fs"), r = e("node:fs/promises"), i = e("node:path");
-		t.isexe = async (e, t = {}) => {
+	}), i = n((e) => {
+		Object.defineProperty(e, "__esModule", { value: !0 }), e.sync = e.isexe = void 0;
+		var n = t("node:fs"), r = t("node:fs/promises"), i = t("node:path");
+		e.isexe = async (e, t = {}) => {
 			let { ignoreErrors: n = !1 } = t;
 			try {
 				return o(await (0, r.stat)(e), e, t);
@@ -41,7 +41,7 @@ var n = /* @__PURE__ */ t(((t) => {
 				if (n || t.code === "EACCES") return !1;
 				throw t;
 			}
-		}, t.sync = (e, t = {}) => {
+		}, e.sync = (e, t = {}) => {
 			let { ignoreErrors: r = !1 } = t;
 			try {
 				return o((0, n.statSync)(e), e, t);
@@ -62,7 +62,7 @@ var n = /* @__PURE__ */ t(((t) => {
 		}, o = (e, t, n) => e.isFile() && a(t, n);
 	}), a = n((e) => {
 		Object.defineProperty(e, "__esModule", { value: !0 });
-	}), o = t && t.__createBinding || (Object.create ? (function(e, t, n, r) {
+	}), o = e && e.__createBinding || (Object.create ? (function(e, t, n, r) {
 		r === void 0 && (r = n);
 		var i = Object.getOwnPropertyDescriptor(t, n);
 		(!i || ("get" in i ? !t.__esModule : i.writable || i.configurable)) && (i = {
@@ -73,14 +73,14 @@ var n = /* @__PURE__ */ t(((t) => {
 		}), Object.defineProperty(e, r, i);
 	}) : (function(e, t, n, r) {
 		r === void 0 && (r = n), e[r] = t[n];
-	})), s = t && t.__setModuleDefault || (Object.create ? (function(e, t) {
+	})), s = e && e.__setModuleDefault || (Object.create ? (function(e, t) {
 		Object.defineProperty(e, "default", {
 			enumerable: !0,
 			value: t
 		});
 	}) : function(e, t) {
 		e.default = t;
-	}), c = t && t.__importStar || (function() {
+	}), c = e && e.__importStar || (function() {
 		var e = function(t) {
 			return e = Object.getOwnPropertyNames || function(e) {
 				var t = [];
@@ -94,18 +94,18 @@ var n = /* @__PURE__ */ t(((t) => {
 			if (t != null) for (var r = e(t), i = 0; i < r.length; i++) r[i] !== "default" && o(n, t, r[i]);
 			return s(n, t), n;
 		};
-	})(), l = t && t.__exportStar || function(e, t) {
+	})(), l = e && e.__exportStar || function(e, t) {
 		for (var n in e) n !== "default" && !Object.prototype.hasOwnProperty.call(t, n) && o(t, e, n);
 	};
-	Object.defineProperty(t, "__esModule", { value: !0 }), t.sync = t.isexe = t.posix = t.win32 = void 0;
+	Object.defineProperty(e, "__esModule", { value: !0 }), e.sync = e.isexe = e.posix = e.win32 = void 0;
 	var u = c(r());
-	t.posix = u;
+	e.posix = u;
 	var d = c(i());
-	t.win32 = d, l(a(), t);
+	e.win32 = d, l(a(), e);
 	var f = (process.env._ISEXE_TEST_PLATFORM_ || process.platform) === "win32" ? d : u;
-	t.isexe = f.isexe, t.sync = f.sync;
-})), r = /* @__PURE__ */ t(((t, r) => {
-	var { isexe: i, sync: a } = n(), { join: o, delimiter: s, sep: c, posix: l } = e("path"), u = process.platform === "win32", d = new RegExp(`[${l.sep}${c === l.sep ? "" : c}]`.replace(/(\\)/g, "\\$1")), f = RegExp(`^\\.${d.source}`), p = (e) => Object.assign(/* @__PURE__ */ Error(`not found: ${e}`), { code: "ENOENT" }), m = (e, { path: t = process.env.PATH, pathExt: n = process.env.PATHEXT, delimiter: r = s }) => {
+	e.isexe = f.isexe, e.sync = f.sync;
+})), r = /* @__PURE__ */ e(((e, r) => {
+	var { isexe: i, sync: a } = n(), { join: o, delimiter: s, sep: c, posix: l } = t("path"), u = process.platform === "win32", d = new RegExp(`[${l.sep}${c === l.sep ? "" : c}]`.replace(/(\\)/g, "\\$1")), f = RegExp(`^\\.${d.source}`), p = (e) => Object.assign(/* @__PURE__ */ Error(`not found: ${e}`), { code: "ENOENT" }), m = (e, { path: t = process.env.PATH, pathExt: n = process.env.PATHEXT, delimiter: r = s }) => {
 		let i = e.match(d) ? [""] : [...u ? [process.cwd()] : [], ...(t || "").split(r)];
 		if (u) {
 			let t = n || [

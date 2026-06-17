@@ -16,7 +16,9 @@ var f = async (e) => {
 	} : f.define = s(h, p);
 	let _ = o(f, g), v = c(m, h);
 	"err" in v && (t("failed to parse exports: " + v.err), process.exit(1));
-	let { exports: y } = v.val, b = Object.fromEntries(y.map(({ entryName: e, sourcePathAbs: t }) => [e === "." ? "index" : e, t])), x = Object.fromEntries(y.map(({ entryName: e, distPathRel: t }) => [e === "." ? "index" : e, t]));
+	let { exports: y } = v.val;
+	y.length || (t("must define at least one exports in 'exports' field to build library"), process.exit(1));
+	let b = Object.fromEntries(y.map(({ entryName: e, sourcePathAbs: t }) => [e === "." ? "index" : e, t])), x = Object.fromEntries(y.map(({ entryName: e, distPathRel: t }) => [e === "." ? "index" : e, t]));
 	_.lib ? "entry" in _.lib && (t("build.lib.entry must NOT be specified in vite; it is automatically determined based on exports"), process.exit(1)) : _.lib = { entry: b }, "fileName" in _.lib && (t("build.lib.fileName must NOT be specified in vite; it is automatically determined based on exports"), process.exit(1)), _.lib.fileName = (e, t) => {
 		if (!(t in x)) throw Error("unexpected unknown entry point: " + t);
 		return x[t];
