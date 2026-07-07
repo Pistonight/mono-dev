@@ -26,7 +26,7 @@ var n = /* @__PURE__ */ e(((e) => {
 		var i = (e, t) => e.isFile() && a(e, t), a = (e, t) => {
 			let n = t.uid ?? process.getuid?.(), r = t.groups ?? process.getgroups?.() ?? [], i = t.gid ?? process.getgid?.() ?? r[0];
 			if (n === void 0 || i === void 0) throw Error("cannot get uid or gid");
-			let a = new Set([i, ...r]), o = e.mode, s = e.uid, c = e.gid;
+			let a = /* @__PURE__ */ new Set([i, ...r]), o = e.mode, s = e.uid, c = e.gid;
 			return !!(o & 1 || o & 8 && a.has(c) || o & 64 && s === n || o & 72 && n === 0);
 		};
 	}), i = n((e) => {
