@@ -1,13 +1,13 @@
 {
     "name": "mono-dev",
-    "version": "0.4.20",
+    "version": "0.4.21",
     "description": "NPM module for mono-dev utilities",
     "private": true,
     "type": "module",
     "dependencies": {
         "@babel/core": "^7.29.7",
         "@eslint/js": "^9.39.4",
-        "@prettier/cli": "^0.10.0",
+        "@prettier/cli": "^0.12.0",
         "@rolldown/plugin-babel": "^0.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260421.2",
         "@vitejs/plugin-react": "^6.0.3",
@@ -33,7 +33,7 @@
         "@types/js-yaml": "^4.0.9",
         "@types/node": "^24",
         "@types/which": "^3.0.4",
-        "rolldown": "1.0.0-rc.18",
+        "rolldown": "^1.1.4",
         "which": "^6.0.1"
     },
     "bin": {
