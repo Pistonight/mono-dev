@@ -1,10 +1,23 @@
 plugins {
+    id 'java'
     id 'com.diffplug.spotless'
     id 'net.ltgt.errorprone'
 }
 
 repositories {
     mavenCentral()
+}
+
+def javaVersion = providers.gradleProperty('javaVersion').orNull
+if (javaVersion == null) {
+    throw new GradleException(
+        "The 'javaVersion' property is required but was not set. " +
+        "Define it in gradle.properties or pass -PjavaVersion=...")
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(javaVersion as int)
+    }
 }
 
 def monoDevRoot = providers.gradleProperty('org.pistonite.mono-dev-root').orNull
