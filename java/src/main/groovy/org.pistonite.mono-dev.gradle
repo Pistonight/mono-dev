@@ -1,0 +1,29 @@
+plugins {
+    id 'com.diffplug.spotless'
+    id 'net.ltgt.errorprone'
+}
+
+repositories {
+    mavenCentral()
+}
+
+def monoDevRoot = providers.gradleProperty('org.pistonite.mono-dev-root').orNull
+if (monoDevRoot == null) {
+    throw new GradleException(
+        "The 'org.pistonite.mono-dev-root' property is required but was not set. " +
+        "Define it in gradle.properties or pass -Porg.pistonite.mono-dev-root=...")
+}
+def eclipseFormatterConfig = rootDir.toPath()
+    .resolve(monoDevRoot).resolve('java/eclipse-formatter.xml').toFile()
+
+spotless {
+    java {
+        eclipse().configFile eclipseFormatterConfig
+        target 'src/**/*.java'
+    }
+}
+
+dependencies {
+    errorprone 'com.google.errorprone:error_prone_core:2.50.0'
+}
+
