@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'com.diffplug.spotless'
-    id 'net.ltgt.errorprone'
 }
 
 repositories {
@@ -36,7 +35,17 @@ spotless {
     }
 }
 
-dependencies {
-    errorprone 'com.google.errorprone:error_prone_core:2.50.0'
+// errorprone plugin can be opt-out for migrating old codebase
+def errorproneEnabled = providers.gradleProperty('org.pistonite.mono-dev-errorprone').getOrElse('true')
+if (!(errorproneEnabled in ['true', 'false'])) {
+    throw new GradleException(
+        "The 'org.pistonite.mono-dev-errorprone' property must be 'true' or 'false', " +
+        "but was '$errorproneEnabled'.")
+}
+if (errorproneEnabled == 'true') {
+    pluginManager.apply('net.ltgt.errorprone')
+    dependencies {
+        errorprone 'com.google.errorprone:error_prone_core:2.50.0'
+    }
 }
 
