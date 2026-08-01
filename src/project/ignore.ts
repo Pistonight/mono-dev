@@ -4,7 +4,7 @@ import path from "node:path";
 import type { PackageJson } from "#util";
 
 export const getIgnoreConfig = (packageJson: PackageJson, rootDir: string): string[] => {
-    let checkIgnoreLines: string[] = [];
+    let checkIgnoreLines: string[];
     try {
         const gitignore = fs.readFileSync(path.join(rootDir, ".gitignore"), "utf-8");
         checkIgnoreLines = gitignore

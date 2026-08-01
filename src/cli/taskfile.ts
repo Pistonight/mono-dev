@@ -2,7 +2,7 @@
 
 import fs from "node:fs";
 import { execSync } from "node:child_process";
-import YAML from "js-yaml";
+import { load as yamlLoad } from "js-yaml";
 
 import { logInfo, logWarn } from "#util";
 
@@ -100,7 +100,7 @@ function insert_desc(text: string, name: string, desc: string): string | null {
 function process_file(filepath: string): boolean {
     const text = fs.readFileSync(filepath, "utf8");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const doc = YAML.load(text) as any;
+    const doc = yamlLoad(text) as any;
     const tasks = doc?.tasks;
     if (!tasks || typeof tasks !== "object") return false;
 

@@ -83,11 +83,11 @@ export const runBuild = async (): Promise<number> => {
         logWarn("skipping dts since nodts is true");
     } else {
         const dtsStartTime = Date.now();
-        const useTsc = !!packageJson["pistonight/mono-dev"]?.tsc;
-        const tscBin = useTsc ? "tsc" : "tsgo";
-        if (useTsc) {
-            logWarn("warning: using tsc instead of tsgo for generating declarations");
-        }
+        // typedoc still needs typescript 6 API so we need to install
+        // the native preview package and use tsgo explicitly
+        // (if we install both typescript versions then both will be called
+        // tsc and we don't know what to do)
+        const tscBin = "tsgo";
         const tscResult = executeNode(tscBin, rootDir, ["-p", tsconfigModifiedPath]);
         if ("err" in tscResult) {
             logError("dts generation with tsc failed: " + tscResult.err);

@@ -14,7 +14,6 @@ import {
     getProjectLocations,
     logError,
     logInfo,
-    logWarn,
     MONO_DEV_PATH,
     type PackageJson,
 } from "#util";
@@ -35,8 +34,6 @@ export const runCheck = async (args: string[]): Promise<number> => {
     }
     genPrettierConfig(packageJson, rootDir);
 
-    const useTsc = !!packageJson["pistonight/mono-dev"]?.tsc;
-
     const fix = args.includes("--fix") || args.includes("-f");
     if (fix) {
         if (!runEslint(rootDir, cacheDir, fix)) {
@@ -45,11 +42,11 @@ export const runCheck = async (args: string[]): Promise<number> => {
         if (!runPrettier(rootDir, cacheDir, fix)) {
             return 51;
         }
-        if (!runTypeck(rootDir, useTsc)) {
+        if (!runTypeck(rootDir)) {
             return 31;
         }
     } else {
-        if (!runTypeck(rootDir, useTsc)) {
+        if (!runTypeck(rootDir)) {
             return 31;
         }
         if (!runEslint(rootDir, cacheDir, fix)) {
@@ -63,12 +60,13 @@ export const runCheck = async (args: string[]): Promise<number> => {
     return 0;
 };
 
-const runTypeck = (rootDir: string, useTsc: boolean): boolean => {
+const runTypeck = (rootDir: string): boolean => {
     const tscStartTime = Date.now();
-    const bin = useTsc ? "tsc" : "tsgo";
-    if (useTsc) {
-        logWarn("warning: using tsc instead of tsgo for typeck");
-    }
+    // typedoc still needs typescript 6 API so we need to install
+    // the native preview package and use tsgo explicitly
+    // (if we install both typescript versions then both will be called
+    // tsc and we don't know what to do)
+    const bin = "tsgo";
     const tscResult = executeNode(bin, rootDir, ["--build", "--pretty"]);
     if ("err" in tscResult) {
         logError("typeck failed!");
