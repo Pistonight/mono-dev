@@ -23,8 +23,6 @@ export interface MonoDevOptions {
     nocompile?: string[];
     /** additional exports to compile, the corresponding key in 'exports' should have import and type */
     compile?: Record<string, string>;
-    /** Use tsc instead of tsgo - for 6->7 transition if something breaks. Default tsgo will be used */
-    tsc?: boolean;
     /** Allow publishing (default false) */
     publish?: boolean;
     /**

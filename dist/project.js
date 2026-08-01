@@ -1,60 +1,91 @@
-import { _ as e, c as t, g as n, i as r, l as i, r as a, v as o, y as s } from "./plugins.js";
-import c from "node:fs";
-import l from "node:path";
-import u from "node:fs/promises";
-//#region src/project/exports.ts
-var d = (r, a, s = !1) => {
-	if (!a.exports) return { val: { exports: [] } };
-	if (typeof a.exports == "string") return { err: "'exports' must be the object form in order for types to be respected" };
-	if (a.types) return { err: "'types' field must not be specified in package.json; use exports.<entry>.types" };
-	let u = a.exports, d = new Set(a["pistonight/mono-dev"]?.nocompile || []), f = a["pistonight/mono-dev"]?.compile || {}, p = "./src/", m = [];
-	for (let a in u) {
-		if (d.has(a)) {
-			s && o(`skipping nocompile export '${a}'`);
+import { a as e, g as t, h as n, m as r, o as i, p as a } from "./plugins.js";
+import o from "node:fs";
+import s from "node:path";
+import c from "node:fs/promises";
+//#region src/util/json.ts
+var l = 4, u = (e) => d(e, 0), d = (e, t) => {
+	if (e == null) return "null";
+	switch (typeof e) {
+		case "string":
+		case "number":
+		case "boolean": return JSON.stringify(e);
+		case "object":
+			if (Array.isArray(e)) {
+				if (e.length === 0) return "[]";
+				if (e.length === 1) {
+					let n = d(e[0], t);
+					return n === void 0 ? "[]" : `[ ${n} ]`;
+				}
+				let n = "[\n", r = !1, i = " ".repeat(t);
+				for (let a = 0; a < e.length; a++) {
+					let o = d(e[a], t + l);
+					o !== void 0 && (r && (n += ",\n"), r = !0, n += i, n += " ".repeat(l), n += o);
+				}
+				return n += "\n", n += i, n += "]", n;
+			}
+			break;
+		default: return;
+	}
+	let n = Object.keys(e).sort();
+	if (n.length === 0) return "{}";
+	let r = "{\n", i = " ".repeat(t), a = !1;
+	for (let o = 0; o < n.length; o++) {
+		let s = d(e[n[o]], t + l);
+		s !== void 0 && (a && (r += ",\n"), a = !0, r += i, r += " ".repeat(l), r += JSON.stringify(n[o]), r += ": ", r += s);
+	}
+	return r += "\n", r += i, r += "}", r;
+}, f = (t, c, l = !1) => {
+	if (!c.exports) return { val: { exports: [] } };
+	if (typeof c.exports == "string") return { err: "'exports' must be the object form in order for types to be respected" };
+	if (c.types) return { err: "'types' field must not be specified in package.json; use exports.<entry>.types" };
+	let u = c.exports, d = new Set(c["pistonight/mono-dev"]?.nocompile || []), f = c["pistonight/mono-dev"]?.compile || {}, p = "./src/", m = [];
+	for (let c in u) {
+		if (d.has(c)) {
+			l && n(`skipping nocompile export '${c}'`);
 			continue;
 		}
-		let h = a;
-		if (a !== ".") {
-			if (!a.startsWith("./")) return { err: "entry name subpath must start with './'" };
-			if (h = a.substring(2), h.includes("/")) return { err: "too avoid over-complicated export paths, entry name cannot contain '/' other than the initial './'" };
+		let h = c;
+		if (c !== ".") {
+			if (!c.startsWith("./")) return { err: "entry name subpath must start with './'" };
+			if (h = c.substring(2), h.includes("/")) return { err: "too avoid over-complicated export paths, entry name cannot contain '/' other than the initial './'" };
 			if (h.includes(".")) return { err: "entry name cannot contain '.' other than the initial './'" };
 		}
-		let g = u[a];
+		let g = u[c];
 		if (typeof g != "string") {
 			let n = g.import;
-			if (!n) return { err: `object-type 'exports' must be have an 'import' (for entry point '${a}')` };
-			if (!n.startsWith("./dist/") || !n.endsWith(".js")) return { err: `object-type 'exports' .import must start with ./${t}/ and end with .js (for entry point '${a}')` };
-			let o = "./" + t + "/" + i + "/src" + n.substring(t.length + 2, n.length - 3) + ".d.ts", u = g.types;
-			if (u !== o) return { err: `object-type 'exports' .import=${n} must be have .types=${o} (for entry point '${a}')` };
-			let d = f[a];
-			if (!d) return { err: `object-type 'exports' must have the source specified in mono-dev 'compile' option (for entry point '${a}')` };
-			let p = l.join(r, d);
-			if (!c.existsSync(p)) return { err: `couldn't find extra compile source ${d} (for entry point '${a}')` };
-			s && e(`configured compile entry "${a}": ${d}`), m.push({
+			if (!n) return { err: `object-type 'exports' must be have an 'import' (for entry point '${c}')` };
+			if (!n.startsWith("./dist/") || !n.endsWith(".js")) return { err: `object-type 'exports' .import must start with ./${e}/ and end with .js (for entry point '${c}')` };
+			let a = "./" + e + "/" + i + "/src" + n.substring(e.length + 2, n.length - 3) + ".d.ts", u = g.types;
+			if (u !== a) return { err: `object-type 'exports' .import=${n} must be have .types=${a} (for entry point '${c}')` };
+			let d = f[c];
+			if (!d) return { err: `object-type 'exports' must have the source specified in mono-dev 'compile' option (for entry point '${c}')` };
+			let p = s.join(t, d);
+			if (!o.existsSync(p)) return { err: `couldn't find extra compile source ${d} (for entry point '${c}')` };
+			l && r(`configured compile entry "${c}": ${d}`), m.push({
 				entryName: h,
 				sourcePathAbs: p,
-				distPathRel: n.substring(t.length + 3),
-				distDtsPathRel: u.substring(t.length + 3)
+				distPathRel: n.substring(e.length + 3),
+				distDtsPathRel: u.substring(e.length + 3)
 			});
 			continue;
 		}
-		if (a.includes(" ")) return { err: `entry name must not contain space: '${a}'` };
-		if (a === "index") return { err: "entry name must not be \"index\", use \".\" instead" };
-		if (a === "_dts_") return { err: `entry name must not be "${i}"` };
+		if (c.includes(" ")) return { err: `entry name must not contain space: '${c}'` };
+		if (c === "index") return { err: "entry name must not be \"index\", use \".\" instead" };
+		if (c === "_dts_") return { err: `entry name must not be "${i}"` };
 		if (g.endsWith(".d.ts")) {
-			s && o(`skipping raw .d.ts export '${a}'`);
+			l && n(`skipping raw .d.ts export '${c}'`);
 			continue;
 		}
 		if (!g.match(/\.(c|m)?tsx?$/)) {
-			s && o(`skipping non-typescript export '${a}'`);
+			l && n(`skipping non-typescript export '${c}'`);
 			continue;
 		}
-		if (!g.startsWith(p)) return { err: `compiled export path must start with '${p}' (for entry point '${a}')` };
-		let _ = g.substring(6), v = l.join(r, g);
-		if (!c.existsSync(v)) return { err: `couldn't find compiled export source ${g} (for entry point '${a}')` };
-		s && e(`auto-configured entry "${a}": ${g}`);
+		if (!g.startsWith(p)) return { err: `compiled export path must start with '${p}' (for entry point '${c}')` };
+		let _ = g.substring(6), v = s.join(t, g);
+		if (!o.existsSync(v)) return { err: `couldn't find compiled export source ${g} (for entry point '${c}')` };
+		l && r(`auto-configured entry "${c}": ${g}`);
 		let y = _.lastIndexOf(".");
-		y === -1 && (n("unexpected: failed to get inSrcPath extension"), process.exit(1));
+		y === -1 && (a("unexpected: failed to get inSrcPath extension"), process.exit(1));
 		let b = _.substring(0, y) + ".js", x = i + "/src/" + _.substring(0, y) + ".d.ts";
 		m.push({
 			entryName: h,
@@ -64,69 +95,71 @@ var d = (r, a, s = !1) => {
 		});
 	}
 	return m.length ? { val: { exports: m } } : { val: { exports: [] } };
-}, f = (e, t) => {
-	let n = [];
+}, p = (e, t) => {
+	let n;
 	try {
-		n = c.readFileSync(l.join(t, ".gitignore"), "utf-8").split("\n").map((e) => e.trim()).filter(Boolean);
+		n = o.readFileSync(s.join(t, ".gitignore"), "utf-8").split("\n").map((e) => e.trim()).filter(Boolean);
 	} catch {
 		n = [];
 	}
 	let r = e["pistonight/mono-dev"]?.nocheck;
 	return r && n.push(...r), n;
-}, p = async (e, t) => {
+}, m = async (e, t) => {
 	let n = e["pistonight/mono-dev"] || {};
 	if ("importmap" in n && n.importmap === !1) return {};
-	let r = await m(l.dirname(l.resolve(t)));
-	return r.err ? r : await h(r.val, e, t);
-}, m = async (e) => {
-	let t = [], n = l.join(e, "src"), r = (e) => e.replace(/[\\/]+$/, "");
+	let r = await h(s.dirname(s.resolve(t)));
+	return r.err ? r : await g(r.val, e, t);
+}, h = async (e) => {
+	let t = [], n = s.join(e, "src"), r = (e) => e.replace(/[\\/]+$/, "");
 	try {
-		let e = await u.readdir(n);
+		let e = await c.readdir(n);
 		for (let i of e) {
 			let e = `${n}/${i}`;
-			c.statSync(e).isDirectory() && t.push([r(e), r(`src/${i}`)]);
+			o.statSync(e).isDirectory() && t.push([r(e), r(`src/${i}`)]);
 		}
 	} catch {}
 	let i = {}, a = /* @__PURE__ */ RegExp("^src/");
 	for (; t.length;) {
 		let e = t.pop();
 		if (!e) break;
-		let [n, o] = e;
+		let [n, s] = e;
 		try {
-			let e = await u.readdir(n), s = [];
+			let e = await c.readdir(n), l = [];
 			for (let t of e) {
 				let e = `${n}/${t}`;
 				if (t.match(/index\.(c|m)?tsx?$/)) {
-					i[o.replace(a, "#")] = `./${o}/${t}`, s = [];
+					i[s.replace(a, "#")] = `./${s}/${t}`, l = [];
 					break;
 				}
-				c.statSync(e).isDirectory() && s.push([r(e), r(`${o}/${t}`)]);
+				o.statSync(e).isDirectory() && l.push([r(e), r(`${s}/${t}`)]);
 			}
-			t.push(...s);
+			t.push(...l);
 		} catch {}
 	}
 	return { val: i };
-}, h = async (t, n, i) => {
-	let o = r(t, 4);
-	if (n.imports && r(n.imports, 4) === o) return e("subpath import mapping is up-to-date"), {};
-	let c = (await u.readFile(i, "utf-8")).trim(), l = c.split("\n").map((e) => e.trimEnd()), d, f, p;
-	if (d = l.indexOf("    \"imports\": {"), d !== -1) if (f = l.indexOf("    },", d + 1), f === -1) {
-		if (f = l.indexOf("    }", d + 1), f === -1) return { err: "failed to edit 'imports' in package.json: cannot find end of 'imports' field. Please delete the field manually and retry" };
+}, g = async (e, n, i) => {
+	let a = d(e, 4);
+	if (n.imports && d(n.imports, 4) === a) return r("subpath import mapping is up-to-date"), {};
+	let o = (await c.readFile(i, "utf-8")).trim(), s = o.split("\n").map((e) => e.trimEnd()), l, f, p;
+	if (l = s.indexOf("    \"imports\": {"), l !== -1) if (f = s.indexOf("    },", l + 1), f === -1) {
+		if (f = s.indexOf("    }", l + 1), f === -1) return { err: "failed to edit 'imports' in package.json: cannot find end of 'imports' field. Please delete the field manually and retry" };
 		p = !0;
 	} else p = !1;
-	else d = l.indexOf("    \"imports\": {}"), d === -1 ? (d = l.indexOf("    \"imports\": {},"), d === -1 ? (d = f = -1, p = !1) : (f = d, p = !1)) : (f = d, p = !0);
-	if (d === -1 && "imports" in n) return { err: "failed to edit 'imports' in package.json: cannot locate 'imports' field. Please delete the field manually and retry" };
+	else l = s.indexOf("    \"imports\": {}"), l === -1 ? (l = s.indexOf("    \"imports\": {},"), l === -1 ? (l = f = -1, p = !1) : (f = l, p = !1)) : (f = l, p = !0);
+	if (l === -1 && "imports" in n) return { err: "failed to edit 'imports' in package.json: cannot locate 'imports' field. Please delete the field manually and retry" };
 	let m;
-	if (d !== -1) {
-		let e = p ? "" : ",";
-		t ? l.splice(d, f - d + 1, `    "imports": ${o}${e}`) : l.splice(d, f - d + 1), m = s(l.join("\n"));
-	} else if (t) m = s((c.endsWith("}") ? c.substring(0, c.length - 1) : c).trimEnd() + `,\n    "imports": ${o}\n}`);
-	else return e("subpath import mapping is up-to-date"), {};
+	if (l !== -1) {
+		let n = p ? "" : ",";
+		e ? s.splice(l, f - l + 1, `    "imports": ${a}${n}`) : s.splice(l, f - l + 1), m = t(s.join("\n"));
+	} else if (e) {
+		let e = o.endsWith("}") ? o.substring(0, o.length - 1) : o;
+		m = t(e.trimEnd() + `,\n    "imports": ${a}\n}`);
+	} else return r("subpath import mapping is up-to-date"), {};
 	let h = { ...n };
-	t ? h.imports = t : delete h.imports;
-	let g = s(a(h) || "");
+	e ? h.imports = e : delete h.imports;
+	let g = t(u(h) || "");
 	try {
-		let e = s(a(JSON.parse(m)) || "");
+		let e = t(u(JSON.parse(m)) || "");
 		if (g !== e) return console.log({
 			expectedContent: g,
 			actualContent: e
@@ -134,9 +167,9 @@ var d = (r, a, s = !1) => {
 	} catch {
 		return { err: "failed to edit 'imports' in package.json: failed to edit 'imports': content is not valid JSON after editing. Please delete the field manually and retry" };
 	}
-	return await u.writeFile(i, m), t ? n.imports = t : delete n.imports, e("updated subpath import mapping"), {};
+	return await c.writeFile(i, m), e ? n.imports = e : delete n.imports, r("updated subpath import mapping"), {};
 };
 //#endregion
-export { f as n, d as r, p as t };
+export { u as i, p as n, f as r, m as t };
 
 //# sourceMappingURL=project.js.map
