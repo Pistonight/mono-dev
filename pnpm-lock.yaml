@@ -25,10 +25,10 @@ importers:
         version: 7.0.0-dev.20260707.2
       '@vitejs/plugin-react':
         specifier: ^6.0.5
-        version: 6.0.5(@rolldown/plugin-babel@0.2.3(@babel/core@8.0.1)(rolldown@1.2.1)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0)))(babel-plugin-react-compiler@0.0.0-experimental-a1856f3-20260507)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0))
+        version: 6.0.5(@rolldown/plugin-babel@0.2.3(@babel/core@8.0.1)(rolldown@1.2.1)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0))
       babel-plugin-react-compiler:
-        specifier: 0.0.0-experimental-a1856f3-20260507
-        version: 0.0.0-experimental-a1856f3-20260507
+        specifier: ^1.0.0
+        version: 1.0.0
       eslint:
         specifier: ^10.8.0
         version: 10.8.0
@@ -778,8 +778,8 @@ packages:
   atomically@2.1.1:
     resolution: {integrity: sha512-P4w9o2dqARji6P7MHprklbfiArZAWvo07yW7qs3pdljb3BWr12FIB7W+p0zJiuiVsUpRO0iZn1kFFcpPegg0tQ==}
 
-  babel-plugin-react-compiler@0.0.0-experimental-a1856f3-20260507:
-    resolution: {integrity: sha512-NH/o9ojGrQ5xQhkLry8KulKssfWuM68myEGVUpIJhExt1/WVWBOTBPSPGiSRoJtfB9yP8Kj4UXZpLXKFCXineg==}
+  babel-plugin-react-compiler@1.0.0:
+    resolution: {integrity: sha512-Ixm8tFfoKKIPYdCCKYTsqv+Fd4IJ0DQqMyEimo+pxUOMUR9cVPlwTrFt9Avu+3cb6Zp3mAzl+t1MrG2fxxKsxw==}
 
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
@@ -2456,13 +2456,13 @@ snapshots:
       '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260707.2
       '@typescript/native-preview-win32-x64': 7.0.0-dev.20260707.2
 
-  '@vitejs/plugin-react@6.0.5(@rolldown/plugin-babel@0.2.3(@babel/core@8.0.1)(rolldown@1.2.1)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0)))(babel-plugin-react-compiler@0.0.0-experimental-a1856f3-20260507)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0))':
+  '@vitejs/plugin-react@6.0.5(@rolldown/plugin-babel@0.2.3(@babel/core@8.0.1)(rolldown@1.2.1)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.2.0(@types/node@24.13.3)(yaml@2.9.0)
     optionalDependencies:
       '@rolldown/plugin-babel': 0.2.3(@babel/core@8.0.1)(rolldown@1.2.1)(vite@8.2.0(@types/node@24.13.3)(yaml@2.9.0))
-      babel-plugin-react-compiler: 0.0.0-experimental-a1856f3-20260507
+      babel-plugin-react-compiler: 1.0.0
 
   '@vitest/expect@4.1.10':
     dependencies:
@@ -2533,7 +2533,7 @@ snapshots:
       stubborn-fs: 2.0.0
       when-exit: 2.1.5
 
-  babel-plugin-react-compiler@0.0.0-experimental-a1856f3-20260507:
+  babel-plugin-react-compiler@1.0.0:
     dependencies:
       '@babel/types': 7.29.7
 
