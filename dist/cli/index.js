@@ -343,7 +343,7 @@ var T = (e) => {
 		let n = e[t];
 		if (typeof n != "string") continue;
 		let [r, i] = n.split("#", 2), a = r.toLowerCase();
-		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#f11465970d13486c48debd2f0faf37fd22f59110");
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#ed5221afd6da197e5bee573df5408e09518cbe1c");
 	}
 }, B = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
