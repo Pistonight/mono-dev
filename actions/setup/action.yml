@@ -198,7 +198,7 @@ runs:
         cmake-version: '4.x'
 
     - if: ${{ inputs.python == 'true' }}
-      uses: actions/setup-uv@v7
+      uses: actions/setup-python@v7
       with:
         python-version: '3.14'
     - if: ${{ inputs.python == 'uv' }}
