@@ -227,7 +227,6 @@ const DEFAULT_TSCONFIG = {
 
         /* === Lib Build Options */
         declaration: true,
-        declarationMap: true,
         emitDeclarationOnly: true,
 
         // TS 6->7 migration

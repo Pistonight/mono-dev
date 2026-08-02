@@ -67,6 +67,8 @@ export const runBuild = async (): Promise<number> => {
         theConfig.compilerOptions.tsBuildInfoFile = tsbuildinfo;
         theConfig.compilerOptions.noEmit = false;
         theConfig.compilerOptions.outDir = path.join(DIST, DTS);
+        const sourcemapOption = "sourcemap" in monoDevOptions ? !!monoDevOptions.sourcemap : true;
+        theConfig.compilerOptions.declarationMap = sourcemapOption;
         theConfig.exclude = ["**/*.test.ts", "**/*.test.mts", "**/*.test.cts", "**/*.test.tsx"];
         fs.writeFileSync(tsconfigModifiedPath, normalizeLineEnds(stringifySorted(theConfig) || ""));
     }
