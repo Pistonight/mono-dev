@@ -129,7 +129,6 @@ var T = (e) => {
 	noFallthroughCasesInSwitch: !0,
 	skipLibCheck: !0,
 	declaration: !0,
-	declarationMap: !0,
 	emitDeclarationOnly: !0,
 	stableTypeOrdering: !0
 } }, A = (e) => {
@@ -170,12 +169,16 @@ var T = (e) => {
 	let x = v.join(i, "tsconfig.src.json"), S = JSON.parse(_.readFileSync(x, "utf-8")), C = `${o}/tsconfig.src__${s}.tsbuildinfo`;
 	_.existsSync(C) && _.unlinkSync(C);
 	let w = p.nodts, T = v.join(i, "tsconfig.src__" + s + ".json");
-	w || (S.compilerOptions.tsBuildInfoFile = C, S.compilerOptions.noEmit = !1, S.compilerOptions.outDir = v.join(e, s), S.exclude = [
-		"**/*.test.ts",
-		"**/*.test.mts",
-		"**/*.test.cts",
-		"**/*.test.tsx"
-	], _.writeFileSync(T, t(f(S) || "")));
+	if (!w) {
+		S.compilerOptions.tsBuildInfoFile = C, S.compilerOptions.noEmit = !1, S.compilerOptions.outDir = v.join(e, s);
+		let n = "sourcemap" in p ? !!p.sourcemap : !0;
+		S.compilerOptions.declarationMap = n, S.exclude = [
+			"**/*.test.ts",
+			"**/*.test.mts",
+			"**/*.test.cts",
+			"**/*.test.tsx"
+		], _.writeFileSync(T, t(f(S) || ""));
+	}
 	let D = b ? l("vite", i, [
 		"build",
 		"--config",
@@ -343,7 +346,7 @@ var T = (e) => {
 		let n = e[t];
 		if (typeof n != "string") continue;
 		let [r, i] = n.split("#", 2), a = r.toLowerCase();
-		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#ed5221afd6da197e5bee573df5408e09518cbe1c");
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#e5b961f75a07390c48549f3dee6f6ee909a49e36");
 	}
 }, B = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
