@@ -13,8 +13,9 @@ const {
     MONODEV_TOOL_MDBOOK,
     MONODEV_TOOL_CARGO_BINSTALL,
     MONODEV_TOOL_CARGO_INSTALL,
-    // MONODEV_CCPP_LINT,
+    MONODEV_CCPP_LINT,
     MONODEV_CCPP_CMAKE,
+    MONODEV_PYTHON,
 } = process.env;
 
 const bool = (value) => {
@@ -163,7 +164,7 @@ if (MONODEV_RUST_NATIVE) {
 // C/C++ tooling
 const CCPP_VERSION = "22";
 const ccpp_cmake = bool(MONODEV_CCPP_CMAKE);
-const ccpp_lint = ccpp_cmake || bool(MONODEV_CCPP_CMAKE);
+const ccpp_lint = ccpp_cmake || bool(MONODEV_CCPP_LINT);
 
 let ccpp_lint_clang_format = "";
 let ccpp_lint_clang_tidy = "";
@@ -184,6 +185,8 @@ if (ccpp_lint) {
     ccpp_lint_clang_tidy = `clang-tidy-${CCPP_VERSION}_${platform}${ccpp_lint_ext}`;
 }
 
+let python = MONODEV_PYTHON === "uv" ? "uv" : !!MONODEV_PYTHON;
+
 writeGitHubOutput({
     setup_node,
     node_cache,
@@ -202,4 +205,6 @@ writeGitHubOutput({
     ccpp_cmake,
     ccpp_lint_clang_format,
     ccpp_lint_clang_tidy,
+
+    python,
 });

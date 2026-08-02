@@ -1,7 +1,8 @@
 # Tooling and Templates
 
-This section covers 2 things:
-- Tooling: Introduces in detail tooling used for each type of projects in the Standard.
-- Templates: Guide for quickly stand up a package (copy-paste sections).
+> [!NOTE]
+> This chapter is mainly documentation for myself as a single source of truth
+> for configurations.
+> 
+> If you are looking for setup documentation, see [Standard](./standard.md)
 
-Templates are mainly documentation for myself.

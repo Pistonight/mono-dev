@@ -1,143 +1,95 @@
 # System Tools
 
-TLDR - 
-- System tools: GNU, `task`
-- Rust: `cargo`
-- ECMA: `node`, `pnpm` and `bun`
-- Python: `uv`
-- C/C++: `cmake`, `ninja`, `clang`, `clangd`, `clang-format` and `clang-tidy`
+The system tools are expected to be installed and available globally on your system
+(i.e. in `PATH`).
 
-## Operating System
-My projects are usually not OS-specific. I daily drive Windows and do my
-development stuff on Linux, sometimes Windows as well. Therefore,
-these standards aim to support both development on Windows and Linux.
+1. **Operating System**: Linux is preferred. Most projects also work with Windows.
+   Most projects should also work with MacOS but they are not tested.
+2. **GNU Utils**: Coreutils like `cp`, `rm`, `mkdir` should be available
+   although they are not required for every project. For Windows users
+   please use [Microsoft fork of uutils/coreutils](https://github.com/microsoft/coreutils/)
 
-However, cross-platform build scripts are PAIN. The Standard transfers
-that pain to the developer by assuming the System Tools already exists
-in `PATH`. These tools are usually cross-platform, so scripts don't
-need to deal with platform-specific commands.
+    > [!WARNING]
+    > The Microsoft version of coreutils is still an early product and has some
+    > rough edges. It also requires some complicated powershell integration.
+    > If you have to work on Windows, it's recommended to test if the project
+    > already works without Coreutils, or use Windows Subsystem for Linux directly.
 
-> [!TIP]
-> On Windows, the easiest way to meet the requirements is to install WSL,
-> then install the tools inside WSL.
+   Some other utils like `find`, `xargs`, `sed`, `wget`, `grep` might be needed for some projects.
+3. **Task Runner**: Please install the latest version of [`task`](https://taskfile.dev).
+   This is a great cross-platform script runner 
+    > [!NOTE]
+    > This is a great cross-platform script runner with an implementation of coreutils
+    > built-in, which is the reason why Windows don't usually need Coreutils unless for compatibility
+    > reason).
+    > It's also a great way to make the build system consistent across languages - 
+    > instead of scripts in `package.json` which would only work with the NPM ecosystem,
+    > every project has a `Taskfile.yml` which works regardless of the language/ecosystem.
+4. **Git submodule manager**: For projects with submodules it's recommended
+   to use [`magoo`](https://github.com/Pistonite/magoo), which is a wrapper
+   for `git submodule`. If you are a veteran of git-submodule commands you can
+   also run
+    > [!NOTE]
+    > If you are a veteran of git-submodule commands, you can also opt to run
+    > the git-submodule commands directly.
+    >
+    > Magoo offers an interface more like a modern package manager (such as `npm` or `cargo`);
+    > Most contributors just need to run `magoo install` when they `git pull` to checkout
+    > the submodules.
 
-## GNU Utils
-GNU Coreutils like `cp`, `rm`, `mkdir` should be available on the system.
-The build scripts will almost always use these.
 
-Other GNU utils like `sed`, `wget` might be needed for some projects.
+In addition to the general system tools, please setup the language-specific
+tool depending on the project you are working on. Some projects use
+multiple languages and you will need to have all of them installed.
 
-## Task Runner
-Install [`task`](https://taskfile.dev/), the command runner to run, well, tasks.
+## Rust
+For Rust projects:
+- Install Rust (recommended through [`rustup`](https://rustup.rs))
+- Windows users would need to install MSVC dependencies, please follow the guide
+  on the Rustup download page.
+- Projects may require additional tools that are written in Rust.
+  Run `task install-cargo-extra-tools` or `task icets` for short from the repo root.
+- `rust-analyzer` is the official language server. Install the `rust-analyzer`
+  extension in VS Code, or if you use another editor, the corresponding extension/plugin
+  for that editor for Rust Analyzer.
 
-This is technically not always required, if you are willing to copy commands
-from `Taskfile.yml` to the terminal every time you want to run something.
 
-Reason:
-- Every project has some task runner, whether it is `npm` for ECMAScript/TypeScript
-  projects, some `.sh` scripts in a `scripts` folder, or some `.md` doc that
-  tells you what commands to run.
-- The problems with each of those approaches are:
-  - `npm`: not language-agnostic. I don't want to install `node` for Rust projects, for example
-  - `.sh`: not platform-agnostic. I don't want to gate-keep devs that only use Windows from contributing
-  - documentation: Inconvenient. I don't want to copy command every time I want to execute them
-- I have used [`just`](https://github.com/casey/just) before switching to `task`.
-  It's a command runner written in Rust. The main thing lacking is ability to run
-  tasks in parallel and it uses a DSL. `task` on the other hand uses YAML.
-
-Tasks replaces the scripting system in other package managers. For example
-instead of `npm run test`, you would run `task test`.
-
-## Package Manager(s)
-Modern ecosystems have package managers, like `node_modules` for JS or crates for Rust.
-However, I need something outside of these to enable dependency management in monorepos
-with multiple languages. The solution might be surprising - git modules!
-
-With git modules, arbitrary git repositories can be integrated as a member in the monorepo,
-then integrated with ecosystem-specific package managers like `pnpm` or `cargo`.
-For these tools, the package appears to be a local dependency, but for `git`, it's an external dependency.
-
-I made a wrapper for `git submodule` called [`magoo`](https://github.com/Pistonite/magoo) to streamline
-the process of updating submodules. (Rust needed for installation)
-
-## Rust Toolchain
-> [!NOTE]
-> The Version (or MSRV - Minimum Supported Rust Version) for the standard,
-> is always the latest stable release of Rust. Projects will also begin
-> to be migrated to the latest edition of Rust as soon as it's released.
->
-> Specific projects might require nightly features.
-
-The Rust Toolchain is needed not only for Rust projects, but also to install
-various tools from `crates.io` - Rust's public registry.
-
-You can install Rust from [rustup.rs](https://rustup.rs) or from your distro's package
-manager.
-
-> [!WARNING]
-> Windows users need to first install MSVC, which is included in the Visual Studio Build Tools (VSBT).
-> This does not apply if you are using WSL.
->
-> You can either:
-> 1. Follow the installation in the [Rustup Book](https://rust-lang.github.io/rustup/installation/windows-msvc.html),
->    which has a step-by-step walkthrough with images, but installs the whole Visual Studio IDE, or:
-> 2. Download and install just the build tools from [Microsoft](https://aka.ms/vs/17/release/vs_BuildTools.exe)
->
-> Either way, be sure to select the latest `MSVC vXXX - VS XXXX C++ x64/x86` and `Windows 11 SDK` components
-> when installing.
-
-For projects, the root should define a task called `install-cargo-extra-tools`
-with the alias `icets` to invoke `cargo install` for all tools needed
-for the most common development workflows. This serves as a documentation
-for what cargo tools are needed for the project.
-
-Most of the time, a Rust Toolchain is also the only thing you need
-to work on a Rust project, thanks to `cargo` also being a linter and formater for Rust.
-
-## ECMAScript ecosystem
-> [!NOTE]
-> The current NodeJS version in the standard is v22
-
-NodeJS is basically still the source of truth for the industry.
-You can install it from [NodeJS.org](https://nodejs.org), from your distro's package manager,
-or use [NVM](https://github.com/nvm-sh/nvm) (or [NVM-Windows](https://github.com/coreybutler/nvm-windows) for windows).
-
-There are 2 additional tools needed globally:
-- `pnpm` - the package manager that works better with monorepos
-- `bun` - sometimes bun is nice for bundling everything without transpilation and weird module resolution quirks.
-
-Both of these tools should always be updated to the latest version.
-Fortunately, this is very easy with NPM:
-```
-npm i -g pnpm bun
-```
-> [!WARNING]
-> If you are using NVM or other version managers, the global packages
-> are usually tied to the node version.
-
-Other JS ecosystem tools used in development are managed as node dependencies,
-so they will automatically be installed local to the project.
-
-## Python
-[`uv`](https://docs.astral.sh/uv/) is used for Python management.
-Currently, no production Python project exists. So this part of the Standard
-has not been developped.
+## TypeScript/ECMAScript/JS
+For TypeScript/ECMAScript (aka JS) projects:
+- Install NodeJS **v24**. You should use a node version manager in most cases.
+  Some projects may use an older version if they are not maintained for a long time.
+- Install PNPM. Usually the latest version is used, but it might lag behind
+  when a new version comes out and the project is not actively maintained.
+- Some projects may also need [Bun](https://bun.com/docs/installation).
+- Install TypeScript and ESLint extension for VS Code, or if you use another editor,
+  the corresponding TypeScript extension/plugin for that editor (only the official
+  compiler `tsc` is supported).
 
 ## C/C++
-The Standard for C/C++ tooling is experimental, as it differs a lot
-between Linux and Windows. There's also not an industry standard for packages.
+For C or C++ projects:
+- Install [CMake](https://cmake.org/download/)
+- Install [Ninja](https://github.com/ninja-build/ninja). This is especially needed for Windows
+  to generate build commands for `clangd`
+- Install a C compiler. For Windows this usually means you need MSVC (from Visual Studio Build Tools).
+  Sometimes you need the GNU toolchain for Windows instead, one option is [LLVM-MINGW](https://github.com/mstorsjo/llvm-mingw)
+- Install `clang-format` and `clang-tidy` from the LLVM toolchain. For Windows you can
+  download from the [`official LLVM release`](https://github.com/llvm/llvm-project/releases/tag/llvmorg-22.1.8)
+- Install the `clangd` extension for VS Code (NOT the official C/C++ extension).
+  For other editor please install the corresponding `clangd` extension/plugin for that editor.
 
-Projects will most likely use `clang-format` for formatting and `clangd` for LSP.
-For build system, it will probably be `cmake` or `ninja`.
+## Java
+For Java projects:
+- A decently modern JDK is expected to be installed on the system to run Gradle.
+  You don't need to install the exact version the project uses because Gradle will handle that.
+  A JDK installed through a version manager like `jabba` will also work.
+- My version of [gradlew](https://github.com/Pistonite/gradle-wrapper) which
+  does not require `jar` files in the repo (Read more in the link for the security
+  concerns of that).
+- I have a [very custom LSP setup with JDTLS and Neovim](https://github.com/Pistonite/shaft/blob/main/packages/registry/src/packages/nvim/config/piston-jdtls.nvim/lua/piston_jdtls/init.lua)
+  but any editor that can work with a Gradle project should work.
 
-## Other Languages
-No Standard exists for these languages first, as I don't have projects in-production
-that use them. However, I am side-eyeing these and may look into it in the future
-- Go
-- Zig
 
-## Docker
-Usually, docker is only used for my project if a server is needed.
-Even for those projects, there is a good chance the local development workflow
-does not need docker.
+## Python
+For Python projects or projects that contain python scripts:
+- Install [`uv`](https://docs.astral.sh/uv/)
 

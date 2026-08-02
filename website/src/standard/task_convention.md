@@ -1,98 +1,63 @@
 # Task Convention
 
 This section defines a convention for task names, such as 
-`check`, `test`, `build`.
+`check`, `test`, `build`. This way, commands are mapped to mental
+tasks in developers' brains and the same commands work everywhere.
 
-Note that these are just a recommendation, not a limitation.
-Names outside of the ones defined here can still be used.
 
-## Task Description
-`task` has a feature where a task can be given a description. Only
-tasks that have description will show up when you `task --list`
+## `setup`/`install-cargo-extra-tools`
+The `setup` task defines one-time setup on the system. such as pulling
+large data or installing extra tools. It's meant to only run once when you clone
+the repo and not have to run when updating the repo with `git pull`.
 
-```yaml
-tasks:
-  check:
-    desc: Check for issues
-    cmds:
-      - cargo check
-```
+`install-cargo-extra-tools` (aliased `icets`) is a special setup task that installs
+`cargo-binstall` and other `cargo-install`-able tools needed for development on the system.
 
-Because of the Convention, common task names like `check` and `fix`
-don't need to have their description repeated. Developers should
-expect when they run `check`, a set of linters will run.
 
-## Suffixes
-If there are multiple of one type of task, such as `install`ing multiple
-things. The tasks should be defined with a suffix after `-`. For example
-`install-deps`
 
-## Tasks
+## `install`
+The `install` task installs dependencies, syncs dependencies, and setups the package
+(like post-install hooks in some ecosystem).
 
-#### `list` and `exec` (`x`)
-The root level of a monorepo has `list` and `exec` tasks:
-- `list`: List the tasks of the root level or of a package
-- `exec`: Execute a task from a package
+Usually this delegates to installing dependencies with a package manager like `pnpm`.
+If no `install` task is present, it means no special install logic is needed.
+Either install the project like other projects (for example run `pnpm install` directly
+like a regular JS project), or no installing is needed (for example running `cargo build`
+or `uv run` will install the dependencies automatically).
 
-See [Common tooling](./tool_common.md) for how these tasks are defined.
+## `dev`
+The `dev` task is for the inner-most loop development workflow. For example,
+it can be starting a dev server for a watch-build-serve loop, or it can start
+a watch-build-test loop for non-UI projects.
 
-#### `install`
-At the root level, the `install` task should be defined to download
-external dependencies, and make changes to the downloaded packages (a step
-typically known as post-install hooks.
+## `test`
+The `test` task runs all the tests in the project. Sometimes there will be multiple
+parts of the test runnable through suffixes like `test-lib`, `test-e2e`, etc.
 
-At package level, the `install` task can have the same functionality as a
-post-install hook. Essentially, it is the script to run to setup the package
-for local development.
+## `check`
+The `check` task runs linters and formatters to check code quality.
+Run this before making a commit or Pull Request.
 
-This pattern is common at the root level:
-```yaml
-tasks:
-  install:
-    cmds:
-      - magoo install
-      - pnpm install
-      - task: post-install
-  install-ci:
-    cmds:
-      - pnpm install --frozen-lockfile
-      - task: post-install
-  post-install:
-    cmds:
-      - task: my-package:install
-```
+> [!NOTE]
+> Some people may prefer check/fix to automatically run when they save a file or
+> when commiting (known as a pre-commit hook). This is not done for many reasons:
+>
+> 1. Some checkers/formatters such as gofmt are really aggressive and touches the file
+>    in a way that slows the workflow. For example it may remove unused imports/variables.
+>    This means you have to write some code that use the import/variable before you can save.
+> 2. Consistency and performance: not all ecosystems provide performant formatters and linters,
+>    I don't like the feeling when my editor is stuck when I try to save my work.
+> 3. Git hooks have well-known security issues and they also slow down the workflow.
+     For example commiting becomes slow because it has to run all the checks. This does
+     not make sense for the scale of my projects.
 
-The root should also define a `install-cargo-extra-tools` tasks
-to install the necessary development tools that can be installed with `cargo`
+## `fix`
+Fixs the issues found with `check` automatically. This should always fix all formatting issues.
+Some issues are not mechanically fixable (or the recommended fix doesn't always make sense).
+Manual fix is required in those cases.
 
-#### `pull`
-Like `install`, `pull` indicates downloading data externally. `pull`
-should be used for things that only needs to be setup once (or infrequently).
-These typically include assets, data packs or generated files stored outside of the repo.
 
-#### `push`
-This is the opposite of `pull` - Uploading assets, data packs or generated files to external location.
-
-A related task is `git-push`, typically used in atomrepos to set the correct remote address before calling `git push`
-
-#### `dev`
-The `dev` task starts the most common inner-loop development workflow.
-This is typically used for running a process that watches for changes and re-build/re-test
-the code.
-
-#### `check`
-Checks for code issues with linter/formater. Even though `build`
-may still check the code internally in the compilers. `check` is not meant to emit any files (unlike `build`)
-
-#### `fix`
-Fixs the issues found with `check` automatically. This should always
-include automatically fixing all formatting issues.
-
-#### `test`
-Run the tests. This sits somewhere in between `check` and `build`, as `check` is most often
-static checks. `test` however should actually run the code and run assertion on the outcome.
-
-#### `build`
-Build should produce assets to be used outside of this package. Note the word *outside*.
-A task that generates code for use within the package should be part of `install`, not `build`
+## `build`
+The build task produces some artifacts to be published or used outside of the package.
+This task can also be used as a baseline for the package to "work" (i.e. not broken).
 

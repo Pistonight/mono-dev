@@ -1,18 +1,33 @@
-# The `mono-dev` Standard
+# The Standard
 
-> [!NOTE]
-> This section contains important information about working on projects that
-> follows the standard. Please read it all and do the setup necessary if 
-> you are directed here by contributing guides of my projects.
 
-The `mono-dev` standard consists of:
-- Tools (i.e. binaries) that must be available globally on the system
-  and callable from the command line.
-  - Project-specific tools, like build scripts, are not included
-- Project structure
-- Name convention for build tasks (like `check`, `test`, `fix`, `build`)
-- Shared configurations and wrappers that invokes the tools with configurations
+Please follow these steps to setup a project locally for development.
 
-The last point - shared configurations, are covered by chapters in the rest of the book:
-- Copy-paste instruction for setting up frameworks
-- Instruction for setting up CI pipelines
+## Read the Guidelines
+Ensure you have read the [Contributing Guidelines](./standard/pr_guidelines.md) prior
+to setting up the project.
+Contributing to the project assume you have agreed to everything in the guidelines.
+
+## Prerequisite
+
+> [!IMPORTANT]
+> I assume you are familiar with basic workflows for programming and working
+> with version control software (i.e. `git`). If not, my projects are not the place
+> for you to make your first contribution.
+
+Please ensure you:
+1. Know how to run things from a terminal/command line
+2. Have `git` installed and know the basic git workflows (clone, commit, push, Pull Request)
+3. Have a working editor that supports the Language Server Protocol (LSP). For most people
+   this would be [Visual Studio Code](https://code.visualstudio.com/download)
+
+
+## Setting up your development environment
+
+1. Ensure you have the prerequisites above.
+2. Setup the [System Tools](./standard/tools.md)
+3. Setup the language-specific tools by following the additional sections below the System Tools page,
+   for the language(s) used by the project.
+4. Understand the [Project structure](./standard/project_structure.md) and [Task Convention](./standard/task_convention.md)
+5. If the project is complicated, follow the setup guide in the project to finish setting up the project (install dependencies, build, etc).
+   For simple projects the task convention covers everything (like `task check`, `task build`, `task test`).

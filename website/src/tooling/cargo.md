@@ -1,5 +1,11 @@
 # Rust (Cargo)
 
+> [!NOTE]
+> This chapter is mainly documentation for myself as a single source of truth
+> for configurations.
+> 
+> If you are looking for setup documentation for Rust, see [here](../standard/tools.html#rust)
+
 ## Tools
 Rust projects use:
 - `rustfmt` for formatting
@@ -18,6 +24,7 @@ includes:
   cargo:
     taskfile: mono-dev/task/cargo.yaml
     internal: true
+    optional: true
 
 tasks:
   check:

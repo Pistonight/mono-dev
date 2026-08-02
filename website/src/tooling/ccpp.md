@@ -1,11 +1,12 @@
 # C/C++
 
-C/C++ codebase will typically have its own build system. `mono-dev`
-on the other hand, ships the formatting config
-
-## Check and Fix
 > [!NOTE]
-> `fd` and `clang-format` are required
+> This chapter is mainly documentation for myself as a single source of truth
+> for configurations.
+> 
+> If you are looking for setup documentation for C/C++ projects, see [here](../standard/tools.html#cc)
+
+#### Template: `Taskfile.yml`
 
 ```yaml
 version: '3'
@@ -14,10 +15,12 @@ includes:
   ccpp:
     taskfile: ../mono-dev/task/ccpp.yaml
     internal: true
+    optional: true
 
 tasks:
   check:
     cmds:
+      - task: ccpp:clang-tidy
       - task: ccpp:fmt-check
 
   fix:

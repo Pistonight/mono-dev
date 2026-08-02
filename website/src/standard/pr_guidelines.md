@@ -2,6 +2,10 @@
 
 These guidelines apply to all of my projects
 
+## Contributor License Agreement
+> [!IMPORTANT]
+> By submitting code, documentation, or any other contributions to this project, you agree that your contributions are provided under the same license as the project, and you grant the project maintainers and users the rights necessary to use, modify, distribute, and sublicense your contributions in accordance with that license.
+
 ## Code of Conduct
 There is no official Code of Conduct in the Standard. Be reasonable and respectful.
 

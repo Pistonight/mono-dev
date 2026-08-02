@@ -1,5 +1,11 @@
 # GitHub Actions
 
+> [!NOTE]
+> This chapter is documentation for myself.
+>
+> You do not need to modify workflows when contributing (including bumping versions).
+> Please understand that all PRs that touch `.github` will be closed for supply-chain security.
+
 Since the development activity is on GitHub, I use GitHub Actions
 to run CI. I use runners from [Blacksmith](https://app.blacksmith.sh/)
 to speed up some hot workflows.

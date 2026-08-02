@@ -50,6 +50,9 @@ inputs:
   ccpp-cmake:
     description: Setup CMake
     default: false
+  python:
+    description: Setup python or UV for python projects
+    default: false
 
 runs:
   using: composite
@@ -98,6 +101,7 @@ runs:
         MONODEV_TOOL_CARGO_INSTALL: ${{ inputs.tool-cargo-install }}
         MONODEV_CCPP_LINT: ${{ inputs.ccpp-lint }}
         MONODEV_CCPP_CMAKE: ${{ inputs.ccpp-cmake }}
+        MONODEV_PYTHON: ${{ inputs.python }}
 
 
     - if: ${{ inputs.ecma-pnpm == 'true' }}
@@ -192,6 +196,15 @@ runs:
       uses: jwlawson/actions-setup-cmake@v2
       with:
         cmake-version: '4.x'
+
+    - if: ${{ inputs.python == 'true' }}
+      uses: actions/setup-uv@v7
+      with:
+        python-version: '3.14'
+    - if: ${{ inputs.python == 'uv' }}
+      uses: astral-sh/setup-uv@v9
+      with:
+        python-version: '3.14'
 
     - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'pnpm' }}
       run: pnpm install --frozen-lockfile

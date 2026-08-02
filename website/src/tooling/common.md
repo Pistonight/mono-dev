@@ -1,16 +1,10 @@
 # Common
 
-## Common Tasks
-Each monorepo has 2 common tasks in the root: `list` and `exec`.
-
-The usage is
-```
-task list                     # same as task --list
-task list -- <package>        # list tasks from <package>
-task exec -- <package>:<task> # execute <task> in <package>
-```
-
-The alias for `list` is `ls` and for `exec` is `x`
+> [!NOTE]
+> This chapter is mainly documentation for myself as a single source of truth
+> for configurations.
+> 
+> If you are looking for setup documentation, see [Standard](./standard.md)
 
 #### Template: root `Taskfile.yml`
 

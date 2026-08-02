@@ -1,37 +1,38 @@
 # Motivation
 
+> [!IMPORTANT]
+> Welcome to `mono-dev` - my personal standard for all my projects.
+> 
+> Continue here if you are interested in the motivation. Otherwise if you are
+> looking to contribute to a project of mine, proceed to [Standard](./standard.md)
+> to understand the repo structure and tooling I use.
+
 After creating so many projects across many different languages
 (primarily Rust, TypeScript, JavaScript, Python, and C/C++),
 I started to have this internal configuration hell, where
 I constantly copy build scripts, `package.json`, CI configs,
 linter rules, etc, between projects. 
 
-The worst part is, things change. so the "source of truth"
+The worst part is - things change. So, the "source of truth"
 of these configs is basically what project I am currently working
-on. These means I never "backport" these improvements to older projects.
-When I do need to upgrade other projects to "newer" standards,
-I again have to remember which project has the latest standard,
-and copy from that.
+on. These means I either never "backport" these improvements to older projects
+or it's a very tedious process when I do so - as I have to copy all the configurations
+from a newer project to an older project and wire up everything properly.
 
-In the past, I don't often switch between projects. Maybe once or twice
-per year. However, another problem started to surface as I created
-more and more projects based on TypeScript/Web tech stacks.
-Recently I have even started using [`bun`](https://bun.sh) to run TypeScript on the server,
-while 5 years ago I would be disgusted at the idea of running anything
-other than blazing fast, optimized, compiled languages on the server (I was a junior
-back then). 
-
-As I make these projects, common pattern/code emerge.
-At some point, I started creating these internal libraries that 
-all my projects would depend on. One of the example is [`pure`](https://pure.pistonite.dev),
+This was toleratable in the past when I didn't have many projects,
+maybe one new project per year. However, as I make more and more projects
+faster and faster, common pattern/code emerge. At some point, I started creating 
+these internal libraries that all my projects would depend on. 
+One of the example is [`pure`](https://pure.pistonite.dev),
 a pure-TypeScript library to bootstrap a web application with dark mode,
 multi-languages, `Result` type, etc. Now, I not only have a configuration
 hell, I also have my internal dependency hell!!
 
-The solution might be simple if I only write Rust code, or TypeScript code,
-as basically that's what package managers do. However,
-keep in mind that I work with multiple language and ecosystems,
-often in the same project. For example, my 
+If I only ever work with one language, say Rust or TypeScript, this might be simple
+to solve - create a dev dependency that contains all my build configurations
+and common code and publish it to whatever package registry the ecosystem uses.
+However, I often work in multiple languages and ecosystems in the *same* project.
+For example, my 
 [`Breath of the Wild Weapon Modifier Corruption Database`](https://github.com/Pistonite/botw-recipe)
 project, had:
 - Python for processing BOTW data and generating source code, along with other scripts

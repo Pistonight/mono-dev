@@ -1,5 +1,11 @@
 # TypeScript/ECMA
 
+> [!NOTE]
+> This chapter is mainly documentation for myself as a single source of truth
+> for configurations.
+> 
+> If you are looking for setup documentation for TypeScript, see [here](../standard/tools.html#typescriptecmascriptjs)
+
 ## Tools
 TypeScript projects use:
 - `prettier` for formatting
