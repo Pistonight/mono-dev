@@ -84,6 +84,7 @@ var p = { rules: {
 	}), h());
 }, h = () => ({
 	"@typescript-eslint/no-unused-vars": ["warn", {
+		args: "all",
 		varsIgnorePattern: "^_",
 		argsIgnorePattern: "^_"
 	}],

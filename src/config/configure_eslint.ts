@@ -91,7 +91,11 @@ const getDefaultOverrides = (): Linter.RulesRecord => {
         // typescript has coverage already
         "@typescript-eslint/no-unused-vars": [
             "warn",
-            { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
+            {
+                args: "all",
+                varsIgnorePattern: "^_",
+                argsIgnorePattern: "^_",
+            },
         ],
         "@typescript-eslint/restrict-template-expressions": ["warn", { allowNumber: true }],
         // we have TypeScript
