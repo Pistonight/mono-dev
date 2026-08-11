@@ -32,9 +32,6 @@ importers:
       eslint:
         specifier: ^10.8.1
         version: 10.8.1
-      eslint-plugin-react-compiler:
-        specifier: 0.0.0-experimental-6cef588-20250815
-        version: 0.0.0-experimental-6cef588-20250815(eslint@10.8.1)
       eslint-plugin-react-hooks:
         specifier: ^7.1.1
         version: 7.1.1(eslint@10.8.1)
@@ -53,9 +50,6 @@ importers:
       typedoc:
         specifier: ^0.28.20
         version: 0.28.20(typescript@6.0.3)
-      typedoc-theme-oxide:
-        specifier: ^0.3.0
-        version: 0.3.0(typedoc@0.28.20(typescript@6.0.3))
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -87,9 +81,15 @@ importers:
       '@types/which':
         specifier: ^3.0.4
         version: 3.0.4
+      eslint-plugin-react-compiler:
+        specifier: 0.0.0-experimental-6cef588-20250815
+        version: 0.0.0-experimental-6cef588-20250815(eslint@10.8.1)
       rolldown:
         specifier: ^1.2.1
         version: 1.2.1
+      typedoc-theme-oxide:
+        specifier: ^0.3.0
+        version: 0.3.0(typedoc@0.28.20(typescript@6.0.3))
       which:
         specifier: ^7.0.0
         version: 7.0.0

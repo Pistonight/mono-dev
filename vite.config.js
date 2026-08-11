@@ -8,7 +8,12 @@ export default configure({
             output: {
                 // generate files without hash to minimize diffs
                 // when publishing through git
-                chunkFileNames: "[name].js",
+                chunkFileNames: () => {
+                    // if (facadeModuleId?.includes("shikijs") || moduleIds.some((x) => x.includes("shikijs"))) {
+                    //     return "deps/shikijs/[name].js";
+                    // }
+                    return "[name].js";
+                },
             },
         },
     },

@@ -133,6 +133,7 @@ export const patchUserConfigWithMonodev = (_env: ConfigEnv, config: UserConfig) 
         // is because the list could be different depending on the runtime
         // that is used to build the package
         const COMMON_OLD_FORMAT_NODE_MODULES = [
+            "assert",
             "buffer",
             "child_process",
             "crypto",
@@ -141,10 +142,15 @@ export const patchUserConfigWithMonodev = (_env: ConfigEnv, config: UserConfig) 
             "http",
             "http2",
             "https",
+            "inspector",
+            "module",
             "os",
             "path",
             "path/posix",
             "path/win32",
+            "url",
+            "util",
+            "zlib",
         ];
         externals.push(...COMMON_OLD_FORMAT_NODE_MODULES);
         // to suppress node builtin modules not included here user would need
