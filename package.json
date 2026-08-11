@@ -1,6 +1,6 @@
 {
   "name": "mono-dev",
-  "version": "0.4.26",
+  "version": "0.4.27",
   "description": "NPM module for mono-dev utilities",
   "type": "module",
   "dependencies": {
@@ -12,14 +12,12 @@
     "@vitejs/plugin-react": "^6.0.5",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^10.8.1",
-    "eslint-plugin-react-compiler": "0.0.0-experimental-6cef588-20250815",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.9.0",
     "js-yaml": "^5.2.3",
     "jsdom": "^30.0.1",
     "typedoc": "^0.28.20",
-    "typedoc-theme-oxide": "^0.3.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.66.0",
     "vite": "^8.2.1",
@@ -33,11 +31,15 @@
     "@types/node": "^24.13.3",
     "@types/which": "^3.0.4",
     "rolldown": "^1.2.1",
-    "which": "^7.0.0"
+    "which": "^7.0.0",
+    "typedoc-theme-oxide": "^0.3.0",
+    "eslint-plugin-react-compiler": "0.0.0-experimental-6cef588-20250815"
   },
   "bin": {
     "vite": "./bin/vite.js",
     "vitest": "./bin/vitest.js",
+    "eslint": "./bin/eslint.js",
+    "tsc": "./bin/tsc.js",
     "mono": "./bin/mono.js"
   },
   "files": [

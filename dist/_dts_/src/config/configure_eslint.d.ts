@@ -8,4 +8,3 @@ export interface EslintConfigPartSelector {
     single: EslintConfigPart;
     array: EslintConfigPart[];
 }
-//# sourceMappingURL=configure_eslint.d.ts.map

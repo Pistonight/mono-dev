@@ -8,4 +8,3 @@ export declare const genVitePlugins: (packageJson: PackageJson) => Plugin[];
 export declare const genViteDefines: (packageJson: PackageJson, packageJsonPath: string) => Record<string, string>;
 export declare const genViteBuildConfig: (config: UserConfig, monodevOptions: MonoDevOptions) => Exclude<UserConfig["build"], undefined>;
 export declare const genVitest: (config: UserConfig, monodevOptions: MonoDevOptions) => Exclude<UserConfig["test"], undefined>;
-//# sourceMappingURL=gen_vite.d.ts.map

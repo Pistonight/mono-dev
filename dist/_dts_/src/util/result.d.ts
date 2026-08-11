@@ -29,4 +29,3 @@ export type Void<E> = {
 export type VoidOk = Record<string, never>;
 /** Try best effort converting an error to a string */
 export declare const errstr: (e: unknown, recursing?: boolean) => string;
-//# sourceMappingURL=result.d.ts.map

@@ -110,4 +110,3 @@ export declare const logWarn: (...args: unknown[]) => void;
 export declare const logError: (...args: unknown[]) => void;
 export declare const normalizeLineEnds: (content: string) => string;
 export declare const splitOnce: (input: string, sep: string) => [string, string | undefined];
-//# sourceMappingURL=misc.d.ts.map

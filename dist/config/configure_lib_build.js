@@ -29,7 +29,7 @@ var f = async (e) => {
 	if (h.optionalDependencies) for (let e in h.optionalDependencies) S.add(e);
 	let C = Array.from(S);
 	for (let e of S) C.push(RegExp("^" + e + "/"));
-	if (g.lib === "node" && (C.push(/^node:/), C.push("buffer", "child_process", "crypto", "fs", "fs/promises", "http", "http2", "https", "os", "path", "path/posix", "path/win32")), _.rolldownOptions ||= {}, typeof _.rolldownOptions.external == "function") {
+	if (g.lib === "node" && (C.push(/^node:/), C.push("assert", "buffer", "child_process", "crypto", "fs", "fs/promises", "http", "http2", "https", "inspector", "module", "os", "path", "path/posix", "path/win32", "url", "util", "zlib")), _.rolldownOptions ||= {}, typeof _.rolldownOptions.external == "function") {
 		t("build.rolldownOptions.external is a function which is REALLY BAD for perf");
 		let e = _.rolldownOptions.external;
 		_.rolldownOptions.external = (t, n, r) => {
@@ -43,5 +43,3 @@ var f = async (e) => {
 };
 //#endregion
 export { f as configure, p as patchUserConfigWithMonodev };
-
-//# sourceMappingURL=configure_lib_build.js.map

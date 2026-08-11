@@ -5,4 +5,3 @@ export declare const executeNode: (bin: string, cwd: string, args: string[]) => 
 /** execute native binary on the system */
 export declare const executeNative: (bin: string, cwd: string, args: string[]) => Promise<Void<string>>;
 export declare const executeNativeRaw: (bin: string, cwd: string, args: string[]) => Promise<Void<string>>;
-//# sourceMappingURL=execute.d.ts.map

@@ -3,4 +3,3 @@ export type { RolldownOutputOptions, RolldownPreRenderedChunk, RolldownPreRender
 export declare const wrapChunkFileNames: (isLib: boolean, original: string | ((chunk: RolldownPreRenderedChunk) => string) | undefined, fn: (chunk: RolldownPreRenderedChunk) => string | undefined) => ((chunk: RolldownPreRenderedChunk) => string);
 export declare const wrapEntryFileNames: (isLib: boolean, original: string | ((chunk: RolldownPreRenderedChunk) => string) | undefined, fn: (chunk: RolldownPreRenderedChunk) => string | undefined) => ((chunk: RolldownPreRenderedChunk) => string);
 export declare const wrapAssetFileNames: (original: string | ((chunk: RolldownPreRenderedAsset) => string) | undefined, fn: (chunk: RolldownPreRenderedAsset) => string | undefined) => ((chunk: RolldownPreRenderedAsset) => string);
-//# sourceMappingURL=rolldown.d.ts.map
