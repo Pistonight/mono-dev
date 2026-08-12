@@ -1,4 +1,4 @@
-import { i as e, t } from "./rolldown-runtime.js";
+import { r as e, t } from "./rolldown-runtime.js";
 //#region node_modules/.pnpm/isexe@4.0.0/node_modules/isexe/dist/commonjs/index.min.js
 var n = /* @__PURE__ */ t(((t) => {
 	var n = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), r = n((t) => {

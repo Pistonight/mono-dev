@@ -1,4 +1,4 @@
-import { o as e, r as t, t as n } from "../rolldown-runtime.js";
+import { i as e, n as t, t as n } from "../rolldown-runtime.js";
 import { a as r, g as i, h as a, i as o, l as s, m as c, n as l, o as u, p as d, r as f, s as p, u as m } from "../plugins.js";
 import { i as h, n as g, r as _, t as v } from "../project.js";
 import { o as y } from "../gen_vite.js";
@@ -11573,7 +11573,7 @@ var jp = async (e) => {
 		let n = e[t];
 		if (typeof n != "string") continue;
 		let [r, i] = n.split("#", 2), a = r.toLowerCase();
-		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#a6069f3f39fbb2744bc9445482b6b5e0cf482199");
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#0e4deeeefb5336470664a485bba3bc1787f4cf66");
 	}
 }, Pp = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
