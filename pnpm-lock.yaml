@@ -32,6 +32,9 @@ importers:
       eslint:
         specifier: ^10.8.1
         version: 10.8.1
+      eslint-plugin-react-compiler:
+        specifier: 0.0.0-experimental-6cef588-20250815
+        version: 0.0.0-experimental-6cef588-20250815(eslint@10.8.1)
       eslint-plugin-react-hooks:
         specifier: ^7.1.1
         version: 7.1.1(eslint@10.8.1)
@@ -81,9 +84,6 @@ importers:
       '@types/which':
         specifier: ^3.0.4
         version: 3.0.4
-      eslint-plugin-react-compiler:
-        specifier: 0.0.0-experimental-6cef588-20250815
-        version: 0.0.0-experimental-6cef588-20250815(eslint@10.8.1)
       rolldown:
         specifier: ^1.2.1
         version: 1.2.1
