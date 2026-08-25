@@ -1,5 +1,4 @@
-import { i as e, n as t, t as n } from "../rolldown-runtime.js";
-import { a as r, g as i, h as a, i as o, l as s, m as c, n as l, o as u, p as d, r as f, s as p, u as m } from "../plugins.js";
+import { _ as e, a as t, b as n, g as r, h as i, i as a, l as o, m as s, n as c, o as l, p as u, r as d, s as f, u as p, v as m } from "../plugins.js";
 import { i as h, n as g, r as _, t as v } from "../project.js";
 import { o as y } from "../gen_vite.js";
 import b from "node:fs";
@@ -15,7 +14,7 @@ import { deflate as de } from "zlib";
 //#region src/config/gen_eslint.ts
 var fe = (e) => {
 	let t = x.join(e, "eslint.config.js");
-	b.writeFileSync(t, i("import { configure } from \"mono-dev/eslint-config\"; export default configure();"));
+	b.writeFileSync(t, r("import { configure } from \"mono-dev/eslint-config\"; export default configure();"));
 }, pe = async (e, t) => e.private ? await v(e, t) : { err: "'private' must be set to true to prevent accidental publishing; to pack for publishing please use mono publish" }, me = (e, t) => {
 	let n = [
 		"*.yml",
@@ -26,35 +25,35 @@ var fe = (e) => {
 		"*.hbs",
 		"tsconfig*.json",
 		"eslint.config.js"
-	], r = g(e, t);
-	for (let e of r) e.includes("tsconfig") || e.includes("eslint.config.js") || n.push(e);
-	b.writeFileSync(x.join(t, ".prettierignore"), i(n.join("\n")));
+	], i = g(e, t);
+	for (let e of i) e.includes("tsconfig") || e.includes("eslint.config.js") || n.push(e);
+	b.writeFileSync(x.join(t, ".prettierignore"), r(n.join("\n")));
 }, he = async (e) => {
-	let t = /* @__PURE__ */ new Set(), n = [], r = [], o = [], s = /* @__PURE__ */ new Set(), l = e["pistonight/mono-dev"]?.nocheck;
-	if (l) for (let e of l) {
+	let t = /* @__PURE__ */ new Set(), n = [], a = [], o = [], c = /* @__PURE__ */ new Set(), u = e["pistonight/mono-dev"]?.nocheck;
+	if (u) for (let e of u) {
 		if (e.startsWith("/") && !e.substring(1).includes("/")) {
-			s.add(e.substring(1));
+			c.add(e.substring(1));
 			continue;
 		}
 		if (!e.includes("/")) {
-			s.add(e);
+			c.add(e);
 			continue;
 		}
 	}
 	let d = (await T.readdir(".")).map(async (e) => {
-		let i = x.basename(e);
-		if (s.has(i)) {
+		let r = x.basename(e);
+		if (c.has(r)) {
 			o.push(e);
 			return;
 		}
-		let c;
+		let s;
 		try {
-			c = await T.stat(e);
+			s = await T.stat(e);
 		} catch (t) {
-			console.error(t), a(`cannot stat ${e}, skipping`);
+			console.error(t), i(`cannot stat ${e}, skipping`);
 			return;
 		}
-		if (c.isDirectory()) {
+		if (s.isDirectory()) {
 			let t = x.join(e, "env.d.ts");
 			b.existsSync(t) ? n.push(e) : o.push(e);
 			return;
@@ -63,12 +62,12 @@ var fe = (e) => {
 			t.add(e);
 			return;
 		}
-		e.match(/\.(c|m)?tsx?$/) && r.push(e);
+		e.match(/\.(c|m)?tsx?$/) && a.push(e);
 	});
 	await Promise.all(d);
 	let f = new Set(t);
-	r.length && f.delete("tsconfig._.json"), n.forEach((e) => {
-		f.delete(`tsconfig.${e}.json`), f.delete(`tsconfig.${e}__${u}.json`);
+	a.length && f.delete("tsconfig._.json"), n.forEach((e) => {
+		f.delete(`tsconfig.${e}.json`), f.delete(`tsconfig.${e}__${l}.json`);
 	});
 	let p = n.map(async (e) => {
 		let t = `tsconfig.${e}.json`, n = {
@@ -79,32 +78,32 @@ var fe = (e) => {
 			},
 			include: [e]
 		};
-		await T.writeFile(t, i(h(n) || ""));
+		await T.writeFile(t, r(h(n) || ""));
 	}), m = (async () => {
-		for (let e of f) c(`removing ${e}`), await T.unlink(e);
+		for (let e of f) s(`removing ${e}`), await T.unlink(e);
 	})();
-	if (r.length) {
+	if (a.length) {
 		let e = {
 			compilerOptions: {
 				...ge.compilerOptions,
 				tsBuildInfoFile: "node_modules/.mono/tsconfig._.tsbuildinfo",
 				rootDir: "."
 			},
-			include: r
+			include: a
 		};
-		await T.writeFile("tsconfig._.json", i(h(e) || ""));
+		await T.writeFile("tsconfig._.json", r(h(e) || ""));
 	}
-	let g = r.length + n.length;
+	let g = a.length + n.length;
 	if (await m, await Promise.all(p), g) {
 		let e = n.map((e) => ({ path: `./tsconfig.${e}.json` }));
-		r.length && e.push({ path: "./tsconfig._.json" });
+		a.length && e.push({ path: "./tsconfig._.json" });
 		let t = {
 			compilerOptions: {},
 			files: [],
 			references: e
 		};
-		await T.writeFile("tsconfig.json", i(h(t) || ""));
-	} else b.existsSync("tsconfig.json") && (c("removing tsconfig.json"), await T.unlink("tsconfig.json"));
+		await T.writeFile("tsconfig.json", r(h(t) || ""));
+	} else b.existsSync("tsconfig.json") && (s("removing tsconfig.json"), await T.unlink("tsconfig.json"));
 	return {
 		projectCount: g,
 		nonTsDirectories: o
@@ -136,77 +135,79 @@ var fe = (e) => {
 	emitDeclarationOnly: !0,
 	stableTypeOrdering: !0
 } }, _e = (e) => {
-	let t = s();
-	if (t) if (!b.existsSync(e)) b.mkdirSync(e, { recursive: !0 }), b.writeFileSync(`${e}/version`, t);
-	else {
-		let n = !1;
-		try {
-			let r = b.readFileSync(`${e}/version`, "utf-8").trim();
-			r !== t && (c(`cleaning cache because of version update: ${r} -> ${t}`), n = !0);
-		} catch {
-			n = !0;
-		}
-		if (n) {
-			b.rmSync(e, {
-				recursive: !0,
-				force: !0
-			}), b.mkdirSync(e, { recursive: !0 });
+	let t = o();
+	if (t) {
+		if (!b.existsSync(e)) b.mkdirSync(e, { recursive: !0 }), b.writeFileSync(`${e}/version`, t);
+		else {
+			let n = !1;
 			try {
-				b.writeFileSync(`${e}/version`, t);
+				let r = b.readFileSync(`${e}/version`, "utf-8").trim();
+				r !== t && (s(`cleaning cache because of version update: ${r} -> ${t}`), n = !0);
 			} catch {
-				a("failed to write version file, will retry next time");
+				n = !0;
+			}
+			if (n) {
+				b.rmSync(e, {
+					recursive: !0,
+					force: !0
+				}), b.mkdirSync(e, { recursive: !0 });
+				try {
+					b.writeFileSync(`${e}/version`, t);
+				} catch {
+					i("failed to write version file, will retry next time");
+				}
 			}
 		}
 	}
 }, ve = async () => {
-	let { packageJsonPath: e, rootDir: t, cacheDir: n } = m();
-	_e(n);
-	let o = JSON.parse(b.readFileSync(e, "utf-8")), s = o["pistonight/mono-dev"] || {};
-	if (!s.lib) return d("package.json mono dev option 'lib' must be true or \"node\" to build library"), 1;
-	let l = await pe(o, e);
-	if ("err" in l) return d("failed to config package: " + l.err), 1;
+	let { packageJsonPath: e, rootDir: n, cacheDir: a } = p();
+	_e(a);
+	let o = JSON.parse(b.readFileSync(e, "utf-8")), c = o["pistonight/mono-dev"] || {};
+	if (!c.lib) return u("package.json mono dev option 'lib' must be true or \"node\" to build library"), 1;
+	let f = await pe(o, e);
+	if ("err" in f) return u("failed to config package: " + f.err), 1;
 	await he(o);
-	let p = _(t, o, !0);
-	if ("err" in p) return d("failed to parse exports: " + p.err), 1;
-	let g = y(n, t);
-	g || c("using vite config from project root directly");
-	let v = x.join(t, "tsconfig.src.json"), S = JSON.parse(b.readFileSync(v, "utf-8")), C = `${n}/tsconfig.src__${u}.tsbuildinfo`;
+	let m = _(n, o, !0);
+	if ("err" in m) return u("failed to parse exports: " + m.err), 1;
+	let g = y(a, n);
+	g || s("using vite config from project root directly");
+	let v = x.join(n, "tsconfig.src.json"), S = JSON.parse(b.readFileSync(v, "utf-8")), C = `${a}/tsconfig.src__${l}.tsbuildinfo`;
 	b.existsSync(C) && b.unlinkSync(C);
-	let w = s.nodts, T = x.join(t, "tsconfig.src__" + u + ".json");
+	let w = c.nodts, T = x.join(n, "tsconfig.src__" + l + ".json");
 	if (!w) {
-		S.compilerOptions.tsBuildInfoFile = C, S.compilerOptions.noEmit = !1, S.compilerOptions.outDir = x.join(r, u);
-		let e = "sourcemap" in s ? !!s.sourcemap : !0;
+		S.compilerOptions.tsBuildInfoFile = C, S.compilerOptions.noEmit = !1, S.compilerOptions.outDir = x.join(t, l);
+		let e = "sourcemap" in c ? !!c.sourcemap : !0;
 		S.compilerOptions.declarationMap = e, S.exclude = [
 			"**/*.test.ts",
 			"**/*.test.mts",
 			"**/*.test.cts",
 			"**/*.test.tsx"
-		], b.writeFileSync(T, i(h(S) || ""));
+		], b.writeFileSync(T, r(h(S) || ""));
 	}
-	let ee = g ? f("vite", t, [
+	let ee = g ? d("vite", n, [
 		"build",
 		"--config",
 		g
-	]) : f("vite", t, ["build"]);
-	if ("err" in ee) return d("bundle with vite failed: " + ee.err), 21;
-	if (w) a("skipping dts since nodts is true");
+	]) : d("vite", n, ["build"]);
+	if ("err" in ee) return u("bundle with vite failed: " + ee.err), 21;
+	if (w) i("skipping dts since nodts is true");
 	else {
-		let e = Date.now(), n = f("tsgo", t, ["-p", T]);
-		if ("err" in n) return d("dts generation with tsc failed: " + n.err), 31;
+		let e = Date.now(), t = d("tsgo", n, ["-p", T]);
+		if ("err" in t) return u("dts generation with tsc failed: " + t.err), 31;
 		let r = Math.floor(Date.now() - e);
-		c(`dts generated (${r}ms)`);
+		s(`dts generated (${r}ms)`);
 	}
 	return 0;
 }, ye = async (e) => {
-	let { packageJsonPath: t, rootDir: n, cacheDir: r } = m();
+	let { packageJsonPath: t, rootDir: n, cacheDir: r } = p();
 	_e(r);
 	let i = JSON.parse(b.readFileSync(t, "utf-8")), a = await pe(i, t);
-	if ("err" in a) return d("failed to config package: " + a.err), 1;
+	if ("err" in a) return u("failed to config package: " + a.err), 1;
 	(await he(i)).projectCount && fe(n), me(i, n);
 	let o = e.includes("--fix") || e.includes("-f");
 	if (o) {
-		if (!xe(n, r, o)) return 41;
 		if (!Se(n, r, o)) return 51;
+		if (!xe(n, r, o)) return 41;
 		if (!be(n)) return 31;
 	} else {
 		if (!be(n)) return 31;
@@ -216,9 +217,9 @@ var fe = (e) => {
 	return 0;
 }, be = (e) => {
 	let t = Date.now();
-	if ("err" in f("tsgo", e, ["--build", "--pretty"])) return d("typeck failed!"), !1;
+	if ("err" in d("tsgo", e, ["--build", "--pretty"])) return u("typeck failed!"), !1;
 	let n = Math.floor(Date.now() - t);
-	return c(`typeck passed (${n}ms)`), !0;
+	return s(`typeck passed (${n}ms)`), !0;
 }, xe = (e, t, n) => {
 	let r = [
 		".",
@@ -231,11 +232,11 @@ var fe = (e) => {
 	];
 	n && r.push("--fix");
 	let i = Date.now();
-	if ("err" in f("eslint", e, r)) return d("eslint failed!"), !1;
+	if ("err" in d("eslint", e, r)) return u("eslint failed!"), !1;
 	let a = Math.floor(Date.now() - i);
-	return c(`eslint passed (${a}ms)`), !0;
+	return s(`eslint passed (${a}ms)`), !0;
 }, Se = (e, t, n) => {
-	let r = x.join(e, ".prettierignore"), i = x.join(t, ".prettier-cache"), a = x.join(p, "bin", "prettier-wrapper.js"), o = Date.now(), s = S.spawnSync(process.argv[0], [
+	let r = x.join(e, ".prettierignore"), i = x.join(t, ".prettier-cache"), a = x.join(f, "bin", "prettier-wrapper.js"), o = Date.now(), c = S.spawnSync(process.argv[0], [
 		a,
 		r,
 		i,
@@ -244,19 +245,19 @@ var fe = (e) => {
 		cwd: e,
 		stdio: "pipe"
 	});
-	if (s.error) return d("failed to spawn prettier: " + s.error), !1;
-	if (s.status) {
-		let e = s.stderr.toString("utf-8").trim();
-		return console.warn(e.split("\n").map((e) => (e.startsWith("[warn]") && (e = e.substring(6)), e.replace("Run Prettier with --write to fix.", "").trimEnd())).join("\n")), d("prettier failed!"), !1;
+	if (c.error) return u("failed to spawn prettier: " + c.error), !1;
+	if (c.status) {
+		let e = c.stderr.toString("utf-8").trim();
+		return console.warn(e.split("\n").map((e) => (e.startsWith("[warn]") && (e = e.substring(6)), e.replace("Run Prettier with --write to fix.", "").trimEnd())).join("\n")), u("prettier failed!"), !1;
 	}
 	let l = Math.floor(Date.now() - o);
-	return c(`prettier passed (${l}ms)`), !0;
+	return s(`prettier passed (${l}ms)`), !0;
 }, Ce = async (e) => {
-	let { packageJsonPath: t, rootDir: n, cacheDir: r } = m();
+	let { packageJsonPath: t, rootDir: n, cacheDir: r } = p();
 	_e(r);
 	let i = JSON.parse(b.readFileSync(t, "utf-8")), a = await pe(i, t);
-	return "err" in a ? (d("failed to config package: " + a.err), 1) : ((await he(i)).projectCount ? fe(n) : c("not generating eslint config because no typescript directories exist"), c("config generated"), 0);
-}, we = /* @__PURE__ */ n(((e, t) => {
+	return "err" in a ? (u("failed to config package: " + a.err), 1) : ((await he(i)).projectCount ? fe(n) : s("not generating eslint config because no typescript directories exist"), s("config generated"), 0);
+}, we = /* @__PURE__ */ e(((e, t) => {
 	t.exports = {};
 })), k;
 function Te(e, t, n) {
@@ -346,9 +347,11 @@ k = Fe.prototype, k.assign = function(e) {
 }, k.addReplacer = function(e, t) {
 	return typeof e == "string" ? this.addMatcher(e, t) : (this.replacer ||= [], this.replacer.push(e, t), this.cache && Ie(this), this);
 }, k.encode = function(e, t) {
-	if (this.cache && e.length <= this.H) if (this.F) {
-		if (this.B.has(e)) return this.B.get(e);
-	} else this.F = setTimeout(Ie, 50, this);
+	if (this.cache && e.length <= this.H) {
+		if (this.F) {
+			if (this.B.has(e)) return this.B.get(e);
+		} else this.F = setTimeout(Ie, 50, this);
+	}
 	this.normalize && (e = typeof this.normalize == "function" ? this.normalize(e) : Pe ? e.normalize("NFKD").replace(Pe, "").toLowerCase() : e.toLowerCase()), this.prepare && (e = this.prepare(e)), this.numeric && e.length > 3 && (e = e.replace(Me, "$1 $2").replace(Ne, "$1 $2").replace(je, "$1 "));
 	let n = !(this.dedupe || this.mapper || this.filter || this.matcher || this.stemmer || this.replacer), r = [], i = A(), a, o, s = this.split || this.split === "" ? e.split(this.split) : [e];
 	for (let e = 0, l, u; e < s.length; e++) if ((l = u = s[e]) && !(l.length < this.minlength || l.length > this.maxlength)) {
@@ -361,13 +364,15 @@ k = Fe.prototype, k.assign = function(e) {
 		}
 		if (n) r.push(l);
 		else if (!this.filter || (typeof this.filter == "function" ? this.filter(l) : !this.filter.has(l))) {
-			if (this.cache && l.length <= this.I) if (this.F) {
-				var c = this.D.get(l);
-				if (c || c === "") {
-					c && r.push(c);
-					continue;
-				}
-			} else this.F = setTimeout(Ie, 50, this);
+			if (this.cache && l.length <= this.I) {
+				if (this.F) {
+					var c = this.D.get(l);
+					if (c || c === "") {
+						c && r.push(c);
+						continue;
+					}
+				} else this.F = setTimeout(Ie, 50, this);
+			}
 			if (this.stemmer) {
 				this.K ||= RegExp("(?!^)(" + this.A + ")$");
 				let e;
@@ -380,12 +385,14 @@ k = Fe.prototype, k.assign = function(e) {
 			}
 			if (this.matcher && l.length > 1 && (this.J ||= RegExp("(" + this.h + ")", "g"), l = l.replace(this.J, (e) => this.matcher.get(e))), l && this.replacer) for (c = 0; l && c < this.replacer.length; c += 2) l = l.replace(this.replacer[c], this.replacer[c + 1]);
 			if (this.cache && u.length <= this.I && (this.D.set(u, l), this.D.size > this.L && (this.D.clear(), this.I = this.I / 1.1 | 0)), l) {
-				if (l !== u) if (t) {
-					if (i[l]) continue;
-					i[l] = 1;
-				} else {
-					if (o === l) continue;
-					o = l;
+				if (l !== u) {
+					if (t) {
+						if (i[l]) continue;
+						i[l] = 1;
+					} else {
+						if (o === l) continue;
+						o = l;
+					}
 				}
 				r.push(l);
 			}
@@ -707,10 +714,10 @@ function lt(e) {
 		}), i ? (r.then(i), this) : r;
 	};
 }
-function ut(t, n, r) {
-	return n ? typeof module < "u" ? new (we()).Worker(__dirname + "/worker/node.js") : Promise.resolve().then(() => /* @__PURE__ */ e(we(), 1)).then(function(e) {
+function ut(e, t, r) {
+	return t ? typeof module < "u" ? new (we()).Worker(__dirname + "/worker/node.js") : Promise.resolve().then(() => /* @__PURE__ */ n(we(), 1)).then(function(e) {
 		return new e.Worker(import.meta.dirname + "/node/node.mjs");
-	}) : t ? new window.Worker(URL.createObjectURL(new Blob(["onmessage=" + et.toString()], { type: "text/javascript" }))) : new window.Worker(typeof r == "string" ? r : import.meta.url.replace("/worker.js", "/worker/worker.js").replace("flexsearch.bundle.module.min.js", "module/worker/worker.js").replace("flexsearch.bundle.module.min.mjs", "module/worker/worker.js"), { type: "module" });
+	}) : e ? new window.Worker(URL.createObjectURL(new Blob(["onmessage=" + et.toString()], { type: "text/javascript" }))) : new window.Worker(typeof r == "string" ? r : import.meta.url.replace("/worker.js", "/worker/worker.js").replace("flexsearch.bundle.module.min.js", "module/worker/worker.js").replace("flexsearch.bundle.module.min.mjs", "module/worker/worker.js"), { type: "module" });
 }
 Ot.prototype.add = function(e, t, n) {
 	if (Oe(e) && (t = e, e = ke(t, this.key)), t && (e || e === 0)) {
@@ -770,21 +777,25 @@ Ot.prototype.add = function(e, t, n) {
 };
 function dt(e, t, n, r, i, a) {
 	if (e = e[i], r === n.length - 1) t[i] = a || e;
-	else if (e) if (e.constructor === Array) for (t = t[i] = Array(e.length), i = 0; i < e.length; i++) dt(e, t, n, r, i);
-	else t = t[i] || (t[i] = A()), i = n[++r], dt(e, t, n, r, i);
+	else if (e) {
+		if (e.constructor === Array) for (t = t[i] = Array(e.length), i = 0; i < e.length; i++) dt(e, t, n, r, i);
+		else t = t[i] || (t[i] = A()), i = n[++r], dt(e, t, n, r, i);
+	}
 }
 function ft(e, t, n, r, i, a, o, s) {
-	if (e = e[o]) if (r === t.length - 1) {
-		if (e.constructor === Array) {
-			if (n[r]) {
-				for (t = 0; t < e.length; t++) i.add(a, e[t], !0, !0);
-				return;
+	if (e = e[o]) {
+		if (r === t.length - 1) {
+			if (e.constructor === Array) {
+				if (n[r]) {
+					for (t = 0; t < e.length; t++) i.add(a, e[t], !0, !0);
+					return;
+				}
+				e = e.join(" ");
 			}
-			e = e.join(" ");
-		}
-		i.add(a, e, s, !0);
-	} else if (e.constructor === Array) for (o = 0; o < e.length; o++) ft(e, t, n, r, i, a, o, s);
-	else o = t[++r], ft(e, t, n, r, i, a, o, s);
+			i.add(a, e, s, !0);
+		} else if (e.constructor === Array) for (o = 0; o < e.length; o++) ft(e, t, n, r, i, a, o, s);
+		else o = t[++r], ft(e, t, n, r, i, a, o, s);
+	}
 }
 function pt(e, t, n, r) {
 	if (!e.length) return e;
@@ -880,53 +891,57 @@ j.prototype.and = function() {
 function _t(e, t, n, r, i, a, o) {
 	if (!a && !this.result.length) return i ? this.result : this;
 	let s;
-	if (e.length) if (this.result.length && e.unshift(this.result), e.length < 2) this.result = e[0];
-	else {
-		let r = 0;
-		for (let t = 0, n, i; t < e.length; t++) if ((n = e[t]) && (i = n.length)) r < i && (r = i);
-		else if (!a) {
-			r = 0;
-			break;
+	if (e.length) {
+		if (this.result.length && e.unshift(this.result), e.length < 2) this.result = e[0];
+		else {
+			let r = 0;
+			for (let t = 0, n, i; t < e.length; t++) if ((n = e[t]) && (i = n.length)) r < i && (r = i);
+			else if (!a) {
+				r = 0;
+				break;
+			}
+			r ? (this.result = St(e, r, t, n, a, this.h, i), s = !0) : this.result = [];
 		}
-		r ? (this.result = St(e, r, t, n, a, this.h, i), s = !0) : this.result = [];
-	}
-	else a || (this.result = e);
+	} else a || (this.result = e);
 	return i && (this.await = null), i ? this.resolve(t, n, r, o, s) : this;
 }
 j.prototype.xor = function() {
 	return mt(this, "xor", vt, arguments);
 };
 function vt(e, t, n, r, i, a, o) {
-	if (e.length) if (this.result.length && e.unshift(this.result), e.length < 2) this.result = e[0];
-	else {
-		a: {
-			a = n;
-			var s = this.h;
-			let r = [], o = A(), c = 0;
-			for (let t = 0, n; t < e.length; t++) if (n = e[t]) {
-				c < n.length && (c = n.length);
-				for (let e = 0, t; e < n.length; e++) if (t = n[e]) for (let e = 0, n; e < t.length; e++) n = t[e], o[n] = o[n] ? 2 : 1;
-			}
-			for (let n = 0, l, u = 0; n < c; n++) for (let c = 0, d; c < e.length; c++) if ((d = e[c]) && (l = d[n])) {
-				for (let d = 0, f; d < l.length; d++) if (f = l[d], o[f] === 1) if (a) a--;
-				else if (i) {
-					if (r.push(f), r.length === t) {
-						e = r;
-						break a;
-					}
-				} else {
-					let i = n + (c ? s : 0);
-					if (r[i] || (r[i] = []), r[i].push(f), ++u === t) {
-						e = r;
-						break a;
+	if (e.length) {
+		if (this.result.length && e.unshift(this.result), e.length < 2) this.result = e[0];
+		else {
+			a: {
+				a = n;
+				var s = this.h;
+				let r = [], o = A(), c = 0;
+				for (let t = 0, n; t < e.length; t++) if (n = e[t]) {
+					c < n.length && (c = n.length);
+					for (let e = 0, t; e < n.length; e++) if (t = n[e]) for (let e = 0, n; e < t.length; e++) n = t[e], o[n] = o[n] ? 2 : 1;
+				}
+				for (let n = 0, l, u = 0; n < c; n++) for (let c = 0, d; c < e.length; c++) if ((d = e[c]) && (l = d[n])) {
+					for (let d = 0, f; d < l.length; d++) if (f = l[d], o[f] === 1) {
+						if (a) a--;
+						else if (i) {
+							if (r.push(f), r.length === t) {
+								e = r;
+								break a;
+							}
+						} else {
+							let i = n + (c ? s : 0);
+							if (r[i] || (r[i] = []), r[i].push(f), ++u === t) {
+								e = r;
+								break a;
+							}
+						}
 					}
 				}
+				e = r;
 			}
-			e = r;
+			this.result = e, s = !0;
 		}
-		this.result = e, s = !0;
-	}
-	else a || (this.result = e);
+	} else a || (this.result = e);
 	return i && (this.await = null), i ? this.resolve(t, n, r, o, s) : this;
 }
 j.prototype.not = function() {
@@ -1006,87 +1021,98 @@ function bt(e, t, n, r, i) {
 				if (!e) C = _[S], g += (g ? " " : "") + C, c && v.push({ text: C });
 				else if (c && x >= c) break;
 			}
-			if (x = t.length * (a.length - 2), p || m || c && g.length - x > c) if (x = c + x - f * 2, S = b - y, p > 0 && (S += p), m > 0 && (S += m), S <= x) _ = p ? y - (p > 0 ? p : 0) : y - ((x - S) / 2 | 0), v = m ? b + (m > 0 ? m : 0) : _ + x, l || (_ > 0 && g.charAt(_) !== " " && g.charAt(_ - 1) !== " " && (_ = g.indexOf(" ", _), _ < 0 && (_ = 0)), v < g.length && g.charAt(v - 1) !== " " && g.charAt(v) !== " " && (v = g.lastIndexOf(" ", v), v < b ? v = b : ++v)), g = (_ ? i : "") + g.substring(_, v) + (v < g.length ? i : "");
-			else {
-				for (b = [], y = {}, x = {}, S = {}, C = {}, w = {}, te = ee = T = 0, re = ne = 1;;) {
-					var ae = void 0;
-					for (let e = 0, n; e < t.length; e++) {
-						if (n = t[e], te) if (ee !== te) {
-							if (S[e + 1]) continue;
-							if (n += te, y[n]) {
-								T -= f, x[e + 1] = 1, S[e + 1] = 1;
-								continue;
-							}
-							if (n >= v.length - 1) {
-								if (n >= v.length) {
-									S[e + 1] = 1, n >= _.length && (x[e + 1] = 1);
-									continue;
+			if (x = t.length * (a.length - 2), p || m || c && g.length - x > c) {
+				if (x = c + x - f * 2, S = b - y, p > 0 && (S += p), m > 0 && (S += m), S <= x) _ = p ? y - (p > 0 ? p : 0) : y - ((x - S) / 2 | 0), v = m ? b + (m > 0 ? m : 0) : _ + x, l || (_ > 0 && g.charAt(_) !== " " && g.charAt(_ - 1) !== " " && (_ = g.indexOf(" ", _), _ < 0 && (_ = 0)), v < g.length && g.charAt(v - 1) !== " " && g.charAt(v) !== " " && (v = g.lastIndexOf(" ", v), v < b ? v = b : ++v)), g = (_ ? i : "") + g.substring(_, v) + (v < g.length ? i : "");
+				else {
+					for (b = [], y = {}, x = {}, S = {}, C = {}, w = {}, te = ee = T = 0, re = ne = 1;;) {
+						var ae = void 0;
+						for (let e = 0, n; e < t.length; e++) {
+							if (n = t[e], te) {
+								if (ee !== te) {
+									if (S[e + 1]) continue;
+									if (n += te, y[n]) {
+										T -= f, x[e + 1] = 1, S[e + 1] = 1;
+										continue;
+									}
+									if (n >= v.length - 1) {
+										if (n >= v.length) {
+											S[e + 1] = 1, n >= _.length && (x[e + 1] = 1);
+											continue;
+										}
+										T -= f;
+									}
+									if (g = v[n].text, E = m && w[e]) {
+										if (E > 0) {
+											if (g.length > E) {
+												if (S[e + 1] = 1, l) g = g.substring(0, E);
+												else continue;
+											}
+											(E -= g.length) || (E = -1), w[e] = E;
+										} else {
+											S[e + 1] = 1;
+											continue;
+										}
+									}
+									if (T + g.length + 1 <= c) g = " " + g, b[e] += g;
+									else if (l) ae = c - T - 1, ae > 0 && (g = " " + g.substring(0, ae), b[e] += g), S[e + 1] = 1;
+									else {
+										S[e + 1] = 1;
+										continue;
+									}
+								} else {
+									if (S[e]) continue;
+									if (n -= ee, y[n]) {
+										T -= f, S[e] = 1, x[e] = 1;
+										continue;
+									}
+									if (n <= 0) {
+										if (n < 0) {
+											S[e] = 1, x[e] = 1;
+											continue;
+										}
+										T -= f;
+									}
+									if (g = v[n].text, E = p && C[e]) {
+										if (E > 0) {
+											if (g.length > E) {
+												if (S[e] = 1, l) g = g.substring(g.length - E);
+												else continue;
+											}
+											(E -= g.length) || (E = -1), C[e] = E;
+										} else {
+											S[e] = 1;
+											continue;
+										}
+									}
+									if (T + g.length + 1 <= c) g += " ", b[e] = g + b[e];
+									else if (l) ae = g.length + 1 - (c - T), ae >= 0 && ae < g.length && (g = g.substring(ae) + " ", b[e] = g + b[e]), S[e] = 1;
+									else {
+										S[e] = 1;
+										continue;
+									}
 								}
-								T -= f;
-							}
-							if (g = v[n].text, E = m && w[e]) if (E > 0) {
-								if (g.length > E) if (S[e + 1] = 1, l) g = g.substring(0, E);
-								else continue;
-								(E -= g.length) || (E = -1), w[e] = E;
 							} else {
-								S[e + 1] = 1;
-								continue;
-							}
-							if (T + g.length + 1 <= c) g = " " + g, b[e] += g;
-							else if (l) ae = c - T - 1, ae > 0 && (g = " " + g.substring(0, ae), b[e] += g), S[e + 1] = 1;
-							else {
-								S[e + 1] = 1;
-								continue;
-							}
-						} else {
-							if (S[e]) continue;
-							if (n -= ee, y[n]) {
-								T -= f, S[e] = 1, x[e] = 1;
-								continue;
-							}
-							if (n <= 0) {
-								if (n < 0) {
-									S[e] = 1, x[e] = 1;
-									continue;
+								g = v[n].match, p && (C[e] = p), m && (w[e] = m), e && T++;
+								let t;
+								if (n ? !e && f && (T += f) : (x[e] = 1, S[e] = 1), n >= _.length - 1 || n < v.length - 1 && v[n + 1].match ? t = 1 : f && (T += f), T -= a.length - 2, !e || T + g.length <= c) b[e] = g;
+								else {
+									ae = ne = re = x[e] = 0;
+									break;
 								}
-								T -= f;
+								t && (x[e + 1] = 1, S[e + 1] = 1);
 							}
-							if (g = v[n].text, E = p && C[e]) if (E > 0) {
-								if (g.length > E) if (S[e] = 1, l) g = g.substring(g.length - E);
-								else continue;
-								(E -= g.length) || (E = -1), C[e] = E;
-							} else {
-								S[e] = 1;
-								continue;
-							}
-							if (T + g.length + 1 <= c) g += " ", b[e] = g + b[e];
-							else if (l) ae = g.length + 1 - (c - T), ae >= 0 && ae < g.length && (g = g.substring(ae) + " ", b[e] = g + b[e]), S[e] = 1;
-							else {
-								S[e] = 1;
-								continue;
-							}
+							T += g.length, ae = y[n] = 1;
 						}
+						if (ae) ee === te ? te++ : ee++;
 						else {
-							g = v[n].match, p && (C[e] = p), m && (w[e] = m), e && T++;
-							let t;
-							if (n ? !e && f && (T += f) : (x[e] = 1, S[e] = 1), n >= _.length - 1 || n < v.length - 1 && v[n + 1].match ? t = 1 : f && (T += f), T -= a.length - 2, !e || T + g.length <= c) b[e] = g;
-							else {
-								ae = ne = re = x[e] = 0;
-								break;
-							}
-							t && (x[e + 1] = 1, S[e + 1] = 1);
+							if (ee === te ? ne = 0 : re = 0, !ne && !re) break;
+							ne ? (ee++, te = ee) : te++;
 						}
-						T += g.length, ae = y[n] = 1;
 					}
-					if (ae) ee === te ? te++ : ee++;
-					else {
-						if (ee === te ? ne = 0 : re = 0, !ne && !re) break;
-						ne ? (ee++, te = ee) : te++;
-					}
+					g = "";
+					for (let e = 0, t; e < b.length; e++) t = (x[e] ? e ? " " : "" : (e && !i ? " " : "") + i) + b[e], g += t;
+					i && !x[b.length] && (g += i);
 				}
-				g = "";
-				for (let e = 0, t; e < b.length; e++) t = (x[e] ? e ? " " : "" : (e && !i ? " " : "") + i) + b[e], g += t;
-				i && !x[b.length] && (g += i);
 			}
 			u && (g = g.replace(u, " ")), ce[e].highlight = g;
 		}
@@ -1123,11 +1149,13 @@ k = j.prototype, k.limit = function(e) {
 		});
 	} else if (this.result.length) {
 		let t = [];
-		for (let n = 0, r; n < this.result.length; n++) if (r = this.result[n]) if (r.length <= e) {
-			if (t[n] = r, e -= r.length, !e) break;
-		} else {
-			t[n] = r.slice(0, e);
-			break;
+		for (let n = 0, r; n < this.result.length; n++) if (r = this.result[n]) {
+			if (r.length <= e) {
+				if (t[n] = r, e -= r.length, !e) break;
+			} else {
+				t[n] = r.slice(0, e);
+				break;
+			}
 		}
 		this.result = t;
 	}
@@ -1194,17 +1222,21 @@ function St(e, t, n, r, i, a, o) {
 		}
 		if (h.push(p), o && n && u === s - 1 && h.length - r === n) return r ? h.slice(r) : h;
 	}
-	if (e = c.length) if (i) c = c.length > 1 ? Ct(c, n, r, o, a) : (c = c[0]) && n && c.length > n || r ? c.slice(r, n + r) : c;
-	else {
-		if (e < s) return [];
-		if (c = c[e - 1], n || r) if (o) (c.length > n || r) && (c = c.slice(r, n + r));
+	if (e = c.length) {
+		if (i) c = c.length > 1 ? Ct(c, n, r, o, a) : (c = c[0]) && n && c.length > n || r ? c.slice(r, n + r) : c;
 		else {
-			i = [];
-			for (let e = 0, t; e < c.length; e++) if (t = c[e]) {
-				if (r && t.length > r) r -= t.length;
-				else if ((n && t.length > n || r) && (t = t.slice(r, n + r), n -= t.length, r && (r -= t.length)), i.push(t), !n) break;
+			if (e < s) return [];
+			if (c = c[e - 1], n || r) {
+				if (o) (c.length > n || r) && (c = c.slice(r, n + r));
+				else {
+					i = [];
+					for (let e = 0, t; e < c.length; e++) if (t = c[e]) {
+						if (r && t.length > r) r -= t.length;
+						else if ((n && t.length > n || r) && (t = t.slice(r, n + r), n -= t.length, r && (r -= t.length)), i.push(t), !n) break;
+					}
+					c = i;
+				}
 			}
-			c = i;
 		}
 	}
 	return c;
@@ -1223,10 +1255,12 @@ function Ct(e, t, n, r, i) {
 	} else for (let u = c - 1, d, f = 0; u >= 0; u--) {
 		d = e[u];
 		for (let e = 0; e < d.length; e++) if (l = (r = d[e]) && r.length) {
-			for (let d = 0; d < l; d++) if (s = r[d], !o[s]) if (o[s] = 1, n) n--;
-			else {
-				let n = (e + (u < c - 1 && i || 0)) / (u + 1) | 0;
-				if ((a[n] || (a[n] = [])).push(s), ++f === t) return a;
+			for (let d = 0; d < l; d++) if (s = r[d], !o[s]) {
+				if (o[s] = 1, n) n--;
+				else {
+					let n = (e + (u < c - 1 && i || 0)) / (u + 1) | 0;
+					if ((a[n] || (a[n] = [])).push(s), ++f === t) return a;
+				}
 			}
 		}
 	}
@@ -1611,10 +1645,12 @@ Yt.prototype.remove = function(e, t) {
 	let n = this.reg.size && (this.fastupdate ? this.reg.get(e) : this.reg.has(e));
 	if (n) {
 		if (this.fastupdate) {
-			for (let t = 0, r, i; t < n.length; t++) if ((r = n[t]) && (i = r.length)) if (r[i - 1] === e) r.pop();
-			else {
-				let t = r.indexOf(e);
-				t >= 0 && r.splice(t, 1);
+			for (let t = 0, r, i; t < n.length; t++) if ((r = n[t]) && (i = r.length)) {
+				if (r[i - 1] === e) r.pop();
+				else {
+					let t = r.indexOf(e);
+					t >= 0 && r.splice(t, 1);
+				}
 			}
 		} else Vt(this.map, e), this.depth && Vt(this.ctx, e);
 		t || this.reg.delete(e);
@@ -2030,10 +2066,12 @@ function tn(e, t, n) {
 	let r = e.value, i, a = 0;
 	for (let e = 0, o; e < r.length; e++) {
 		if (o = n ? r : r[e]) {
-			for (let n = 0, a, s; n < t.length; n++) if (s = t[n], a = o.indexOf(s), a >= 0) if (i = 1, o.length > 1) o.splice(a, 1);
-			else {
-				r[e] = [];
-				break;
+			for (let n = 0, a, s; n < t.length; n++) if (s = t[n], a = o.indexOf(s), a >= 0) {
+				if (i = 1, o.length > 1) o.splice(a, 1);
+				else {
+					r[e] = [];
+					break;
+				}
 			}
 			a += o.length;
 		}
@@ -2770,7 +2808,7 @@ function Qr(e) {
 }
 //#endregion
 //#region node_modules/.pnpm/domutils@3.2.2/node_modules/domutils/lib/esm/index.js
-var $r = /* @__PURE__ */ t({
+var $r = /* @__PURE__ */ m({
 	DocumentPosition: () => Br,
 	append: () => br,
 	appendChild: () => yr,
@@ -2825,7 +2863,7 @@ function ti(e, t) {
 }
 //#endregion
 //#region node_modules/.pnpm/cheerio@1.2.0/node_modules/cheerio/dist/browser/static.js
-var ni = /* @__PURE__ */ t({
+var ni = /* @__PURE__ */ m({
 	contains: () => ui,
 	extract: () => di,
 	html: () => ai,
@@ -3723,7 +3761,7 @@ function Xi(e, t) {
 }
 //#endregion
 //#region node_modules/.pnpm/cheerio@1.2.0/node_modules/cheerio/dist/browser/api/attributes.js
-var Zi = /* @__PURE__ */ t({
+var Zi = /* @__PURE__ */ m({
 	addClass: () => ya,
 	attr: () => aa,
 	data: () => pa,
@@ -3754,11 +3792,13 @@ function aa(e, t) {
 			});
 		}
 		return F(this, (n) => {
-			if (N(n)) if (typeof e == "object") for (let t of Object.keys(e)) {
-				let r = e[t];
-				ia(n, t, r);
+			if (N(n)) {
+				if (typeof e == "object") for (let t of Object.keys(e)) {
+					let r = e[t];
+					ia(n, t, r);
+				}
+				else ia(n, e, t);
 			}
-			else ia(n, e, t);
 		});
 	}
 	return arguments.length > 1 ? this : ra(this[0], e, this.options.xmlMode);
@@ -3802,11 +3842,13 @@ function ca(e, t) {
 			});
 		}
 		return F(this, (n) => {
-			if (N(n)) if (typeof e == "object") for (let t of Object.keys(e)) {
-				let r = e[t];
-				sa(n, t, r, this.options.xmlMode);
+			if (N(n)) {
+				if (typeof e == "object") for (let t of Object.keys(e)) {
+					let r = e[t];
+					sa(n, t, r, this.options.xmlMode);
+				}
+				else sa(n, e, t, this.options.xmlMode);
 			}
-			else sa(n, e, t, this.options.xmlMode);
 		});
 	}
 }
@@ -3919,14 +3961,16 @@ function ba(e) {
 	});
 	let t = ga(e), n = t.length, r = arguments.length === 0;
 	return F(this, (e) => {
-		if (N(e)) if (r) e.attribs.class = "";
-		else {
-			let r = ga(e.attribs.class), i = !1;
-			for (let e = 0; e < n; e++) {
-				let n = r.indexOf(t[e]);
-				n !== -1 && (r.splice(n, 1), i = !0, e--);
+		if (N(e)) {
+			if (r) e.attribs.class = "";
+			else {
+				let r = ga(e.attribs.class), i = !1;
+				for (let e = 0; e < n; e++) {
+					let n = r.indexOf(t[e]);
+					n !== -1 && (r.splice(n, 1), i = !0, e--);
+				}
+				i && (e.attribs.class = r.join(" "));
 			}
-			i && (e.attribs.class = r.join(" "));
 		}
 	});
 }
@@ -4130,16 +4174,18 @@ function Na(e, t, n) {
 					continue;
 				}
 				let e = i(1).toLowerCase(), a = null;
-				if (t.charCodeAt(n) === 40) if (Ta.has(e)) {
-					if (Aa(t.charCodeAt(n + 1))) throw Error(`Pseudo-selector ${e} cannot be quoted`);
-					if (a = [], n = Na(a, t, n + 1), t.charCodeAt(n) !== 41) throw Error(`Missing closing parenthesis in :${e} (${t})`);
-					n += 1;
-				} else {
-					if (a = o(), Da.has(e)) {
-						let e = a.charCodeAt(0);
-						e === a.charCodeAt(a.length - 1) && Aa(e) && (a = a.slice(1, -1));
+				if (t.charCodeAt(n) === 40) {
+					if (Ta.has(e)) {
+						if (Aa(t.charCodeAt(n + 1))) throw Error(`Pseudo-selector ${e} cannot be quoted`);
+						if (a = [], n = Na(a, t, n + 1), t.charCodeAt(n) !== 41) throw Error(`Missing closing parenthesis in :${e} (${t})`);
+						n += 1;
+					} else {
+						if (a = o(), Da.has(e)) {
+							let e = a.charCodeAt(0);
+							e === a.charCodeAt(a.length - 1) && Aa(e) && (a = a.slice(1, -1));
+						}
+						a = ka(a);
 					}
-					a = ka(a);
 				}
 				r.push({
 					type: V.Pseudo,
@@ -4182,7 +4228,7 @@ function Na(e, t, n) {
 }
 //#endregion
 //#region node_modules/.pnpm/css-select@5.2.2/node_modules/css-select/lib/esm/sort.js
-var U = /* @__PURE__ */ e((/* @__PURE__ */ n(((e, t) => {
+var U = /* @__PURE__ */ n((/* @__PURE__ */ e(((e, t) => {
 	t.exports = {
 		trueFunc: function() {
 			return !0;
@@ -4653,8 +4699,10 @@ function go(e, { adapter: t }, n) {
 		return e === no || n && t.isTag(n);
 	});
 	for (let t of e) {
-		if (!(t.length > 0 && Fa(t[0]) && t[0].type !== V.Descendant)) if (r && !t.some(fo)) t.unshift(po);
-		else continue;
+		if (!(t.length > 0 && Fa(t[0]) && t[0].type !== V.Descendant)) {
+			if (r && !t.some(fo)) t.unshift(po);
+			else continue;
+		}
 		t.unshift(ho);
 	}
 }
@@ -4797,10 +4845,12 @@ function Ro(e, t, n) {
 		let r = i[e];
 		if ((a ? t.filter((e) => N(e) && !a.has(e)) : t).length === 0) break;
 		let o = zo(r, t, n);
-		if (o.length) if (a) o.forEach((e) => a.add(e));
-		else {
-			if (e === i.length - 1) return o;
-			a = new Set(o);
+		if (o.length) {
+			if (a) o.forEach((e) => a.add(e));
+			else {
+				if (e === i.length - 1) return o;
+				a = new Set(o);
+			}
 		}
 	}
 	return a === void 0 ? [] : a.size === t.length ? t : t.filter((e) => a.has(e));
@@ -4857,7 +4907,7 @@ function Wo(e, t, n) {
 }
 //#endregion
 //#region node_modules/.pnpm/cheerio@1.2.0/node_modules/cheerio/dist/browser/api/traversing.js
-var Go = /* @__PURE__ */ t({
+var Go = /* @__PURE__ */ m({
 	_findBySelector: () => Jo,
 	add: () => ks,
 	addBack: () => As,
@@ -5084,7 +5134,7 @@ function Ms(e, t) {
 }
 //#endregion
 //#region node_modules/.pnpm/cheerio@1.2.0/node_modules/cheerio/dist/browser/api/manipulation.js
-var Ns = /* @__PURE__ */ t({
+var Ns = /* @__PURE__ */ m({
 	_makeDomArray: () => Ps,
 	after: () => Ks,
 	append: () => zs,
@@ -5302,7 +5352,7 @@ function nc() {
 }
 //#endregion
 //#region node_modules/.pnpm/cheerio@1.2.0/node_modules/cheerio/dist/browser/api/css.js
-var rc = /* @__PURE__ */ t({ css: () => ic });
+var rc = /* @__PURE__ */ m({ css: () => ic });
 function ic(e, t) {
 	if (e != null && t != null || typeof e == "object" && !Array.isArray(e)) return F(this, (n, r) => {
 		N(n) && ac(n, e, t, r);
@@ -5349,7 +5399,7 @@ function cc(e) {
 }
 //#endregion
 //#region node_modules/.pnpm/cheerio@1.2.0/node_modules/cheerio/dist/browser/api/forms.js
-var lc = /* @__PURE__ */ t({
+var lc = /* @__PURE__ */ m({
 	serialize: () => pc,
 	serializeArray: () => mc
 }), uc = "input,select,textarea,keygen", dc = /%20/g, fc = /\r?\n/g;
@@ -5373,7 +5423,7 @@ function mc() {
 }
 //#endregion
 //#region node_modules/.pnpm/cheerio@1.2.0/node_modules/cheerio/dist/browser/api/extract.js
-var hc = /* @__PURE__ */ t({ extract: () => _c });
+var hc = /* @__PURE__ */ m({ extract: () => _c });
 function gc(e) {
 	return typeof e == "string" ? {
 		selector: e,
@@ -6241,10 +6291,13 @@ var ll = class {
 		}), this.active = !1;
 	}
 	_appendCharToCurrentCharacterToken(e, t) {
-		if (this.currentCharacterToken) if (this.currentCharacterToken.type === e) {
-			this.currentCharacterToken.chars += t;
-			return;
-		} else this.currentLocation = this.getCurrentLocation(0), this._emitCurrentCharacterToken(this.currentLocation), this.preprocessor.dropParsedChunk();
+		if (this.currentCharacterToken) {
+			if (this.currentCharacterToken.type === e) {
+				this.currentCharacterToken.chars += t;
+				return;
+			}
+			this.currentLocation = this.getCurrentLocation(0), this._emitCurrentCharacterToken(this.currentLocation), this.preprocessor.dropParsedChunk();
+		}
 		this._createCharacterToken(e, t);
 	}
 	_emitCodePoint(e) {
@@ -7459,10 +7512,12 @@ var ll = class {
 	}
 	_stateCharacterReference() {
 		let e = this.entityDecoder.write(this.preprocessor.html, this.preprocessor.pos);
-		if (e < 0) if (this.preprocessor.lastChunkWritten) e = this.entityDecoder.end();
-		else {
-			this.active = !1, this.preprocessor.pos = this.preprocessor.html.length - 1, this.consumedAfterSnapshot = 0, this.preprocessor.endOfChunkHit = !0;
-			return;
+		if (e < 0) {
+			if (this.preprocessor.lastChunkWritten) e = this.entityDecoder.end();
+			else {
+				this.active = !1, this.preprocessor.pos = this.preprocessor.html.length - 1, this.consumedAfterSnapshot = 0, this.preprocessor.endOfChunkHit = !0;
+				return;
+			}
 		}
 		e === 0 ? (this.preprocessor.pos = this.entityStartPos, this._flushCodePointConsumedAsCharacterReference(W.AMPERSAND), this.state = !this._isCharacterReferenceInAttribute() && il(this.preprocessor.peek(1)) ? Z.AMBIGUOUS_AMPERSAND : this.returnState) : this.state = this.returnState;
 	}
@@ -11480,16 +11535,16 @@ function Ap(e) {
 //#endregion
 //#region src/cli/doc.ts
 var jp = async (e) => {
-	let t = e.includes("--json"), { packageJsonPath: n, rootDir: r, cacheDir: i } = m();
+	let t = e.includes("--json"), { packageJsonPath: n, rootDir: r, cacheDir: i } = p();
 	_e(i);
 	let a = JSON.parse(b.readFileSync(n, "utf-8")), o = await pe(a, n);
-	if ("err" in o) return d("failed to config package: " + o.err), 1;
-	if (!(await he(a)).projectCount) return d("no typescript directory, cannot generate doc"), 1;
+	if ("err" in o) return u("failed to config package: " + o.err), 1;
+	if (!(await he(a)).projectCount) return u("no typescript directory, cannot generate doc"), 1;
 	let s = _(r, a, !0);
-	if ("err" in s) return d("failed to parse exports: " + s.err), 1;
+	if ("err" in s) return u("failed to parse exports: " + s.err), 1;
 	let { exports: c } = s.val;
-	if (!c.length) return d("exports are empty, cannot generate doc"), 1;
-	let l = x.join(r, "tsconfig.src.json"), u = {
+	if (!c.length) return u("exports are empty, cannot generate doc"), 1;
+	let l = x.join(r, "tsconfig.src.json"), d = {
 		entryPoints: c.map(({ sourcePathAbs: e }) => e),
 		entryPointStrategy: "resolve",
 		out: x.join(r, t ? "docs.json" : "docs"),
@@ -11503,77 +11558,77 @@ var jp = async (e) => {
 			"bash",
 			"tsx"
 		]
-	}, f = await ee.bootstrapWithPlugins(u), p = await f.convert();
-	return p ? (t ? await f.generateJson(p, u.out) : await f.generateDocs(p, u.out), 0) : (d("failed to process project with typedoc"), 61);
+	}, f = await ee.bootstrapWithPlugins(d), m = await f.convert();
+	return m ? (t ? await f.generateJson(m, d.out) : await f.generateDocs(m, d.out), 0) : (u("failed to process project with typedoc"), 61);
 }, Mp = async (e) => {
-	let t = e.includes("-n") || e.includes("--dry-run"), { rootDir: n, packageJsonPath: o, cacheDir: s } = m();
-	b.existsSync(s) || b.mkdirSync(s, { recursive: !0 });
-	let f = x.join(s, "pnpm-pack.temp.tgz");
-	if ((await l("pnpm", n, [
+	let n = e.includes("-n") || e.includes("--dry-run"), { rootDir: a, packageJsonPath: o, cacheDir: d } = p();
+	b.existsSync(d) || b.mkdirSync(d, { recursive: !0 });
+	let f = x.join(d, "pnpm-pack.temp.tgz");
+	if ((await c("pnpm", a, [
 		"pack",
 		"--out",
 		f
-	])).err) return d("pnpm pack failed!"), 81;
-	let p = x.join(s, "pnpm-pack.temp");
-	if (b.existsSync(p) && b.rmSync(p, {
+	])).err) return u("pnpm pack failed!"), 81;
+	let m = x.join(d, "pnpm-pack.temp");
+	if (b.existsSync(m) && b.rmSync(m, {
 		recursive: !0,
 		force: !0
-	}), b.mkdirSync(p, { recursive: !0 }), (await l("tar", p, ["-xzf", "../pnpm-pack.temp.tgz"])).err) return d("tgz extract failed!"), 91;
-	let h = x.join(p, "package", "package.json"), g = JSON.parse(b.readFileSync(h, "utf8")), v = JSON.parse(b.readFileSync(o, "utf8")), y = !!g["pistonight/mono-dev"]?.publish;
+	}), b.mkdirSync(m, { recursive: !0 }), (await c("tar", m, ["-xzf", "../pnpm-pack.temp.tgz"])).err) return u("tgz extract failed!"), 91;
+	let h = x.join(m, "package", "package.json"), g = JSON.parse(b.readFileSync(h, "utf8")), v = JSON.parse(b.readFileSync(o, "utf8")), y = !!g["pistonight/mono-dev"]?.publish;
 	delete g["pistonight/mono-dev"], delete g.private;
-	let S = _(n, v);
-	if ("err" in S) return d("failed to parse exports: " + S.err), 1;
+	let S = _(a, v);
+	if ("err" in S) return u("failed to parse exports: " + S.err), 1;
 	if (g.exports) {
-		if (typeof g.exports == "string") return d("failed to parse exports: 'exports' field must be an object"), 1;
+		if (typeof g.exports == "string") return u("failed to parse exports: 'exports' field must be an object"), 1;
 		let e = v["pistonight/mono-dev"]?.compile || {};
-		for (let { entryName: t, distPathRel: n, distDtsPathRel: i } of S.val.exports) {
-			let a = t === "." ? "." : "./" + t;
+		for (let { entryName: n, distPathRel: r, distDtsPathRel: i } of S.val.exports) {
+			let a = n === "." ? "." : "./" + n;
 			a in e || (g.exports[a] = {
-				import: "./" + r + "/" + n,
-				types: "./" + r + "/" + i
+				import: "./" + t + "/" + r,
+				types: "./" + t + "/" + i
 			});
 		}
 	}
 	if (g.imports) for (let e in g.imports) {
 		if (!e.startsWith("#")) continue;
-		let t = g.imports[e];
-		if (!t.startsWith("./src") || !t.match(/\.(c|m)?tsx?$/)) continue;
-		let n = t.lastIndexOf("."), i = t.substring(2, n), a = "./" + r + "/" + u + "/" + i + ".d.ts";
+		let n = g.imports[e];
+		if (!n.startsWith("./src") || !n.match(/\.(c|m)?tsx?$/)) continue;
+		let r = n.lastIndexOf("."), i = n.substring(2, r), a = "./" + t + "/" + l + "/" + i + ".d.ts";
 		g.imports[e] = a;
 	}
 	let C = !0;
 	if (g.files) {
 		for (let e in g.files) if (e.startsWith("dist")) {
-			a("not adding 'dist/**/*' to files since there are dist paths specified in original package.json"), C = !1;
+			i("not adding 'dist/**/*' to files since there are dist paths specified in original package.json"), C = !1;
 			break;
 		}
 	}
-	C && (c("adding 'dist/**/*' to files in package.json"), g.files ? g.files.push("dist/**/*") : g.files = ["dist/**/*"]), g.devDependencies && Np(g.devDependencies), b.writeFileSync(h, i(JSON.stringify(g, void 0, 2)));
-	let w = x.join(p, "package", "dist");
+	C && (s("adding 'dist/**/*' to files in package.json"), g.files ? g.files.push("dist/**/*") : g.files = ["dist/**/*"]), g.devDependencies && Np(g.devDependencies), b.writeFileSync(h, r(JSON.stringify(g, void 0, 2)));
+	let w = x.join(m, "package", "dist");
 	b.existsSync(w) && b.rmSync(w, {
 		recursive: !0,
 		force: !0
-	}), b.cpSync(x.join(n, "dist"), w, { recursive: !0 });
-	let T = x.join(s, "pnpm-packed.tgz");
-	return (await l("tar", s, [
+	}), b.cpSync(x.join(a, "dist"), w, { recursive: !0 });
+	let T = x.join(d, "pnpm-packed.tgz");
+	return (await c("tar", d, [
 		"-czf",
 		"pnpm-packed.tgz",
 		"-C",
 		"pnpm-pack.temp",
 		"package"
-	])).err ? (d("tgz creation failed!"), 91) : (c("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), c("packed at: " + T), t ? (c("dry-run, stopping"), 0) : y ? (await l("pnpm", n, [
+	])).err ? (u("tgz creation failed!"), 91) : (s("unpacked at: node_modules/.mono/pnpm-pack.temp/package"), s("packed at: " + T), n ? (s("dry-run, stopping"), 0) : y ? (await c("pnpm", a, [
 		"publish",
 		T,
 		"--access",
 		"public"
-	])).err ? (d("pnpm publish failed!"), 101) : 0 : (d("please set mono-dev option \"publish\": true"), 1));
+	])).err ? (u("pnpm publish failed!"), 101) : 0 : (u("please set mono-dev option \"publish\": true"), 1));
 }, Np = (e) => {
 	for (let t in e) {
 		if (t !== "mono-dev") continue;
 		let n = e[t];
 		if (typeof n != "string") continue;
 		let [r, i] = n.split("#", 2), a = r.toLowerCase();
-		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#0e4deeeefb5336470664a485bba3bc1787f4cf66");
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#113e0c1e3269ea80844cb284a1c679ef110cc288");
 	}
 }, Pp = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
@@ -11619,46 +11674,46 @@ function Rp(e, t, n) {
 function zp(e) {
 	let t = b.readFileSync(e, "utf8"), n = w(t)?.tasks;
 	if (!n || typeof n != "object") return !1;
-	let r = t, i = !1;
+	let r = t, a = !1;
 	for (let [t, o] of Object.entries(n)) {
 		if (!o || typeof o != "object" || o.internal || o.desc) continue;
 		let n = Pp[t];
-		if (n || (a(`${e}: unknown task "${t}" — add a desc manually`), i = !0), Array.isArray(o)) {
+		if (n || (i(`${e}: unknown task "${t}" — add a desc manually`), a = !0), Array.isArray(o)) {
 			let o = Lp(r, t, n ?? null);
 			if (o === null) {
-				a(`${e}: could not locate task "${t}" in file`), i = !0;
+				i(`${e}: could not locate task "${t}" in file`), a = !0;
 				continue;
 			}
-			c(`${e}: converted shorthand for "${t}"${n ? " and added desc" : ""}`), r = o;
+			s(`${e}: converted shorthand for "${t}"${n ? " and added desc" : ""}`), r = o;
 		} else if (n) {
 			let o = Rp(r, t, n);
 			if (o === null) {
-				a(`${e}: could not locate task "${t}" in file`), i = !0;
+				i(`${e}: could not locate task "${t}" in file`), a = !0;
 				continue;
 			}
-			c(`${e}: added desc for "${t}"`), r = o;
+			s(`${e}: added desc for "${t}"`), r = o;
 		}
 	}
-	return r !== t && b.writeFileSync(e, r, "utf8"), i;
+	return r !== t && b.writeFileSync(e, r, "utf8"), a;
 }
 var Bp = () => {
 	let e = Fp();
-	if (e.length === 0) return c("no Taskfile.yml files found"), 0;
+	if (e.length === 0) return s("no Taskfile.yml files found"), 0;
 	let t = !1;
 	for (let n of e) zp(n) && (t = !0);
 	return +!!t;
 }, Vp = async (e) => {
-	let { packageJsonPath: t, rootDir: n, cacheDir: r } = m();
+	let { packageJsonPath: t, rootDir: n, cacheDir: r } = p();
 	_e(r);
 	let i = JSON.parse(b.readFileSync(t, "utf-8")), a = await pe(i, t);
-	if ("err" in a) return d("failed to config package: " + a.err), 1;
+	if ("err" in a) return u("failed to config package: " + a.err), 1;
 	await he(i);
 	let o = y(r, n);
-	return o || c("using vite config from project root directly"), +!!(o ? f("vitest", n, [
+	return o || s("using vite config from project root directly"), +!!(o ? d("vitest", n, [
 		"--config",
 		o,
 		...e
-	]) : f("vitest", n, e)).err;
+	]) : d("vitest", n, e)).err;
 }, Hp = async (e) => {
 	e.length || (Up(), process.exit(0));
 	let [t, ...n] = e;
@@ -11667,7 +11722,7 @@ var Bp = () => {
 		case "--help":
 		case "?":
 		case "-h": return Up(), process.exit(0);
-		case "version": return console.log("mono-dev " + s()), process.exit(0);
+		case "version": return console.log("mono-dev " + o()), process.exit(0);
 		case "config": return process.exit(await Ce(n));
 		case "check": return process.exit(await ye(n));
 		case "build": return process.exit(await ve());
@@ -11681,9 +11736,9 @@ var Bp = () => {
 			}
 			return process.exit(await Mp(n));
 	}
-	d("unknown command " + t), Up(), process.exit(1);
+	u("unknown command " + t), Up(), process.exit(1);
 }, Up = () => {
 	console.log("mono-dev CLI\n  config           Generate typeck and eslint config, for language servers\n  check [-f]       Run typeck, prettier, eslint\n  build            Build library (for bundling app run vite directly)\n  test  ARGS...    Run test (with vitest)\n  doc   [--json]   Build documentation \n  taskfile         Fixup taskfiles\n  publish [-n]     Publish the package (-n for dry-run)\n  version          Print the version\n");
 };
 //#endregion
-export { o as executeShim, Hp as main };
+export { a as executeShim, Hp as main };

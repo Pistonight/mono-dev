@@ -141,11 +141,12 @@ var l = 4, u = (e) => d(e, 0), d = (e, t) => {
 	let a = d(e, 4);
 	if (n.imports && d(n.imports, 4) === a) return r("subpath import mapping is up-to-date"), {};
 	let o = (await c.readFile(i, "utf-8")).trim(), s = o.split("\n").map((e) => e.trimEnd()), l, f, p;
-	if (l = s.indexOf("    \"imports\": {"), l !== -1) if (f = s.indexOf("    },", l + 1), f === -1) {
-		if (f = s.indexOf("    }", l + 1), f === -1) return { err: "failed to edit 'imports' in package.json: cannot find end of 'imports' field. Please delete the field manually and retry" };
-		p = !0;
-	} else p = !1;
-	else l = s.indexOf("    \"imports\": {}"), l === -1 ? (l = s.indexOf("    \"imports\": {},"), l === -1 ? (l = f = -1, p = !1) : (f = l, p = !1)) : (f = l, p = !0);
+	if (l = s.indexOf("    \"imports\": {"), l !== -1) {
+		if (f = s.indexOf("    },", l + 1), f === -1) {
+			if (f = s.indexOf("    }", l + 1), f === -1) return { err: "failed to edit 'imports' in package.json: cannot find end of 'imports' field. Please delete the field manually and retry" };
+			p = !0;
+		} else p = !1;
+	} else l = s.indexOf("    \"imports\": {}"), l === -1 ? (l = s.indexOf("    \"imports\": {},"), l === -1 ? (l = f = -1, p = !1) : (f = l, p = !1)) : (f = l, p = !0);
 	if (l === -1 && "imports" in n) return { err: "failed to edit 'imports' in package.json: cannot locate 'imports' field. Please delete the field manually and retry" };
 	let m;
 	if (l !== -1) {

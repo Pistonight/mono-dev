@@ -1,4 +1,5 @@
 /// <reference types="node" />
+/// <reference lib="dom" />
 /// <reference types="vite/client" />
 /// <reference types="vitest/importMeta" />
 /// <reference types="vitest/config" />

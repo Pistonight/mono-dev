@@ -79,7 +79,8 @@ var p = { rules: {
 				"@typescript-eslint/consistent-type-definitions": ["warn", "interface"],
 				"monodev-eslint/no-param-destructure": "warn",
 				"monodev-eslint/no-keyof-typeof-alias": "warn"
-			} : void 0
+			} : void 0,
+			"@typescript-eslint/no-restricted-types": ["error", { types: { "WebAssembly.Module": "Anything is assignable to WebAssembly.Module; see https://github.com/microsoft/TypeScript-DOM-lib-generator/issues/2172" } }]
 		}
 	}), h());
 }, h = () => ({
@@ -92,7 +93,12 @@ var p = { rules: {
 	"react/prop-types": "off"
 }), g = (e, t) => {
 	if (Array.isArray(e)) for (let n of e) g(n, t);
-	else if (e.rules) for (let n in t) e.rules[n] && (e.rules[n] = t[n]);
+	else if (e.rules) {
+		for (let n in t) if (e.rules[n]) {
+			let r = t[n];
+			typeof r == "function" ? e.rules[n] = r(e.rules[n]) : e.rules[n] = r;
+		}
+	}
 	return e;
 }, _ = (e, t) => {
 	let i = ["./eslint.config.js"];

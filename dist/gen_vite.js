@@ -33,24 +33,26 @@ var p = 4096, m = [
 	return t["pistonight/mono-dev"]?.wasm && n.push(f()), n;
 }, v = (e, t) => {
 	let i = e["pistonight/mono-dev"]?.["import.meta.env"] || {}, c = { "import.meta.vitest": "undefined" };
-	if (i.VERSION) if (typeof i.VERSION == "string") {
-		let e = o.resolve(o.dirname(t), i.VERSION), s;
-		try {
-			s = a.readFileSync(e, "utf-8");
-		} catch {
-			r(`failed to resolve file for import.meta.env.VERSION: ${e}`), process.exit(1);
+	if (i.VERSION) {
+		if (typeof i.VERSION == "string") {
+			let e = o.resolve(o.dirname(t), i.VERSION), s;
+			try {
+				s = a.readFileSync(e, "utf-8");
+			} catch {
+				r(`failed to resolve file for import.meta.env.VERSION: ${e}`), process.exit(1);
+			}
+			let l;
+			try {
+				l = JSON.parse(s);
+			} catch {
+				r(`failed to parse file for import.meta.env.VERSION: ${e}`), process.exit(1);
+			}
+			let u = String(l.version);
+			n("import.meta.env.VERSION: " + u), c["import.meta.env.VERSION"] = JSON.stringify(u);
+		} else {
+			let t = String(e.version);
+			n("import.meta.env.VERSION: " + t), c["import.meta.env.VERSION"] = JSON.stringify(t);
 		}
-		let l;
-		try {
-			l = JSON.parse(s);
-		} catch {
-			r(`failed to parse file for import.meta.env.VERSION: ${e}`), process.exit(1);
-		}
-		let u = String(l.version);
-		n("import.meta.env.VERSION: " + u), c["import.meta.env.VERSION"] = JSON.stringify(u);
-	} else {
-		let t = String(e.version);
-		n("import.meta.env.VERSION: " + t), c["import.meta.env.VERSION"] = JSON.stringify(t);
 	}
 	if (i.COMMIT) {
 		let e = s.spawnSync("git", ["rev-parse", "HEAD"], { encoding: "utf-8" }).stdout.trim();

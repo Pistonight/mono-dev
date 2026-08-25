@@ -36,11 +36,13 @@ export const runCheck = async (args: string[]): Promise<number> => {
 
     const fix = args.includes("--fix") || args.includes("-f");
     if (fix) {
-        if (!runEslint(rootDir, cacheDir, fix)) {
-            return 41;
-        }
+        // in fix we need to run prettier first because it might
+        // change eslint directives
         if (!runPrettier(rootDir, cacheDir, fix)) {
             return 51;
+        }
+        if (!runEslint(rootDir, cacheDir, fix)) {
+            return 41;
         }
         if (!runTypeck(rootDir)) {
             return 31;
@@ -49,6 +51,8 @@ export const runCheck = async (args: string[]): Promise<number> => {
         if (!runTypeck(rootDir)) {
             return 31;
         }
+        // in check we can run eslint first because if prettier
+        // also pass, it's not going to change eslint ignore directives
         if (!runEslint(rootDir, cacheDir, fix)) {
             return 41;
         }
