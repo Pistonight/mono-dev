@@ -78,13 +78,22 @@ export const configure = () => {
                       "monodev-eslint/no-keyof-typeof-alias": "warn",
                   }
                 : undefined),
+            "@typescript-eslint/no-restricted-types": [
+                "error",
+                {
+                    types: {
+                        "WebAssembly.Module":
+                            "Anything is assignable to WebAssembly.Module; see https://github.com/microsoft/TypeScript-DOM-lib-generator/issues/2172",
+                    },
+                },
+            ],
         },
     });
 
     return overrideEslintConfig(config, getDefaultOverrides());
 };
 
-const getDefaultOverrides = (): Linter.RulesRecord => {
+const getDefaultOverrides = (): EslintOverrides => {
     // these only apply if they are already in the config
     // otherwise add it to above
     return {
@@ -103,9 +112,12 @@ const getDefaultOverrides = (): Linter.RulesRecord => {
     };
 };
 
+export type EslintOverrides = Record<string, Linter.RulesRecord[string] | EslintOverrideFn>;
+export type EslintOverrideFn = (existing: Linter.RulesRecord[string]) => Linter.RulesRecord[string];
+
 export const overrideEslintConfig = <T extends keyof EslintConfigPartSelector>(
     configs: EslintConfigPartSelector[T],
-    overrides: Linter.RulesRecord,
+    overrides: EslintOverrides,
 ): EslintConfigPartSelector[T] => {
     if (Array.isArray(configs)) {
         for (const config of configs) {
@@ -115,7 +127,12 @@ export const overrideEslintConfig = <T extends keyof EslintConfigPartSelector>(
         if (configs.rules) {
             for (const rule in overrides) {
                 if (configs.rules[rule]) {
-                    configs.rules[rule] = overrides[rule];
+                    const theOverride = overrides[rule];
+                    if (typeof theOverride === "function") {
+                        configs.rules[rule] = theOverride(configs.rules[rule]);
+                    } else {
+                        configs.rules[rule] = theOverride;
+                    }
                 }
             }
         }

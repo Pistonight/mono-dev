@@ -38,7 +38,7 @@ Running `pnpm up mono-dev` will resolve the latest commit and update it.
     - Paths in `nocheck` will not be processed by `eslint` or `prettier`.
       If the path is in the form of `/foo` or `foo`, the `foo` directory
       will also not be type-checked.
-    - `pistonight/mono-dev` is the options for mono-dev. See [MonoDevOptions](https://github.com/Pistonight/mono-dev/blob/main/src/util/types.ts)
+    - `pistonight/mono-dev` is the options for mono-dev. See [MonoDevOptions](https://github.com/Pistonight/mono-dev/blob/main/src/util/misc.ts)
 
 #### Template: `Taskfile.yml`
 -   ```yaml
