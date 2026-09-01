@@ -24,9 +24,11 @@ import {
 const CHUNK_SIZE_WARNING_LIMIT = 4096;
 
 export const KNOWN_PROBLEMATIC_ESM_COMPAT_MODULES_AND_THEIR_IMPORTERS = [
-    "@fluentui/react-components",
-    "@fluentui/react-icons",
-    "@pistonite/celera",
+    // https://github.com/microsoft/fluentui/discussions/36614
+    // fluentui now ships ESM properly but tabster still doesn't
+    // (which is funny because it makes the problem worse as we need to inline
+    // all FUI modules that ultimately depends on tabster, which is.. everything
+    /@fluentui\/react-/,
 ];
 
 export const KNOWN_GLOBAL_SINGLETON_PACKAGES = [
