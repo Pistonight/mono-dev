@@ -1,4 +1,4 @@
-import { _ as e, y as t } from "./plugins.js";
+import { _ as e, v as t } from "./plugins.js";
 //#region node_modules/.pnpm/isexe@4.0.0/node_modules/isexe/dist/commonjs/index.min.js
 var n = /* @__PURE__ */ e(((e) => {
 	var n = (e, t) => () => (t || e((t = { exports: {} }).exports, t), t.exports), r = n((e) => {
