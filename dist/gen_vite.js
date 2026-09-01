@@ -7,11 +7,7 @@ import u from "@rolldown/plugin-babel";
 import d from "babel-plugin-react-compiler";
 import f from "vite-plugin-wasm";
 //#region src/config/gen_vite.ts
-var p = 4096, m = [
-	"@fluentui/react-components",
-	"@fluentui/react-icons",
-	"@pistonite/celera"
-], h = [
+var p = 4096, m = [/@fluentui\/react-/], h = [
 	"react",
 	"react-dom",
 	"@pistonite/celera",
