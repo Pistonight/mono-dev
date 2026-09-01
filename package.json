@@ -1,6 +1,6 @@
 {
   "name": "mono-dev",
-  "version": "0.4.29",
+  "version": "0.4.30",
   "description": "NPM module for mono-dev utilities",
   "type": "module",
   "dependencies": {
@@ -29,7 +29,7 @@
     "@types/babel__core": "^7.20.5",
     "@types/bun": "^1.4.0",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24.13.3",
+    "@types/node": "^26",
     "@types/which": "^3.0.4",
     "rolldown": "^1.2.5",
     "which": "^7.0.0",

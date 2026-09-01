@@ -37,7 +37,7 @@ var a = Object.create, o = Object.defineProperty, s = Object.getOwnPropertyDescr
 		t = e, r = n.join(t, "package.json");
 	}
 	return n.resolve(r);
-}, C = () => "0.4.29", w = (e, t) => t.filter((t) => T(e, t)), T = (e, t) => !!(e.dependencies && t in e.dependencies || e.devDependencies && t in e.devDependencies || e.peerDependencies && t in e.peerDependencies || e.optionalDependencies && t in e.optionalDependencies || e.bundledDependencies && t in e.bundledDependencies), E = "[mono]", D = (...e) => console.log(E, ...e), O = (...e) => console.warn("\x1B[33m[mono]", ...e, "\x1B[0m"), k = (...e) => console.error("\x1B[31m[mono]", ...e, "\x1B[0m"), A = (e) => e.split("\r").map((e) => e.trimEnd()).join("\n"), j = (e, t) => {
+}, C = () => "0.4.30", w = (e, t) => t.filter((t) => T(e, t)), T = (e, t) => !!(e.dependencies && t in e.dependencies || e.devDependencies && t in e.devDependencies || e.peerDependencies && t in e.peerDependencies || e.optionalDependencies && t in e.optionalDependencies || e.bundledDependencies && t in e.bundledDependencies), E = "[mono]", D = (...e) => console.log(E, ...e), O = (...e) => console.warn("\x1B[33m[mono]", ...e, "\x1B[0m"), k = (...e) => console.error("\x1B[31m[mono]", ...e, "\x1B[0m"), A = (e) => e.split("\r").map((e) => e.trimEnd()).join("\n"), j = (e, t) => {
 	if (typeof e == "string") return e;
 	if (!e) return `${e}`;
 	if (typeof e == "object" && "message" in e) return t ? `${e.message}` : j(e.message, !0);
