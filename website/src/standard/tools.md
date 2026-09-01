@@ -55,15 +55,21 @@ For Rust projects:
 
 
 ## TypeScript/ECMAScript/JS
+
+> [!TIP]
+> The steps below sets up PNPM and use it as the runtime/toolchain manager.
+> If you already have another runtime/toolchain manager (such as `nvm`),
+> you can install the runtimes use your preferred method. If it also
+> supports the `devEngines` field, you will also get an error or warning
+> if your currently installed engine version is not compatible.
+
 For TypeScript/ECMAScript (aka JS) projects:
-- Install NodeJS **v24**. You should use a node version manager in most cases.
-  Some projects may use an older version if they are not maintained for a long time.
-- Install PNPM. Usually the latest version is used, but it might lag behind
-  when a new version comes out and the project is not actively maintained.
+- Install [PNPM](https://pnpm.io/) which acts as a unified toolchain, engine, and package manager.
+- Install NodeJS **v26** with PNPM: `pnpm i -g node@26`.
 - Some projects may also need [Bun](https://bun.com/docs/installation).
+  You can either install it standalone or through PNPM: `pnpm i -g bun`
 - Install TypeScript and ESLint extension for VS Code, or if you use another editor,
-  the corresponding TypeScript extension/plugin for that editor (only the official
-  compiler `tsc` is supported).
+  the corresponding TypeScript extension/plugin for that editor.
 
 ## C/C++
 For C or C++ projects:

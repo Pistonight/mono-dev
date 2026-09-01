@@ -2,9 +2,6 @@ name: mono-dev setup
 description: Setup for mono-dev Standard Project
 
 inputs:
-  skip-checkout:
-    description: Skip the checkout step
-    default: false
   mono-dev:
     description: Ref for cloning mono-dev, 'auto', 'false', or a specific ref
     default: 'auto'
@@ -62,8 +59,30 @@ runs:
       with:
         persist-credentials: false
         submodules: ${{ inputs.submodules }}
-    - run: node --version
-      shell: bash
+
+    # -- NodeJS 
+    #
+    # setup NodeJS before running environment scripts as the runner image may not have NodeJS
+    # if we are not using the official runner images
+    - if: ${{ inputs.ecma-pnpm != 'false' }}
+      uses: pnpm/setup@v2
+      with:
+        version: 12
+        # we will run install manually which is consistent with the old action-setup behavior
+        # (most of the time this action will run the install, see the end of the action)
+        install: false
+        # this is set to force all projects to run with the latest node version in CI
+        # rather than stuck forever with an old version
+        runtime: node@26
+        cache: true
+    # the bare node (without pnpm) does not use cache
+    - if: ${{ inputs.ecma-node == 'true' && inputs.ecma-pnpm == 'false' }}
+      uses: actions/setup-node@v6
+      with:
+        node-version: 26
+        package-manager-cache: false
+    # determine mono-dev install mode, which might require setting up PNPM without ecma-pnpm
+    # in auto mode
     - run: node wkspenv.mjs
       working-directory: ${{ github.action_path }}
       id: wkspenvjs
@@ -71,27 +90,27 @@ runs:
       env:
         MONODEV_WORKSPACE: ${{ github.workspace }}
         MONODEV_INPUT_MONO_DEV: ${{ inputs.mono-dev }}
-    - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'checkout' }}
-      uses: actions/checkout@v6
+    - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'pnpm' && inputs.ecma-pnpm == 'false' && inputs.ecma-node == 'false' }}
+      uses: pnpm/setup@v2
       with:
-        repository: Pistonight/mono-dev
-        ref: ${{ steps.wkspenvjs.outputs.mono_dev_ref }}
-        path: ${{ inputs.mono-dev-path }}
-        persist-credentials: false
-    - uses: go-task/setup-task@v2
-      with:
-        repo-token: ${{ github.token }}
+        version: 12
+        install: false
+        runtime: node@26
+        cache: true
+    - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'pnpm' && inputs.ecma-pnpm == 'false' && inputs.ecma-node == 'true' }}
+      shell: bash
+      run: |
+        echo "::error::mono-dev installation is detected to be pnpm while ecma-node: true without pnpm - please set ecma-pnpm: true and remove ecma-node"
+
+    # -- Environment
     - run: node env.mjs
       working-directory: ${{ github.action_path }}
       id: envjs
       shell: bash
       env:
-        MONODEV_INSTALL_METHOD: ${{ steps.wkspenvjs.mono_dev_install }}
         MONODEV_RUNNER_OS: ${{ runner.os }}
         MONODEV_RUNNER_ARCH: ${{ runner.arch }}
         MONODEV_RUNNER: ${{ inputs.runner }}
-        MONODEV_ECMA_NODE: ${{ inputs.ecma-node }}
-        MONODEV_ECMA_PNPM: ${{ inputs.ecma-pnpm }}
         MONODEV_RUST: ${{ inputs.rust }}
         MONODEV_RUST_WASM: ${{ inputs.rust-wasm }}
         MONODEV_RUST_NATIVE: ${{ inputs.rust-native }}
@@ -103,20 +122,16 @@ runs:
         MONODEV_CCPP_CMAKE: ${{ inputs.ccpp-cmake }}
         MONODEV_PYTHON: ${{ inputs.python }}
 
-
-    - if: ${{ inputs.ecma-pnpm == 'true' }}
-      uses: pnpm/action-setup@v5
-      with:
-        version: 11
-    - if: ${{ steps.envjs.outputs.setup_node != 'false' }}
-      uses: actions/setup-node@v6 # blacksmith automatically changes to use its cache
-      with:
-        node-version: 24
-        cache: ${{ steps.envjs.outputs.node_cache }}
+    # -- Bun
     - if: ${{ inputs.ecma-bun == 'true' }}
       uses: oven-sh/setup-bun@v2
 
+    # -- Task
+    - uses: go-task/setup-task@v2
+      with:
+        repo-token: ${{ github.token }}
 
+    # -- Rust + Cargo Tools
     - if: ${{ steps.envjs.outputs.rust_toolchain != '' }}
       uses: dtolnay/rust-toolchain@master
       with:
@@ -161,6 +176,7 @@ runs:
       with:
         key: ${{ steps.envjs.outputs.rust_cache_key }}
 
+    # -- CCPP
     - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' }}
       id: ccpp-lint-cache-restore
       uses: actions/cache/restore@v5
@@ -191,12 +207,12 @@ runs:
       run: |
         clang-format --version
         clang-tidy --version
-
     - if: ${{ steps.envjs.outputs.ccpp_cmake == 'true' }}
       uses: jwlawson/actions-setup-cmake@v2
       with:
         cmake-version: '4.x'
 
+    # -- Python
     - if: ${{ inputs.python == 'true' }}
       uses: actions/setup-python@v7
       with:
@@ -206,6 +222,14 @@ runs:
       with:
         python-version: '3.14'
 
+    # -- Finally pull in mono-dev
     - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'pnpm' }}
       run: pnpm install --frozen-lockfile
       shell: bash
+    - if: ${{ github.repository != 'Pistonight/mono-dev' && steps.wkspenvjs.outputs.mono_dev_install == 'checkout' }}
+      uses: actions/checkout@v6
+      with:
+        repository: Pistonight/mono-dev
+        ref: ${{ steps.wkspenvjs.outputs.mono_dev_ref }}
+        path: ${{ inputs.mono-dev-path }}
+        persist-credentials: false

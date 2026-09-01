@@ -1,11 +1,8 @@
 import { writeGitHubOutput } from "../util.mjs";
 
 const {
-    MONODEV_INSTALL_METHOD,
     MONODEV_RUNNER_OS,
     MONODEV_RUNNER_ARCH,
-    MONODEV_ECMA_NODE,
-    MONODEV_ECMA_PNPM,
     MONODEV_RUST,
     MONODEV_RUST_WASM,
     MONODEV_RUST_NATIVE,
@@ -29,14 +26,8 @@ const isWindows = MONODEV_RUNNER_OS === "Windows";
 const isLinux = MONODEV_RUNNER_OS === "Linux";
 const isMacOS = MONODEV_RUNNER_OS === "macOS";
 
-const monodev_ecma_pnpm = bool(MONODEV_ECMA_PNPM) || MONODEV_INSTALL_METHOD === "pnpm";
-const monodev_ecma_node = bool(MONODEV_ECMA_NODE);
 const monodev_rust_wasm = bool(MONODEV_RUST_WASM);
 const monodev_rust_src = bool(MONODEV_RUST_SRC);
-
-// NodeJS
-const setup_node = !!(monodev_ecma_node || monodev_ecma_pnpm);
-const node_cache = monodev_ecma_pnpm ? "pnpm" : "";
 
 // Rust
 const cargoInstallConfigs = [];
@@ -188,9 +179,6 @@ if (ccpp_lint) {
 let python = MONODEV_PYTHON === "uv" ? "uv" : !!MONODEV_PYTHON;
 
 writeGitHubOutput({
-    setup_node,
-    node_cache,
-
     setup_rust,
     rust_toolchain,
     rust_components,
