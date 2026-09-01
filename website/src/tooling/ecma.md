@@ -14,12 +14,12 @@ for setting up the project
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "12.1.0",
+      "version": "^12",
       "onFail": "error"
     },
     "runtime": [
-      { "name": "node", "version": "26", "onFail": "error" },
-      { "name": "bun", "version": "1", "onFail": "warn" }
+      { "name": "node", "version": "^26", "onFail": "error" },
+      { "name": "bun", "version": "^1.4.0", "onFail": "warn" }
     ]
   },
 ```
