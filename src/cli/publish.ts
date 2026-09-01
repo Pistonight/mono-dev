@@ -52,8 +52,14 @@ export const runPublish = async (args: string[]): Promise<number> => {
     );
     const allowPublish = !!packageJson["pistonight/mono-dev"]?.publish;
 
-    delete packageJson["pistonight/mono-dev"];
+    // ..obviously we need to remove the private field to publish
     delete packageJson.private;
+    // this metadata is only meaningful for mono-dev and not to the published package
+    delete packageJson["pistonight/mono-dev"];
+    // the devEngines field is just for development, it might cause troubles
+    // when other people downloads the published the package. the published
+    // package should not care about the engines
+    delete packageJson.devEngines;
 
     const libExports = parseExports(rootDir, originalPackageJson);
     if ("err" in libExports) {
