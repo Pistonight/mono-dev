@@ -11,6 +11,7 @@ export interface PackageJson {
     bundledDependencies?: Record<string, string>;
     ["pistonight/mono-dev"]?: MonoDevOptions;
     imports?: Record<string, string>;
+    devEngines?: unknown;
 }
 export interface PackageExport {
     types?: string;

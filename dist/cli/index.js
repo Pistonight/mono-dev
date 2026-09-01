@@ -295,7 +295,7 @@ var T = (e) => {
 		force: !0
 	}), _.mkdirSync(h, { recursive: !0 }), (await o("tar", h, ["-xzf", "../pnpm-pack.temp.tgz"])).err) return c("tgz extract failed!"), 91;
 	let g = v.join(h, "package", "package.json"), y = JSON.parse(_.readFileSync(g, "utf8")), b = JSON.parse(_.readFileSync(u, "utf8")), x = !!y["pistonight/mono-dev"]?.publish;
-	delete y["pistonight/mono-dev"], delete y.private;
+	delete y.private, delete y["pistonight/mono-dev"], delete y.devEngines;
 	let S = m(l, b);
 	if ("err" in S) return c("failed to parse exports: " + S.err), 1;
 	if (y.exports) {
@@ -348,7 +348,7 @@ var T = (e) => {
 		let n = e[t];
 		if (typeof n != "string") continue;
 		let [r, i] = n.split("#", 2), a = r.toLowerCase();
-		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#2ee37c0663f179f4467fc9c19dac9f9cd3c013d0");
+		!a.startsWith("github:") || !a.endsWith("/mono-dev") || (e[t] = r + "#524dffb7d1191ee560bb2c64ab8341ba8abb03c2");
 	}
 }, B = {
 	"install-cargo-extra-tools": "Install or upgrade extra tools needed for development using cargo onto the system",
