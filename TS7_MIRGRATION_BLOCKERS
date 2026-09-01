@@ -1,0 +1,9 @@
+typescript-eslint:
+  we will migrate to oxlint for the speed boost
+  now that they have better support for the rules we depend on
+
+typedoc:
+  https://github.com/TypeStrong/typedoc/issues/3098
+  it should be fixed soon
+  typedoc does not support being inlined and it directly imports typescript,
+  soooooo there's no workaround we can do

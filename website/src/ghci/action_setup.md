@@ -11,24 +11,28 @@ jobs:
       - uses: Pistonight/mono-dev/actions/setup@main
         with:
           # ALL VALUES BELOW ARE OPTIONAL
-          # clone mono-dev in the repo
+
+          # -- clone mono-dev in the repo --
           # Default: 'auto' - special value:
-          #   - if pnpm-lock.yaml exists at root, then pnpm install will run.
+          #   - if pnpm-lock.yaml exists at root, then pnpm install will run, to pull
+          #     in mono-dev and also all other dependencies.
           #     pnpm and node will also be installed without having to specify ecma-pnpm
           #   - otherwise, cloned to `/mono-dev` of the repo
           #
           # Set to `false` to not clone
-          # Set to anything else to use a different reference than the main branch
+          # Anything else indicates the ref to clone instead of `main`
           mono-dev: auto
           # Where to clone mono-dev, /mono-dev is the default
           mono-dev-path: mono-dev
 
-          # whether to glone submodules
-          # default is false
+          # -- whether to clone submodules, default false
           submodules: true
 
-          # setup NodeJS/PNPM
-          # default false, ecma-pnpm will also setup NodeJS
+          # -- setup NodeJS/PNPM --
+          # ecma-pnpm sets up both NodeJS and PNPM. If ecma-pnpm is set, ecma-node is ignored.
+          # Note that the setup action requires NodeJS to run. If NodeJS is not available
+          # on the runner image, then you need to set at least ecma-node to true
+          # even if the project is not NodeJS
           ecma-node: true
           ecma-pnpm: false
 
@@ -83,7 +87,7 @@ jobs:
           # setup python, use `true` for vanilla python
           python: uv
 
-      # repo-specific setup
+      # repo-specific setup (if needed ..)
       - uses: ./.github/steps/setup
       - run: task install
 ```

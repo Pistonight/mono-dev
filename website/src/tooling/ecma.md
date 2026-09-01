@@ -6,7 +6,37 @@
 > 
 > If you are looking for setup documentation for TypeScript, see [here](../standard/tools.html#typescriptecmascriptjs)
 
+## Dev Engines
+
+The root `package.json` must define a `devEngines` field to guide users
+for setting up the project
+```json
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^12",
+      "onFail": "error"
+    },
+    "runtime": [
+      { "name": "node", "version": "^26", "onFail": "error" },
+      { "name": "bun", "version": "^1.4.0", "onFail": "warn" }
+    ]
+  },
+```
+
+The `onFail` field can either be `error` if the engine is required,
+or `warn` if the engine is only needed for some parts of the project.
+We don't use `download`, since that will automatically install the engines
+if the user's package manager supports it, even when the user does not want
+to use such feature.
+
 ## Tools
+
+> [!IMPORTANT]
+> We will soon migrate from `eslint` to `oxlint`  and `prettier` to `oxfmt`,
+> if everything works out and there aren't any compatibility issues discovered
+> during the migration.
+
 TypeScript projects use:
 - `prettier` for formatting
 - `eslint` for checking code style and issues

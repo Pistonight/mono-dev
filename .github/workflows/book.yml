@@ -16,11 +16,8 @@ jobs:
           persist-credentials: false
       - uses: ./actions/setup
         with:
-          skip-checkout: true
           tool-mdbook: true
-          mono-dev: false
 
-      # run the thing
       - run: task copy-website-theme
       - run: task build-website
       - uses: actions/upload-pages-artifact@v5
