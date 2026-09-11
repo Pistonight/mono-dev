@@ -1,6 +1,7 @@
 version: '3'
 
 vars:
+  PACKAGE_JSON_PATH: '{{joinPath .TASKFILE_DIR ".." "package.json"}}'
   MONO_DEV_MDBOOK_HOME1: { sh: echo $HOME }
   MONO_DEV_MDBOOK_HOME2: { sh: echo $USERPROFILE }
   MONO_DEV_MDBOOK_HOME3: { sh: echo $LOCALAPPDATA }
@@ -14,23 +15,38 @@ vars:
     
 
 tasks:
-  install-theme:
-    # vars: 
-    # - MDBOOK_TARGET: path to the book's package
-    # - MONO_DEV: path to mono-dev root
+  config:
     vars:
-      MDBOOK_TARGET_RESOLVED: '{{.MDBOOK_TARGET| default "."}}'
-      MONO_DEV: '{{.TASKFILE_DIR}}/..'
+      TARGET_THEME_DIR: '{{joinPath .TASK_DIR "theme" | absPath | shellQuote}}'
     cmds:
-      - rm -rf {{.MDBOOK_TARGET_RESOLVED}}/theme
-      - cp -r {{.MONO_DEV}}/mdbook/theme {{.MDBOOK_TARGET_RESOLVED}}
+    - silent: true
+      cmd: |
+        echo "[mono-dev-mdbook]==> installing theme"
+        rm -rf {{.TARGET_THEME_DIR}}
+        cp -r {{joinPath .MONO_DEV_MDBOOK_HOME4 "theme" | absPath | shellQuote}} {{.TASK_DIR}}
+    - task: _mdmdbook-preproc
+      vars:
+        COMMAND: config
 
 
-  test:
+  clean-cache:
+    - rm -rf {{.MONO_DEV_MDBOOK_CACHE | shellQuote}}
+    - rm -rf {{.MONO_DEV_MDBOOK_CACHE_LOCAL | shellQuote}}
+
+  resolve-tree-sitter-parser:
+    vars:
+      MDMDBOOK_TREE_SITTER_NAME: { sh: echo $MDMDBOOK_TREE_SITTER_NAME }
+      MDMDBOOK_TREE_SITTER_REPO: { sh: echo $MDMDBOOK_TREE_SITTER_REPO }
     cmds:
-      - task: _mdbook
+      - task: _tree-sitter
+      - task: _resolve-mdbook-tsitter
+      - task: _git-clone-tree-sitter
+      - task: _build-tree-sitter
+
+    
 
   _mdbook:
+    desc: Run mdbook commands
     vars:
       MDBOOK_: mdbook{{.EXE_EXT}}
       MDBOOK: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .MDBOOK_ | shellQuote}}'
@@ -56,6 +72,137 @@ tasks:
             fi
       - '{{.MDBOOK}} --version'
 
+  _mdmdbook-preproc:
+    desc: Run preprocessor commands
+    vars:
+      CRATE: '{{joinPath .MONO_DEV_MDBOOK_HOME4 "preproc"}}'
+      MDMDBOOK_PRPROC_: mdmdbook-prproc{{.EXE_EXT}}
+      MDMDBOOK_PRPROC: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .MDMDBOOK_PRPROC_ | shellQuote}}'
+    cmds:
+      - task: _cache-version-check
+      - task: _resolve-cache
+        vars:
+          DESC: mono-dev-mdbook-preproc
+          PATH: '{{.MDMDBOOK_PRPROC_}}'
+          BUILD: |
+            cargo install --path {{.CRATE | shellQuote}} --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+            cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/mdmdbook-prproc{{.EXE_EXT}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+      - silent: true
+        if: '[ "{{.COMMAND}}" != "" ]'
+        cmd: |
+          echo "[mono-dev-mdbook]  # {{.MDMDBOOK_PRPROC_}} {{.COMMAND}}"
+          {{.MDMDBOOK_PRPROC}} --dir {{.TASK_DIR | shellQuote}} --task-exe {{.TASK_EXE | shellQuote}} {{.COMMAND}}
+
+  _tree-sitter:
+    desc: Run tree-sitter CLI
+    vars:
+      BIN_: tree-sitter{{.EXE_EXT}}
+      BIN: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .BIN_ | shellQuote}}'
+    cmds:
+      - task: _cache-version-check
+      - task: _resolve-cache
+        vars:
+          DESC: tree-sitter
+          PATH: '{{.BIN_}}'
+          BUILD: |
+            if cmd_path=$(command -v tree-sitter); then
+              echo "[mono-dev-mdbook]==> found $(tree-sitter --version) installed on the system"
+              cp "$cmd_path" $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+            else
+              echo "[mono-dev-mdbook]==> installing tree-sitter-cli with cargo"
+              cargo install tree-sitter-cli --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+              cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/{{.BIN_}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+            fi
+      - silent: true
+        if: '[ "{{.COMMAND}}" != "" ]'
+        cmd: |
+          echo "[mono-dev-mdbook]  # {{.BIN_}} {{.COMMAND}}"
+          {{.BIN}} {{.COMMAND}}
+
+  _git-clone-tree-sitter:
+    desc: Clone the parser repo
+    cmds:
+      - task: _resolve-system-cache
+        vars:
+          DESC: tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} repo
+          PATH: 'tree-sitter-repos/tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}}'
+          BUILD: |
+            rm -rf $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+            GIT_ASKPASS=true GIT_TERMINAL_PROMPT=0 git -c credential.helper= -C $MONO_DEV_MDBOOK_ENV_BUILD_DIR clone {{.MDMDBOOK_TREE_SITTER_REPO | shellQuote}} tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} --depth 1 --progress
+
+  _build-tree-sitter:
+    desc: Compile the tree sitter parser and copy queries
+    vars:
+      BIN_: tree-sitter{{.EXE_EXT}}
+      BIN: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .BIN_ | shellQuote}}'
+      REL_REPO_PATH: 'tree-sitter-repos/tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}}'
+      REPO_PATH: '{{joinPath .MONO_DEV_MDBOOK_CACHE .REL_REPO_PATH}}'
+    cmds:
+      - task: _resolve-cache
+        vars:
+          DESC: tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} parser
+          PATH: 'tree-sitter-installed/{{.MDMDBOOK_TREE_SITTER_NAME}}/parser.so'
+          BUILD: |
+            cd {{.REPO_PATH | shellQuote}}
+            {{.BIN}} build -o $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+      - task: _resolve-cache
+        vars:
+          DESC: tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} queries
+          PATH: 'tree-sitter-installed/{{.MDMDBOOK_TREE_SITTER_NAME}}/queries'
+          BUILD: |
+            cd {{.REPO_PATH | shellQuote}}
+            rm -rf $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+            cp -r queries $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+
+  _resolve-mdbook-tsitter:
+    desc: Resolve mdbook-tsitter plugin
+    vars:
+      BIN_: mdbook-tsitter{{.EXE_EXT}}
+      BIN: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .BIN_ | shellQuote}}'
+    cmds:
+      - task: _cache-version-check
+      - task: _resolve-cache
+        vars:
+          DESC: mdbook-tsitter
+          PATH: '{{.BIN_}}'
+          BUILD: |
+            if cmd_path=$(command -v mdbook-tsitter); then
+              echo "[mono-dev-mdbook]==> found $(mdbook-tsitter --version) installed on the system"
+              cp "$cmd_path" $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+            else
+              echo "[mono-dev-mdbook]==> installing mdbook-tsitter with cargo"
+              cargo install mdbook-tsitter --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+              cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/{{.BIN_}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+            fi
+      
+      
+
+  _cache-version-check:
+    vars:
+      PACKAGE_JSON_RAW: { sh: 'cat {{.PACKAGE_JSON_PATH | shellQuote}}' }
+      PACKAGE_JSON: 
+        ref: .PACKAGE_JSON_RAW | fromJson
+      VERSION: '{{ get .PACKAGE_JSON "version" | trim}}'
+      VERSION_PATH: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL "version-cache" | shellQuote}}'
+    cmds:
+      - task: _resolve-cache
+        vars:
+          DESC: mono-dev-mdbook version
+          PATH: version-cache
+          BUILD: echo {{.VERSION | shellQuote }} > $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+      - silent: true
+        cmd: |
+          oldv=$(cat {{.VERSION_PATH}})
+          if [[ "$oldv" == "{{.VERSION}}" ]]; then
+            exit 0
+          fi
+          echo '[mono-dev-mdbook]==> cleaning due to update: '"$oldv"' -> {{.VERSION}}'
+          rm -rf {{.MONO_DEV_MDBOOK_CACHE | shellQuote}}
+          rm -rf {{.MONO_DEV_MDBOOK_CACHE_LOCAL | shellQuote}}
+          mkdir -p {{joinPath .VERSION_PATH ".." | absPath | shellQuote}}
+          echo {{.VERSION | shellQuote }} > {{.VERSION_PATH}}
+
+
   _resolve-cache:
     vars:
       LOCAL_CACHE_PATH: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .PATH}}'
@@ -78,7 +225,6 @@ tasks:
             MONO_DEV_MDBOOK_ENV_BUILD_DIR={{joinPath .SYSTEM_CACHE_PATH ".." | absPath | shellQuote}}
             mkdir -p $MONO_DEV_MDBOOK_ENV_BUILD_DIR
             MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT={{.SYSTEM_CACHE_PATH_QUOTE}}
-            echo
             echo '[mono-dev-mdbook]==> resolving {{.DESC}}'
             {{.BUILD}}
             mkdir -p {{joinPath .LOCAL_CACHE_PATH ".." | absPath | shellQuote}}
@@ -89,3 +235,19 @@ tasks:
             fi
           fi
       
+  _resolve-system-cache:
+    vars:
+      SYSTEM_CACHE_PATH: '{{joinPath .MONO_DEV_MDBOOK_CACHE .PATH}}'
+      SYSTEM_CACHE_PATH_QUOTE: '{{.SYSTEM_CACHE_PATH | shellQuote}}'
+    cmds:
+      - silent: true
+        cmd: |
+          if [[ -e {{.SYSTEM_CACHE_PATH | shellQuote}} ]]; then
+            exit 0
+          else
+            MONO_DEV_MDBOOK_ENV_BUILD_DIR={{joinPath .SYSTEM_CACHE_PATH ".." | absPath | shellQuote}}
+            mkdir -p $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+            MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT={{.SYSTEM_CACHE_PATH_QUOTE}}
+            echo '[mono-dev-mdbook]==> resolving {{.DESC}}'
+            {{.BUILD}}
+          fi

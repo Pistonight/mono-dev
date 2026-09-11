@@ -4,21 +4,59 @@ language = "en"
 src = "src"
 title = "mono-dev"
 
-# @mono-dev:preprocessors:start
-# @mono-dev:preprocessors:end
+#@mono-dev:preprocessor {
 
+#@mono-dev:    preproc1 {
+# [preprocessor.mdmd-preproc1]
+# renderers = ["html"]
+# command = "./.cache/mono-dev-mdbook/mdmdbook-prproc preproc1"
+#@mono-dev:    }
+
+#@mono-dev:    tree-sitter {
+#@mono-dev:        - {
+[preprocessor.tsitter]
+renderers = ["html"]
+command = "./.cache/mono-dev-mdbook/mdbook-tsitter"
+inject = true
+#@mono-dev:        }
+#@mono-dev:        rust {
+[preprocessor.tsitter.languages.rust]
+library = "./.cache/mono-dev-mdbook/tree-sitter-installed/rust/parser.so"
+highlights = "./.cache/mono-dev-mdbook/tree-sitter-installed/rust/queries/highlights.scm"
+injections = "./.cache/mono-dev-mdbook/tree-sitter-installed/rust/queries/injections.scm"
+#@mono-dev:        }
+#@mono-dev:        yaml {
+[preprocessor.tsitter.languages.yaml]
+library = "./.cache/mono-dev-mdbook/tree-sitter-installed/yaml/parser.so"
+highlights = "./.cache/mono-dev-mdbook/tree-sitter-installed/yaml/queries/highlights.scm"
+#@mono-dev:        }
+#@mono-dev:        json {
+[preprocessor.tsitter.languages.json]
+library = "./.cache/mono-dev-mdbook/tree-sitter-installed/json/parser.so"
+highlights = "./.cache/mono-dev-mdbook/tree-sitter-installed/json/queries/highlights.scm"
+#@mono-dev:        }
+#@mono-dev:        json5 {
+[preprocessor.tsitter.languages.json5]
+library = "./.cache/mono-dev-mdbook/tree-sitter-installed/json5/parser.so"
+highlights = "./.cache/mono-dev-mdbook/tree-sitter-installed/json5/queries/highlights.scm"
+#@mono-dev:        }
+#@mono-dev:    }
+
+#@mono-dev:}
+
+#@mono-dev:html {
 [output.html]
-# @mono-dev:html:start
 git-repository-url = "https://github.com/Pistonight/mono-dev"
-# @mono-dev:html-props:start
+#@mono-dev:    props {
 default-theme = "frappe"
 preferred-dark-theme = "frappe"
 smart-punctuation = true
-# @mono-dev:html-props:end
+#@mono-dev:    }
 additional-css = [
-# @mono-dev:html-css:start
-    "./theme/extra-css/catppuccin.css", 
-    "./theme/extra-css/patch.css", 
-# @mono-dev:html-css:end
+    "./theme/tsitter.css",
+#@mono-dev:    css {
+    "./theme/extra-css/catppuccin.css",
+    "./theme/extra-css/patch.css",
+#@mono-dev:    }
 ]
-# @mono-dev:html:end
+#@mono-dev:}

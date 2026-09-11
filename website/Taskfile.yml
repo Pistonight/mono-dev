@@ -1,0 +1,16 @@
+version: "3"
+
+includes:
+  mdbook:
+    taskfile: ../task/mdbook.yaml
+    internal: true
+
+tasks:
+  install:
+    - task: mdbook:config
+  resolve-tree-sitter-parser:
+    - task: mdbook:resolve-tree-sitter-parser
+  dev:
+    cmds:
+      - rm -rf book
+      - shwoop book -w src --host -- mdbook build

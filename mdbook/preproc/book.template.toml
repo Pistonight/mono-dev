@@ -1,0 +1,9 @@
+[book]
+authors = ["Pistonight"]
+language = "en"
+src = "src"
+title = "____CHANGE ME____"
+
+#@mono-dev:preprocessor {}
+
+#@mono-dev:html {}

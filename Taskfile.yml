@@ -11,13 +11,17 @@ includes:
   common:
     taskfile: ./task/common.yaml
     internal: true
+  website:
+    taskfile: ./website
+    dir: ./website
+    internal: true
 
 tasks:
   install:
     desc: Install or sync project dependencies
     cmds:
       - pnpm install
-      - task: copy-website-theme
+      - task: website:config
 
   install-cargo-extra-tools:
     aliases: [icets]
@@ -25,13 +29,6 @@ tasks:
       - task: common:cargo-binstall
         vars:
           PACKAGES: mdbook shwoop
-
-  copy-website-theme:
-    desc: Copy mdbook themes from the toolset to the website
-    cmds:
-      - task: mdbook:install-theme
-        vars:
-          MDBOOK_TARGET: website
 
   build:
     desc: Build with bootstrap
@@ -60,11 +57,6 @@ tasks:
     cmds:
       - node bin/mono.js test run
       - node bin/mono.js doc
-
-  dev:
-    cmds:
-      - rm -rf website/book
-      - shwoop website/book -w website --host -- mdbook build website
 
   build-website:
     desc: (Re-)build the book
@@ -129,7 +121,3 @@ tasks:
         which @types/which
       - pnpm dedupe
       - pnpm dedupe --check
-
-  test-md:
-    cmds:
-      - task: mdbook:test

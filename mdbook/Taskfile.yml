@@ -1,6 +1,17 @@
 version: '3'
 
+includes:
+  cargo:
+    taskfile: ../task/cargo.yaml
+    internal: true
+
 tasks:
+  check:
+    - task: cargo:clippy-all
+    - task: cargo:fmt-check
+  fix:
+    - task: cargo:fmt-fix
+
   pull-update:
     desc: Update assets with current mdbook version
     cmds:
@@ -16,6 +27,8 @@ tasks:
       - rm template/theme/highlight.css
       - rm template/theme/highlight.js
       - rm template/theme/book.js
+      - rm -rf template/theme/css
+      - rm -rf template/theme/fonts
       - silent: true
         cmd: echo 'please manually check book.toml and index.hbs changes'
       - silent: true

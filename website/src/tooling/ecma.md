@@ -10,7 +10,35 @@
 
 The root `package.json` must define a `devEngines` field to guide users
 for setting up the project
+
+```rust
+impl<T: DefLookup + ?Sized> DefLookup for Arc<T> {
+    fn find(
+        &self,
+        name: &str,
+        skip: &Url,
+    ) -> Vec<Location> {
+        self.as_ref().find(name, skip)
+    }
+
+    fn has(&self, name: &str) -> bool {
+        self.as_ref().has(name)
+    }
+
+    fn kind(
+        &self,
+        name: &str,
+        skip: &Url,
+    ) -> Option<TokenKind> {
+        self.as_ref().kind(name, skip)
+    }
+}
+```
+
 ```json
+{
+  /* ... */
+
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -22,6 +50,9 @@ for setting up the project
       { "name": "bun", "version": "^1.4.0", "onFail": "warn" }
     ]
   },
+
+  /* ... */
+}
 ```
 
 The `onFail` field can either be `error` if the engine is required,
