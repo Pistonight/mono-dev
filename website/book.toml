@@ -4,12 +4,21 @@ language = "en"
 src = "src"
 title = "mono-dev"
 
+# @mono-dev:preprocessors:start
+# @mono-dev:preprocessors:end
+
 [output.html]
+# @mono-dev:html:start
+git-repository-url = "https://github.com/Pistonight/mono-dev"
+# @mono-dev:html-props:start
 default-theme = "frappe"
 preferred-dark-theme = "frappe"
 smart-punctuation = true
-git-repository-url = "https://github.com/Pistonight/mono-dev"
+# @mono-dev:html-props:end
 additional-css = [
+# @mono-dev:html-css:start
     "./theme/extra-css/catppuccin.css", 
     "./theme/extra-css/patch.css", 
+# @mono-dev:html-css:end
 ]
+# @mono-dev:html:end

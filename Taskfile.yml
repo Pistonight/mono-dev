@@ -129,3 +129,7 @@ tasks:
         which @types/which
       - pnpm dedupe
       - pnpm dedupe --check
+
+  test-md:
+    cmds:
+      - task: mdbook:test

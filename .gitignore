@@ -1,3 +1,4 @@
+.cache
 .gradle
 node_modules
 /website/theme
