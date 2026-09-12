@@ -1,16 +1,28 @@
 version: "3"
 
-includes:
-  mdbook:
-    taskfile: ../task/mdbook.yaml
-    internal: true
+vars:
+  IS_WINDOWS: '{{OS | lower | contains "windows"}}'
+  EXE_EXT: '{{if eq .IS_WINDOWS "true"}}.exe{{else}}{{end}}'
+
+# includes:
+#   mdbook:
+#     taskfile: ../task/mdbook.yaml
+#     internal: true
 
 tasks:
-  install:
-    - task: mdbook:config
-  resolve-tree-sitter-parser:
-    - task: mdbook:resolve-tree-sitter-parser
-  dev:
-    cmds:
-      - rm -rf book
-      - shwoop book -w src --host -- mdbook build
+  check:
+    - echo {{.IS_WINDOWS}}
+    - echo {{.EXE_EXT}}
+  # install:
+  #   - task: mdbook:config
+  # resolve-tree-sitter-parser:
+  #   - task: mdbook:resolve-tree-sitter-parser
+  # dev:
+  #   cmds:
+  #     - task: mdbook:config
+  #     - rm -rf book
+  #     - shwoop book -w src --host -- {{.TASK_EXE}} do-build
+  # do-build:
+  #   - task: mdbook:call-mdbook
+  #     vars:
+  #       COMMAND: build

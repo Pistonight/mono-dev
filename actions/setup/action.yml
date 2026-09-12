@@ -233,3 +233,11 @@ runs:
         ref: ${{ steps.wkspenvjs.outputs.mono_dev_ref }}
         path: ${{ inputs.mono-dev-path }}
         persist-credentials: false
+
+    # -- mdbook system wide tooling cache
+    - if: ${{ inputs.tool-mdbook != 'false' }}
+      id: mdbook-tool-cache
+      uses: actions/cache@v5
+      with:
+        path: ${{ env.HOME }}/.cache/mono-dev-mdbook
+        key: mdbook-tools-${{ runner.os }}-${{ runner.arch }}

@@ -9,7 +9,7 @@ vars:
   MONO_DEV_MDBOOK_HOME: '{{coalesce .MONO_DEV_MDBOOK_HOME1 .MONO_DEV_MDBOOK_HOME2 .MONO_DEV_MDBOOK_HOME3 .MONO_DEV_MDBOOK_HOME4}}'
   MONO_DEV_MDBOOK_CACHE: '{{joinPath .MONO_DEV_MDBOOK_HOME ".cache" "mono-dev-mdbook"}}'
   MONO_DEV_MDBOOK_CACHE_LOCAL: '{{joinPath .TASK_DIR ".cache" "mono-dev-mdbook"}}'
-  IS_WINDOWS: '{{.OS | lower | contains "windows"}}'
+  IS_WINDOWS: '{{OS | lower | contains "windows"}}'
   EXE_EXT: '{{if .IS_WINDOWS}}.exe{{else}}{{end}}'
 
     
@@ -45,7 +45,7 @@ tasks:
 
     
 
-  _mdbook:
+  call-mdbook:
     desc: Run mdbook commands
     vars:
       MDBOOK_: mdbook{{.EXE_EXT}}
@@ -70,7 +70,11 @@ tasks:
               cargo install mdbook@^0.5 --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
               cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/mdbook{{.EXE_EXT}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
             fi
-      - '{{.MDBOOK}} --version'
+      - silent: true
+        if: '[ "{{.COMMAND}}" != "" ]'
+        cmd: |
+          echo "[mono-dev-mdbook]  # {{.MDBOOK_}} {{.COMMAND}}"
+          {{.MDBOOK}} {{.COMMAND}}
 
   _mdmdbook-preproc:
     desc: Run preprocessor commands
