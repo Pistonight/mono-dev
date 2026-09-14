@@ -64,7 +64,7 @@ tasks:
       - cmd: echo 'clang-format {{.STYLES_RESOLVED | trim }} using windows xargs hack'
       - silent: true
         cmd: |
-          n=$(nproc 2>/dev/null || echo 4)
+          n={{numCPU}}
           $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?' | {
             rc=0
             pids=
@@ -88,7 +88,7 @@ tasks:
     cmds:
       - >
         find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
-        | xargs -P $(nproc) -n 1
+        | xargs -P {{numCPU}} -n 1
         clang-format
         --style={{.STYLES_RESOLVED | trim }}
         {{.CLANG_FORMAT_ARGS}}
@@ -134,7 +134,7 @@ tasks:
       - cmd: echo 'clang-tidy using windows xargs hack'
       - silent: true
         cmd: |
-          n=$(nproc 2>/dev/null || echo 4)
+          n={{numCPU}}
           $(which find) {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?' | {
             rc=0
             pids=
@@ -158,7 +158,7 @@ tasks:
     cmds:
       - >
         find {{.SOURCE_RESOLVED | trim }} -regextype posix-extended -regex '.*\.[ch](\+\+|pp|xx|c|h)?'
-        | xargs -P $(nproc) -n 1
+        | xargs -P {{numCPU}} -n 1
         clang-tidy --warnings-as-errors='*' --header-filter='{{.HEADER_RESOLVED}}'
         -p {{.BUILD_RESOLVED | trim }}
         --checks={{.CHECKS_RESOLVED | trim }}

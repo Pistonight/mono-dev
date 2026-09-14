@@ -1,0 +1,13 @@
+[package]
+name = "mono-dev-mdbook-configurator"
+version = "0.0.0"
+description = "preprocessor for book.toml"
+edition = "2024"
+
+[dependencies]
+cu = { workspace = true, features = ["cli", "json", "process", "derive"] }
+similar.workspace = true
+
+[[bin]]
+name = "mdbook-configr"
+path = "src/main.rs"
