@@ -40,3 +40,12 @@ Template `.gitignore`
 ## Configuration
 Run ```bash`task install``` and the `mdbook:config` task will generate a base config.
 Edit the `CHANGE ME` fields.
+
+To add `nvim-treesitter` support, add a `#@mono-dev:    nvim-treesitter {}` directive
+in the preprocessor config section, then rerun the configurator.
+
+```toml
+#@mono-dev:preprocessor {
+#@mono-dev:    nvim-treesitter {}
+#@mono-dev:}
+```

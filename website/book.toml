@@ -5,8 +5,12 @@ src = "src"
 title = "mono-dev"
 
 
+#@mono-dev:preprocessor {
+#@mono-dev:    nvim-treesitter {
 [preprocessor.nvim-treesitter]
-
+command = "./.cache/mono-dev-mdbook/mdbook-nvim-treesitter"
+#@mono-dev:    }
+#@mono-dev:}
 
 #@mono-dev:html {
 [output.html]

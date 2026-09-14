@@ -3,7 +3,7 @@ use std::path::Path;
 use cu::pre::*;
 use similar::ChangeTag;
 
-use crate::config::{Config, ConfigNode, html};
+use crate::config::{Config, ConfigNode, html, preprocessor};
 
 pub fn process_config(cli: &crate::Cli) -> cu::Result<()> {
     let path = Path::new(&cli.dir).join("book.toml");
@@ -72,6 +72,12 @@ fn transform_config(config: &mut Config, _cli: &crate::Cli) -> cu::Result<()> {
     for node in &mut config.nodes {
         if let ConfigNode::Section(_, name, node) = node {
             match name.as_str() {
+                "preprocessor" => {
+                    cu::check!(
+                        preprocessor::transform_preprocessor_config(node),
+                        "failed to transform preprocessor section"
+                    )?;
+                }
                 "html" => {
                     cu::check!(
                         html::transform_html_config(node),

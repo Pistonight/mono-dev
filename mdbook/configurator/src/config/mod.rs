@@ -2,6 +2,7 @@ mod parsing;
 use parsing::*;
 mod driver;
 mod html;
+mod preprocessor;
 pub use driver::*;
 
 macro_rules! verbatim {

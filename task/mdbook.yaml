@@ -121,8 +121,13 @@ tasks:
               echo "[mono-dev] ==> found $(mdbook-nvim-treesitter -V) installed on the system"
               cp "$cmd_path" $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
             else
-              echo "[mono-dev] ==> installing mdbook-nvim-treesitter with cargo"
-              cargo install mdbook-nvim-treesitter --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+              if cmd_path=$(command -v cargo-binstall); then
+                echo "[mono-dev] ==> installing mdbook-nvim-treesitter with cargo-binstall"
+                cargo binstall mdbook-nvim-treesitter --no-confirm --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+              else
+                echo "[mono-dev] ==> installing mdbook-nvim-treesitter with cargo"
+                cargo install mdbook-nvim-treesitter --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+              fi
               cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/{{.BIN_}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
             fi
       
