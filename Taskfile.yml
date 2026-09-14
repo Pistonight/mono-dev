@@ -52,7 +52,7 @@ tasks:
       - node bin/mono.js doc
 
   build-website:
-    - task: website:config
+    - task: website:install
     - task: website:build
 
   package:
