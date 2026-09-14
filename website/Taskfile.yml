@@ -13,8 +13,8 @@ tasks:
       # uncomment if needed to iterate theme changes
       # - task: mdbook:config
       - rm -rf book
-      - shwoop book -w src -w theme --host -- {{.TASK_EXE}} do-build
-  do-build:
+      - shwoop book -w src -w theme --host -- {{.TASK_EXE}} build
+  build:
     - task: mdbook:call-mdbook
       vars:
         COMMAND: build
