@@ -7,4 +7,6 @@ title = "____CHANGE ME____"
 #@mono-dev:preprocessor {
 #@mono-dev:}
 
-#@mono-dev:html {}
+#@mono-dev:html {
+[output.html]
+#@mono-dev:}
