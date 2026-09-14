@@ -1,0 +1,27 @@
+version: "3"
+
+includes:
+  mdbook:
+    taskfile: ../task/mdbook.yaml
+    internal: true
+
+tasks:
+  install:
+    - task: mdbook:config
+  dev:
+    cmds:
+      # uncomment if needed to iterate theme changes
+      # - task: mdbook:config
+      - rm -rf book
+      - shwoop book -w src -w theme --host -- {{.TASK_EXE}} build
+  build:
+    - task: mdbook:call-mdbook
+      vars:
+        COMMAND: build
+
+  css-cp:
+    - cp ../mdbook/css/tree-sitter.css theme/extra-css
+
+  clean:
+    - rm -rf book theme
+    - task: mdbook:clean-cache

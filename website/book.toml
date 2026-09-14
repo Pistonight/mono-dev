@@ -4,12 +4,27 @@ language = "en"
 src = "src"
 title = "mono-dev"
 
+
+#@mono-dev:preprocessor {
+#@mono-dev:    nvim-treesitter {
+[preprocessor.nvim-treesitter]
+command = "./.cache/mono-dev-mdbook/mdbook-nvim-treesitter"
+#@mono-dev:    }
+#@mono-dev:}
+
+#@mono-dev:html {
 [output.html]
+git-repository-url = "https://github.com/Pistonight/mono-dev"
+#@mono-dev:    props {
 default-theme = "frappe"
 preferred-dark-theme = "frappe"
 smart-punctuation = true
-git-repository-url = "https://github.com/Pistonight/mono-dev"
+#@mono-dev:    }
 additional-css = [
-    "./theme/extra-css/catppuccin.css", 
-    "./theme/extra-css/patch.css", 
+#@mono-dev:    css {
+    "./theme/extra-css/catppuccin.css",
+    "./theme/extra-css/patch.css",
+    "./theme/extra-css/tree-sitter.css",
+#@mono-dev:    }
 ]
+#@mono-dev:}

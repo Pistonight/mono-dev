@@ -1,9 +1,9 @@
+.cache
 .gradle
 node_modules
 /website/theme
 /website/book
 /target
-/Cargo.lock
 .prettierignore
 /eslint.config.js
 /tsconfig*.json

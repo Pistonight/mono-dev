@@ -35,8 +35,8 @@ from multiple packages.
 The root level `Taskfile.yml` also contains an `exec` task that you can use
 to run a package task at the root level:
 
-```
-task exec -- <package>:<task>
+```bash
+task exec -- PACKAGE:TASK
 # x is an alias for exec
-task x -- <package>:<task>
+task x -- PACKAGE:TASK
 ```

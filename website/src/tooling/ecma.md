@@ -10,7 +10,11 @@
 
 The root `package.json` must define a `devEngines` field to guide users
 for setting up the project
+
 ```json
+{
+  /* ... */
+
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -22,6 +26,9 @@ for setting up the project
       { "name": "bun", "version": "^1.4.0", "onFail": "warn" }
     ]
   },
+
+  /* ... */
+}
 ```
 
 The `onFail` field can either be `error` if the engine is required,
@@ -82,7 +89,7 @@ Running `pnpm up mono-dev` will resolve the latest commit and update it.
     ```
 
 #### Template: `.gitignore`
--   ```
+-   ```gitignore
     # mono-dev: ecma gitignores
     node_modules
     package-lock.json

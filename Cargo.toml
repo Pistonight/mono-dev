@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = [
+    "mdbook/configurator"
+]
+
+[workspace.dependencies.cu]
+package = "pistonite-cu"
+version = "0.9.3"
+
+[workspace.dependencies]
+similar = "3.2.0"
