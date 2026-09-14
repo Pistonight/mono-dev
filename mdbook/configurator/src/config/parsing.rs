@@ -63,8 +63,8 @@ impl ConfigNode {
                         ConfigNodeType::Table => {
                             break;
                         }
-                        ConfigNodeType::SectionStart(_, _) |
-                        ConfigNodeType::SectionStartEnd(_, _) => {
+                        ConfigNodeType::SectionStart(_, _)
+                        | ConfigNodeType::SectionStartEnd(_, _) => {
                             // nested section
                             let node = Self::parse(peek, iter)?;
                             let node =
@@ -142,14 +142,17 @@ impl ConfigNode {
             }
             let has_end = s.ends_with('}');
 
-            let section = s.trim_end_matches('}').trim_end().trim_end_matches('{').trim_end();
+            let section = s
+                .trim_end_matches('}')
+                .trim_end()
+                .trim_end_matches('{')
+                .trim_end();
             let section_trimmed = section.trim_start();
             let indent = section.len() - section_trimmed.len();
             if has_end {
-            return ConfigNodeType::SectionStartEnd(indent, section_trimmed);
+                return ConfigNodeType::SectionStartEnd(indent, section_trimmed);
             }
-            return 
-            ConfigNodeType::SectionStart(indent, section_trimmed);
+            return ConfigNodeType::SectionStart(indent, section_trimmed);
         }
         if trimmed.starts_with('#') {
             return ConfigNodeType::Verbatim;

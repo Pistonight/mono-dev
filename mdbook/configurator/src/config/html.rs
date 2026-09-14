@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::config::{verbatim, ConfigNode};
+use crate::config::{ConfigNode, verbatim};
 
 pub fn transform_html_config(nodes: &mut Vec<ConfigNode>) -> cu::Result<()> {
     let mut properties = [
@@ -44,7 +44,7 @@ pub fn transform_html_config(nodes: &mut Vec<ConfigNode>) -> cu::Result<()> {
                     check_fn(n)?;
                 }
             }
-            flat => check_fn(flat)?
+            flat => check_fn(flat)?,
         }
     }
 
@@ -66,5 +66,6 @@ fn get_css_config() -> Vec<ConfigNode> {
     verbatim![
         r#"    "./theme/extra-css/catppuccin.css","#,
         r#"    "./theme/extra-css/patch.css","#,
+        r#"    "./theme/extra-css/tree-sitter.css","#,
     ]
 }

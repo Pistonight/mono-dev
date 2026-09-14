@@ -11,30 +11,6 @@
 The root `package.json` must define a `devEngines` field to guide users
 for setting up the project
 
-```rust
-impl<T: DefLookup + ?Sized> DefLookup for Arc<T> {
-    fn find(
-        &self,
-        name: &str,
-        skip: &Url,
-    ) -> Vec<Location> {
-        self.as_ref().find(name, skip)
-    }
-
-    fn has(&self, name: &str) -> bool {
-        self.as_ref().has(name)
-    }
-
-    fn kind(
-        &self,
-        name: &str,
-        skip: &Url,
-    ) -> Option<TokenKind> {
-        self.as_ref().kind(name, skip)
-    }
-}
-```
-
 ```json
 {
   /* ... */
@@ -113,7 +89,7 @@ Running `pnpm up mono-dev` will resolve the latest commit and update it.
     ```
 
 #### Template: `.gitignore`
--   ```
+-   ```gitignore
     # mono-dev: ecma gitignores
     node_modules
     package-lock.json

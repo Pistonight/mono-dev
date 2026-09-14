@@ -1,5 +1,10 @@
 version: '3'
 
+# when migrating mdbook 0.4->0.5 it was a lot of pain
+# because the preprocessors weren't getting updated in time.
+# so let's build a cache to source the tools ourselves.
+# Honestly it might be a good idea to expand this to all the tools we use
+
 vars:
   PACKAGE_JSON_PATH: '{{joinPath .TASKFILE_DIR ".." "package.json"}}'
   MONO_DEV_MDBOOK_HOME1: { sh: echo $HOME }
@@ -10,40 +15,42 @@ vars:
   MONO_DEV_MDBOOK_CACHE: '{{joinPath .MONO_DEV_MDBOOK_HOME ".cache" "mono-dev-mdbook"}}'
   MONO_DEV_MDBOOK_CACHE_LOCAL: '{{joinPath .TASK_DIR ".cache" "mono-dev-mdbook"}}'
   IS_WINDOWS: '{{OS | lower | contains "windows"}}'
-  EXE_EXT: '{{if .IS_WINDOWS}}.exe{{else}}{{end}}'
+  EXE_EXT: '{{if eq .IS_WINDOWS "true"}}.exe{{else}}{{end}}'
 
     
 
 tasks:
   config:
     vars:
+      TARGET_BOOK_TOML: '{{joinPath .TASK_DIR "book.toml" | absPath | shellQuote}}'
       TARGET_THEME_DIR: '{{joinPath .TASK_DIR "theme" | absPath | shellQuote}}'
+      TARGET_THEME_CSS_DIR: '{{joinPath .TASK_DIR "theme" "extra-css" | absPath | shellQuote}}'
+      HAS_NVIM_TREESITTER:
+        sh: |
+          case "$(cat {{.TARGET_BOOK_TOML}})" in
+            *'[preprocessor.nvim-treesitter]'* ) echo 'true' ;;
+            * ) echo 'false' ;;
+          esac
     cmds:
     - silent: true
       cmd: |
-        echo "[mono-dev-mdbook]==> installing theme"
+        echo "[mono-dev] ==> installing mdbook theme"
         rm -rf {{.TARGET_THEME_DIR}}
-        cp -r {{joinPath .MONO_DEV_MDBOOK_HOME4 "theme" | absPath | shellQuote}} {{.TASK_DIR}}
-    - task: _mdmdbook-preproc
+        cp -R {{joinPath .MONO_DEV_MDBOOK_HOME4 "theme" | absPath | shellQuote}} {{.TARGET_THEME_DIR}}
+        cp -R {{joinPath .MONO_DEV_MDBOOK_HOME4 "css" | absPath | shellQuote}} {{.TARGET_THEME_CSS_DIR}}
+    - task: _resolve-mdbook-nvim-treesitter
+      if: '[ "{{.HAS_NVIM_TREESITTER}}" = "true" ]'
+    - task: _mdbook-configr
       vars:
         COMMAND: config
 
 
   clean-cache:
-    - rm -rf {{.MONO_DEV_MDBOOK_CACHE | shellQuote}}
-    - rm -rf {{.MONO_DEV_MDBOOK_CACHE_LOCAL | shellQuote}}
-
-  resolve-tree-sitter-parser:
-    vars:
-      MDMDBOOK_TREE_SITTER_NAME: { sh: echo $MDMDBOOK_TREE_SITTER_NAME }
-      MDMDBOOK_TREE_SITTER_REPO: { sh: echo $MDMDBOOK_TREE_SITTER_REPO }
-    cmds:
-      - task: _tree-sitter
-      - task: _resolve-mdbook-tsitter
-      - task: _git-clone-tree-sitter
-      - task: _build-tree-sitter
-
-    
+    - silent: true
+      cmd: |
+        echo "[mono-dev] ==> cleaning local and system cache"
+        rm -rf {{.MONO_DEV_MDBOOK_CACHE | shellQuote}}
+        rm -rf {{.MONO_DEV_MDBOOK_CACHE_LOCAL | shellQuote}}
 
   call-mdbook:
     desc: Run mdbook commands
@@ -59,123 +66,63 @@ tasks:
             if cmd_path=$(command -v mdbook); then
               mdbook_version=$(mdbook --version)
               case "$mdbook_version" in
-                *"mdbook v0.5"*) echo "[mono-dev-mdbook]==> found $mdbook_version installed on the system"
+                *"mdbook v0.5"*) echo "[mono-dev] ==> found $mdbook_version installed on the system"
                   cp "$cmd_path" $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT ;;
-                *) echo "[mono-dev-mdbook]==> installing mdbook@0.5 with cargo"
+                *) echo "[mono-dev] ==> installing mdbook@0.5 with cargo"
                   cargo install mdbook@^0.5 --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
                   cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/mdbook{{.EXE_EXT}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
               esac
             else
-              echo "[mono-dev-mdbook]==> installing mdbook@0.5 with cargo"
+              echo "[mono-dev] ==> installing mdbook@0.5 with cargo"
               cargo install mdbook@^0.5 --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
               cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/mdbook{{.EXE_EXT}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
             fi
       - silent: true
         if: '[ "{{.COMMAND}}" != "" ]'
         cmd: |
-          echo "[mono-dev-mdbook]  # {{.MDBOOK_}} {{.COMMAND}}"
+          echo "[mono-dev]  $ {{.MDBOOK_}} {{.COMMAND}}"
           {{.MDBOOK}} {{.COMMAND}}
 
-  _mdmdbook-preproc:
-    desc: Run preprocessor commands
+  _mdbook-configr:
+    desc: Run configurator commands
     vars:
-      CRATE: '{{joinPath .MONO_DEV_MDBOOK_HOME4 "preproc"}}'
-      MDMDBOOK_PRPROC_: mdmdbook-prproc{{.EXE_EXT}}
-      MDMDBOOK_PRPROC: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .MDMDBOOK_PRPROC_ | shellQuote}}'
+      CRATE: '{{joinPath .MONO_DEV_MDBOOK_HOME4 "configurator"}}'
+      BIN_: mdbook-configr{{.EXE_EXT}}
+      BIN: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .BIN_ | shellQuote}}'
     cmds:
       - task: _cache-version-check
       - task: _resolve-cache
         vars:
-          DESC: mono-dev-mdbook-preproc
-          PATH: '{{.MDMDBOOK_PRPROC_}}'
+          DESC: mono-dev-mdbook-configurator
+          PATH: '{{.BIN_}}'
           BUILD: |
             cargo install --path {{.CRATE | shellQuote}} --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
-            cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/mdmdbook-prproc{{.EXE_EXT}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
+            cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/{{.BIN_}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
       - silent: true
         if: '[ "{{.COMMAND}}" != "" ]'
         cmd: |
-          echo "[mono-dev-mdbook]  # {{.MDMDBOOK_PRPROC_}} {{.COMMAND}}"
-          {{.MDMDBOOK_PRPROC}} --dir {{.TASK_DIR | shellQuote}} --task-exe {{.TASK_EXE | shellQuote}} {{.COMMAND}}
+          echo "[mono-dev]  $ {{.BIN_}} {{.COMMAND}}"
+          {{.BIN}} --dir {{.TASK_DIR | shellQuote}} {{.COMMAND}}
 
-  _tree-sitter:
-    desc: Run tree-sitter CLI
+
+  _resolve-mdbook-nvim-treesitter:
+    desc: Resolve mdbook-nvim-treesitter preprocessor
     vars:
-      BIN_: tree-sitter{{.EXE_EXT}}
+      BIN_: mdbook-nvim-treesitter{{.EXE_EXT}}
       BIN: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .BIN_ | shellQuote}}'
     cmds:
       - task: _cache-version-check
       - task: _resolve-cache
         vars:
-          DESC: tree-sitter
+          DESC: mdbook-nvim-treesitter
           PATH: '{{.BIN_}}'
           BUILD: |
-            if cmd_path=$(command -v tree-sitter); then
-              echo "[mono-dev-mdbook]==> found $(tree-sitter --version) installed on the system"
+            if cmd_path=$(command -v mdbook-nvim-treesitter); then
+              echo "[mono-dev] ==> found $(mdbook-nvim-treesitter -V) installed on the system"
               cp "$cmd_path" $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
             else
-              echo "[mono-dev-mdbook]==> installing tree-sitter-cli with cargo"
-              cargo install tree-sitter-cli --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
-              cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/{{.BIN_}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
-            fi
-      - silent: true
-        if: '[ "{{.COMMAND}}" != "" ]'
-        cmd: |
-          echo "[mono-dev-mdbook]  # {{.BIN_}} {{.COMMAND}}"
-          {{.BIN}} {{.COMMAND}}
-
-  _git-clone-tree-sitter:
-    desc: Clone the parser repo
-    cmds:
-      - task: _resolve-system-cache
-        vars:
-          DESC: tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} repo
-          PATH: 'tree-sitter-repos/tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}}'
-          BUILD: |
-            rm -rf $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
-            GIT_ASKPASS=true GIT_TERMINAL_PROMPT=0 git -c credential.helper= -C $MONO_DEV_MDBOOK_ENV_BUILD_DIR clone {{.MDMDBOOK_TREE_SITTER_REPO | shellQuote}} tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} --depth 1 --progress
-
-  _build-tree-sitter:
-    desc: Compile the tree sitter parser and copy queries
-    vars:
-      BIN_: tree-sitter{{.EXE_EXT}}
-      BIN: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .BIN_ | shellQuote}}'
-      REL_REPO_PATH: 'tree-sitter-repos/tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}}'
-      REPO_PATH: '{{joinPath .MONO_DEV_MDBOOK_CACHE .REL_REPO_PATH}}'
-    cmds:
-      - task: _resolve-cache
-        vars:
-          DESC: tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} parser
-          PATH: 'tree-sitter-installed/{{.MDMDBOOK_TREE_SITTER_NAME}}/parser.so'
-          BUILD: |
-            cd {{.REPO_PATH | shellQuote}}
-            {{.BIN}} build -o $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
-      - task: _resolve-cache
-        vars:
-          DESC: tree-sitter-{{.MDMDBOOK_TREE_SITTER_NAME}} queries
-          PATH: 'tree-sitter-installed/{{.MDMDBOOK_TREE_SITTER_NAME}}/queries'
-          BUILD: |
-            cd {{.REPO_PATH | shellQuote}}
-            rm -rf $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
-            cp -r queries $MONO_DEV_MDBOOK_ENV_BUILD_DIR
-
-  _resolve-mdbook-tsitter:
-    desc: Resolve mdbook-tsitter plugin
-    vars:
-      BIN_: mdbook-tsitter{{.EXE_EXT}}
-      BIN: '{{joinPath .MONO_DEV_MDBOOK_CACHE_LOCAL .BIN_ | shellQuote}}'
-    cmds:
-      - task: _cache-version-check
-      - task: _resolve-cache
-        vars:
-          DESC: mdbook-tsitter
-          PATH: '{{.BIN_}}'
-          BUILD: |
-            if cmd_path=$(command -v mdbook-tsitter); then
-              echo "[mono-dev-mdbook]==> found $(mdbook-tsitter --version) installed on the system"
-              cp "$cmd_path" $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
-            else
-              echo "[mono-dev-mdbook]==> installing mdbook-tsitter with cargo"
-              cargo install mdbook-tsitter --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
+              echo "[mono-dev] ==> installing mdbook-nvim-treesitter with cargo"
+              cargo install mdbook-nvim-treesitter --force --no-track --root $MONO_DEV_MDBOOK_ENV_BUILD_DIR
               cp $MONO_DEV_MDBOOK_ENV_BUILD_DIR/bin/{{.BIN_}} $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
             fi
       
@@ -191,7 +138,7 @@ tasks:
     cmds:
       - task: _resolve-cache
         vars:
-          DESC: mono-dev-mdbook version
+          DESC: mono-dev version
           PATH: version-cache
           BUILD: echo {{.VERSION | shellQuote }} > $MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT
       - silent: true
@@ -200,7 +147,7 @@ tasks:
           if [[ "$oldv" == "{{.VERSION}}" ]]; then
             exit 0
           fi
-          echo '[mono-dev-mdbook]==> cleaning due to update: '"$oldv"' -> {{.VERSION}}'
+          echo '[mono-dev] ==> cleaning due to update: '"$oldv"' -> {{.VERSION}}'
           rm -rf {{.MONO_DEV_MDBOOK_CACHE | shellQuote}}
           rm -rf {{.MONO_DEV_MDBOOK_CACHE_LOCAL | shellQuote}}
           mkdir -p {{joinPath .VERSION_PATH ".." | absPath | shellQuote}}
@@ -229,7 +176,7 @@ tasks:
             MONO_DEV_MDBOOK_ENV_BUILD_DIR={{joinPath .SYSTEM_CACHE_PATH ".." | absPath | shellQuote}}
             mkdir -p $MONO_DEV_MDBOOK_ENV_BUILD_DIR
             MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT={{.SYSTEM_CACHE_PATH_QUOTE}}
-            echo '[mono-dev-mdbook]==> resolving {{.DESC}}'
+            echo '[mono-dev] ==> resolving {{.DESC}}'
             {{.BUILD}}
             mkdir -p {{joinPath .LOCAL_CACHE_PATH ".." | absPath | shellQuote}}
             if [[ -f {{.SYSTEM_CACHE_PATH_QUOTE}} ]]; then
@@ -239,19 +186,3 @@ tasks:
             fi
           fi
       
-  _resolve-system-cache:
-    vars:
-      SYSTEM_CACHE_PATH: '{{joinPath .MONO_DEV_MDBOOK_CACHE .PATH}}'
-      SYSTEM_CACHE_PATH_QUOTE: '{{.SYSTEM_CACHE_PATH | shellQuote}}'
-    cmds:
-      - silent: true
-        cmd: |
-          if [[ -e {{.SYSTEM_CACHE_PATH | shellQuote}} ]]; then
-            exit 0
-          else
-            MONO_DEV_MDBOOK_ENV_BUILD_DIR={{joinPath .SYSTEM_CACHE_PATH ".." | absPath | shellQuote}}
-            mkdir -p $MONO_DEV_MDBOOK_ENV_BUILD_DIR
-            MONO_DEV_MDBOOK_ENV_BUILD_OUTPUT={{.SYSTEM_CACHE_PATH_QUOTE}}
-            echo '[mono-dev-mdbook]==> resolving {{.DESC}}'
-            {{.BUILD}}
-          fi

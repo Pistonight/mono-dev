@@ -25,3 +25,6 @@
   - [Action: Release](./ghci/action_release.md)
   - [Action: GCloud](./ghci/action_gcloud.md)
   - [Workflow Templates](./ghci/workflow_template.md)
+- [Highlighting Test](./highlight/index.md)
+  - [Rust](./highlight/rust.md)
+  - [C and CPP](./highlight/ccpp.md)

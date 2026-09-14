@@ -3,12 +3,14 @@ use std::path::Path;
 use cu::pre::*;
 use similar::ChangeTag;
 
-use crate::config::{html, preprocessor, Config, ConfigNode};
+use crate::config::{Config, ConfigNode, html};
 
 pub fn process_config(cli: &crate::Cli) -> cu::Result<()> {
     let path = Path::new(&cli.dir).join("book.toml");
-    let book_toml_raw = if path.exists() {cu::fs::read_string(&path)? } else {
-           include_str!("../../book.template.toml").to_string()
+    let book_toml_raw = if path.exists() {
+        cu::fs::read_string(&path)?
+    } else {
+        include_str!("../../book.template.toml").to_string()
     };
     let old_lines = book_toml_raw
         .lines()
@@ -17,7 +19,7 @@ pub fn process_config(cli: &crate::Cli) -> cu::Result<()> {
     let mut book_toml = cu::check!(Config::parse(&book_toml_raw), "failed to parse book.toml")?;
     cu::trace!("{book_toml:#?}");
     cu::check!(
-        transform_config(&mut book_toml, &cli),
+        transform_config(&mut book_toml, cli),
         "failed to transform config"
     )?;
     let mut serialized = vec![];
@@ -66,16 +68,10 @@ pub fn process_config(cli: &crate::Cli) -> cu::Result<()> {
     Ok(())
 }
 
-fn transform_config(config: &mut Config, cli: &crate::Cli) -> cu::Result<()> {
+fn transform_config(config: &mut Config, _cli: &crate::Cli) -> cu::Result<()> {
     for node in &mut config.nodes {
         if let ConfigNode::Section(_, name, node) = node {
             match name.as_str() {
-                "preprocessor" => {
-                    cu::check!(
-                        preprocessor::transform_preprocessor_config(node, &cli.dir, &cli.task_exe),
-                        "failed to transform preprocessor section"
-                    )?;
-                }
                 "html" => {
                     cu::check!(
                         html::transform_html_config(node),

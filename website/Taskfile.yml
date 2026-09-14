@@ -1,28 +1,27 @@
 version: "3"
 
-vars:
-  IS_WINDOWS: '{{OS | lower | contains "windows"}}'
-  EXE_EXT: '{{if eq .IS_WINDOWS "true"}}.exe{{else}}{{end}}'
-
-# includes:
-#   mdbook:
-#     taskfile: ../task/mdbook.yaml
-#     internal: true
+includes:
+  mdbook:
+    taskfile: ../task/mdbook.yaml
+    internal: true
 
 tasks:
-  check:
-    - echo {{.IS_WINDOWS}}
-    - echo {{.EXE_EXT}}
-  # install:
-  #   - task: mdbook:config
-  # resolve-tree-sitter-parser:
-  #   - task: mdbook:resolve-tree-sitter-parser
-  # dev:
-  #   cmds:
-  #     - task: mdbook:config
-  #     - rm -rf book
-  #     - shwoop book -w src --host -- {{.TASK_EXE}} do-build
-  # do-build:
-  #   - task: mdbook:call-mdbook
-  #     vars:
-  #       COMMAND: build
+  install:
+    - task: mdbook:config
+  dev:
+    cmds:
+      # uncomment if needed to iterate theme changes
+      # - task: mdbook:config
+      - rm -rf book
+      - shwoop book -w src -w theme --host -- {{.TASK_EXE}} do-build
+  do-build:
+    - task: mdbook:call-mdbook
+      vars:
+        COMMAND: build
+
+  css-cp:
+    - cp ../mdbook/css/tree-sitter.css theme/extra-css
+
+  clean:
+    - rm -rf book theme
+    - task: mdbook:clean-cache

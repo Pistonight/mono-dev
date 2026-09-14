@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "mdbook/preproc"
+    "mdbook/configurator"
 ]
 
 [workspace.dependencies.cu]

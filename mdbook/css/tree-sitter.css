@@ -1,0 +1,243 @@
+/*
+ * Theme for mdbook-treesitter.
+ * https://github.com/AlexanderGolys/mdbook-tsitter/blob/main/assets/treesitter.css
+ *
+ * The preprocessor emits one `<span class="ts-…">` per tree-sitter capture,
+ * using the capture name as the class (dots become hyphens, and each prefix is
+ * added too: `keyword.operator` -> `class="ts-keyword ts-keyword-operator"`).
+ * Each block is wrapped in `<code class="language-<fence>">`, so colours can be
+ * scoped per language (see "Per-language overrides" at the bottom).
+ *
+ * Colours are organised in three layers so they stay both theme-adaptive and
+ * per-language tunable:
+ *
+ *   1. Hue palette  — `--ts-red`, `--ts-blue`, … redefined per mdBook theme with
+ *      that theme's own syntax colours (mdBook sets the theme as a class on
+ *      <html>: `light`, `rust`, `coal`, `navy`, `ayu`). The hues come straight
+ *      from mdBook's bundled highlight.js stylesheets — Tomorrow for the light
+ *      themes, Tomorrow Night for coal/navy, Ayu for ayu — so highlighting
+ *      matches the rest of the page.
+ *   2. Semantic map — `--ts-keyword: var(--ts-purple)`, … assigned once; because
+ *      it points at hue variables, every theme gets its own colour for free.
+ *   3. Capture rules — `.ts-keyword { color: var(--ts-keyword) }`, and per-
+ *      language overrides that re-point a capture at a different hue.
+ *
+ * To retheme: override a hue (`--ts-blue`), a semantic (`--ts-keyword`), or a
+ * rule. A custom mdBook colour scheme falls back to the light hue palette.
+ */
+
+/* ---- Layer 0: root theme and overrides ---------------------------- */
+:root {
+    --treesitter-background: #1e1e2e;
+    --treesitter-foreground: #cdd6f4;
+    --treesitter-selection:  #45475a;
+}
+:root.mocha {
+    /* mocha page background is already base, so it needs to be darker */
+    --treesitter-background: #181825;
+}
+:root.latte {
+    /* the too-dark constracts with light theme is not comfortable */
+    --treesitter-background: #3b3c4f;
+    --treesitter-selection:  #1e1e2e;
+}
+
+/* override all highlighted codeblocks to mocha, including light theme*/
+pre > code.hljs {
+  color: var(--treesitter-foreground) ;
+  background: var(--treesitter-background) ;
+}
+code.no-highlight.tree-sitter-inline {
+  color: var(--treesitter-foreground) ;
+  background: var(--treesitter-background) ;
+}
+pre.treesitter > code {
+  color: var(--treesitter-foreground) ;
+  background: var(--treesitter-background) ;
+}
+pre > code.hljs::selection {
+  background: var(--treesitter-selection) ;
+}
+code.no-highlight.tree-sitter-inline::selection {
+  background: var(--treesitter-selection) ;
+}
+pre.treesitter > code::selection {
+  background: var(--treesitter-selection) ;
+}
+/* match regular inline blocks */
+:not(pre) > .tree-sitter-inline {
+  display: inline;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+/* ---- Layer 1: hue palette, mocha only ---------------------------- */
+
+:root {
+  --ts-rosewater: #f5e0dc;
+  --ts-flamingo:  #f2cdcd;
+  --ts-pink:      #f5c2e7;
+  --ts-mauve:     #cba6f7;
+  --ts-red:       #f38ba8;
+  --ts-maroon:    #eba0ac;
+  --ts-peach:     #fab387;
+  --ts-yellow:    #f9e2af;
+  --ts-green:     #a6e3a1;
+  --ts-teal:      #94e2d5;
+  --ts-sky:       #89dceb;
+  --ts-sapphire:  #74c7ec;
+  --ts-blue:      #89b4fa;
+  --ts-lavender:  #b4befe;
+  --ts-text:      #cdd6f4;
+  --ts-subtext1:  #bac2de;
+  --ts-subtext0:  #a6adc8;
+  --ts-overlay2:  #9399b2;
+  --ts-overlay1:  #7f849c;
+  --ts-overlay0:  #6c7086;
+  --ts-surface2:  #585b70;
+  --ts-surface1:  #45475a;
+  --ts-surface0:  #313244;
+  --ts-base:      #1e1e2e;
+  --ts-mantle:    #181825;
+}
+
+/* ---- Layer 2: semantic map (hue per role; theme-independent) ------------ */
+:root {
+  --ts-comment:   var(--ts-overlay2);
+  --ts-string:    var(--ts-green);
+  --ts-escape:    var(--ts-pink);
+  --ts-keyword:   var(--ts-mauve);
+  --ts-function:  var(--ts-yellow);
+  --ts-macro:     var(--ts-peach);
+  --ts-type:      var(--ts-blue);
+  --ts-operator:  var(--ts-sapphire);
+  --ts-delimiter: var(--ts-overlay2);
+  --ts-variable:  var(--ts-lavender);
+  --ts-constant:  var(--ts-peach);
+  --ts-attribute: var(--ts-teal);
+  --ts-label:     var(--ts-pink);
+}
+
+
+
+/* .latte { */
+/*   --ts-comment:   var(--ts-subtext0); } */
+
+/* ---- Layer 3: capture rules, need important to override hljs -------------------------------------------- */
+
+
+
+/* Comments. */
+.ts-comment {
+    color: var(--ts-comment);
+    font-style: italic;
+}
+
+/* Literals. */
+.ts-string-regexp {
+    color: var(--ts-red);
+}
+.ts-string, .ts-character {
+    color: var(--ts-string);
+}
+.ts-string-special, .ts-string-escape, .ts-escape, .ts-character-special {
+    color: var(--ts-escape);
+}
+.ts-string > .ts-guess, .ts-string-regexp > .ts-guess, .ts-character > .ts-guess {
+    color: inherit;
+}
+
+/* Keywords */
+.ts-keyword, .ts-keyword-export, .ts-keyword-import {
+    color: var(--ts-keyword);
+}
+
+/* Functions */
+.ts-function, .ts-method {
+    color: var(--ts-function);
+}
+.ts-function-call, .ts-method-call {
+    color: var(--ts-function);
+}
+.ts-constructor {
+    color: var(--ts-function);
+}
+
+/* Macros */
+.ts-macro, .ts-function-macro {
+    color: var(--ts-macro);
+}
+.treesitter-language-rust .ts-attribute,
+.treesitter-language-rust .ts-attribute > .ts-guess-variable {
+    color: var(--ts-macro);
+}
+
+/* Types */
+.ts-type, .ts-type-builtin, .ts-type-builtin-cpp, .ts-guess-type {
+    color: var(--ts-type);
+}
+.ts-module, .ts-namespace, .ts-guess-module { /* make module/namespace not blend in */
+    color: var(--ts-type);
+}
+.ts-constructor { /* some imports stuff are treated as constructor */
+    color: var(--ts-type);
+}
+.ts-tag-tsx, .ts-tag-javascript {
+    color: var(--ts-type);
+}
+
+/* Punctuation and Delimiter*/
+.ts-punctuation, .ts-punctuation-bracket, .ts-punctuation-delimiter, .ts-punctuation-special, .ts-guess-delimiter {
+    color: var(--ts-delimiter);
+}
+.ts-operator, .ts-guess-operator {
+    color: var(--ts-operator);
+}
+.ts-tag-delimiter {
+    color: var(--ts-delimiter);
+}
+
+/* Labels */
+.ts-label {
+    color: var(--ts-label);
+}
+.treesitter-language-rust .ts-operator:has(+ .ts-label) { /* rust lifetimes */
+    color: var(--ts-label);
+}
+
+/* Variables */
+.ts-variable, .ts-property, .ts-parameter, .ts-variable-parameter, .ts-guess-variable { 
+    color: var(--ts-variable);
+}
+.ts-property, .ts-field {
+    color: var(--ts-variable);
+}
+.ts-variable-builtin {
+    color: var(--ts-red);
+}
+
+/* Constants */
+.ts-number, .ts-float, .ts-boolean, .ts-constant, .ts-guess-constant {
+    color: var(--ts-constant);
+}
+
+/* Attributes */
+.ts-attribute { color: var(--ts-attribute); }
+.ts-tag-attribute { color: var(--ts-attribute); }
+
+/* Text */
+.ts-text {
+    color: var(--ts-text);
+}
+.ts-text-title {
+    color: var(--ts-peach);
+}
+.treesitter-language-markdown .ts-punctuation-special:has(+ .ts-text-title) {
+    color: var(--ts-peach);
+}
+.treesitter-language-markdown .ts-guess:not(.ts-none .ts-guess) { /* Do not apply guesses to raw markdown, except for embedded languages */
+    color: inherit;
+}
+.ts-none {
+    color: inherit;
+}

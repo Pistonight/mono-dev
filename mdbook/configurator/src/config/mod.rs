@@ -1,11 +1,8 @@
-
 mod parsing;
 use parsing::*;
-mod html;
-mod preprocessor;
 mod driver;
+mod html;
 pub use driver::*;
-
 
 macro_rules! verbatim {
     ($($line:literal),* $(,)*) => {
@@ -13,6 +10,3 @@ macro_rules! verbatim {
     }
 }
 pub(crate) use verbatim;
-
-
-
