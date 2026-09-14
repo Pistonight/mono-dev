@@ -51,6 +51,10 @@ tasks:
       - node bin/mono.js test run
       - node bin/mono.js doc
 
+  build-website:
+    - task: website:config
+    - task: website:build
+
   package:
     desc: Package the package using publish --dry-run
     cmds:

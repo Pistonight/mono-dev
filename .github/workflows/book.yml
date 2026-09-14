@@ -18,8 +18,7 @@ jobs:
         with:
           tool-mdbook: true
 
-      - run: task exec -- website:config
-      - run: task exec -- website:build
+      - run: task build-website
       - uses: actions/upload-pages-artifact@v5
         with:
           path: website/book
