@@ -9,4 +9,13 @@ title = "____CHANGE ME____"
 
 #@mono-dev:html {
 [output.html]
+
+# add extra props here
+
+#@mono-dev:    props {}
+
+additional-css = [
+#@mono-dev:    css {}
+]
+
 #@mono-dev:}
