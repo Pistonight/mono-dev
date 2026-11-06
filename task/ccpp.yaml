@@ -107,7 +107,7 @@ tasks:
         -modernize-use-trailing-return-type,
         readability-*,
         -readability-magic-numbers,
-        {{.ADD_CHECKS | trim}}'
+        {{.ADD_CHECKS | default "" | trim}}'
 
     cmds:
       - >
