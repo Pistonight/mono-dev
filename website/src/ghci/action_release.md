@@ -24,7 +24,7 @@ jobs:
         with:
           # optional: download artifacts from a previous workflow
           artifacts-workflow: build.yml
-          artifacts-name: packages/server/dist
+          artifacts-path: packages/server/dist
 
           # optional: run a task after downloading artifacts
           task: server:package-assets

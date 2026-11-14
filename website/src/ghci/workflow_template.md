@@ -136,7 +136,7 @@ Note that the [Docker Image Action](./action_docker.md) automatically downloads 
 ```yaml
       - run: mkdir -p package
         shell: bash
-      - uses: dawidd6/action-download-artifact@v20
+      - uses: dawidd6/action-download-artifact@v28
         with:
           github_token: ${{ github.token }}
           workflow: CHANGEME.yml

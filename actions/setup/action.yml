@@ -55,7 +55,7 @@ runs:
   using: composite
   steps:
     - if: ${{ inputs.skip-checkout != 'true' }}
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         persist-credentials: false
         submodules: ${{ inputs.submodules }}
@@ -65,7 +65,7 @@ runs:
     # setup NodeJS before running environment scripts as the runner image may not have NodeJS
     # if we are not using the official runner images
     - if: ${{ inputs.ecma-pnpm != 'false' }}
-      uses: pnpm/setup@v2
+      uses: pnpm/setup@v3
       with:
         version: 12
         # we will run install manually which is consistent with the old action-setup behavior
@@ -77,7 +77,7 @@ runs:
         cache: true
     # the bare node (without pnpm) does not use cache
     - if: ${{ inputs.ecma-node == 'true' && inputs.ecma-pnpm == 'false' }}
-      uses: actions/setup-node@v6
+      uses: actions/setup-node@v7
       with:
         node-version: 26
         package-manager-cache: false
@@ -91,7 +91,7 @@ runs:
         MONODEV_WORKSPACE: ${{ github.workspace }}
         MONODEV_INPUT_MONO_DEV: ${{ inputs.mono-dev }}
     - if: ${{ steps.wkspenvjs.outputs.mono_dev_install == 'pnpm' && inputs.ecma-pnpm == 'false' && inputs.ecma-node == 'false' }}
-      uses: pnpm/setup@v2
+      uses: pnpm/setup@v3
       with:
         version: 12
         install: false
@@ -153,7 +153,7 @@ runs:
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
     - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' }}
       id: cargoinstall-cache-restore
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}
         key: cargoinstall-${{ runner.os }}-${{ runner.arch }}-${{ steps.cargoinstall-cache-env.outputs.cache_key }}
@@ -165,7 +165,7 @@ runs:
         MONODEV_CARGO_INSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_install_config }}
         MONODEV_CARGO_BINSTALL_CONFIG: ${{ steps.envjs.outputs.cargo_binstall_config }}
     - if: ${{ steps.envjs.outputs.need_cargo_install_or_binstall == 'true' && steps.cargoinstall-cache-restore.outputs.cache-hit != 'true' }}
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         path: ${{ steps.cargoinstall-cache-env.outputs.cache_path }}
         key: ${{ steps.cargoinstall-cache-restore.outputs.cache-primary-key }}
@@ -179,7 +179,7 @@ runs:
     # -- CCPP
     - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' }}
       id: ccpp-lint-cache-restore
-      uses: actions/cache/restore@v5
+      uses: actions/cache/restore@v6
       with:
         path: ~/.local/bin/ccpp-lint
         key: ccpp-lint-${{ steps.envjs.outputs.ccpp_lint_clang_format }}
@@ -198,7 +198,7 @@ runs:
       shell: bash
       run: echo "$HOME/.local/bin/ccpp-lint" >> "$GITHUB_PATH"
     - if: ${{ steps.envjs.outputs.ccpp_lint_clang_format != '' }}
-      uses: actions/cache/save@v5
+      uses: actions/cache/save@v6
       with:
         path: ~/.local/bin/ccpp-lint
         key: ${{ steps.ccpp-lint-cache-restore.outputs.cache-primary-key }}
@@ -218,7 +218,7 @@ runs:
       with:
         python-version: '3.14'
     - if: ${{ inputs.python == 'uv' }}
-      uses: astral-sh/setup-uv@v9.0.0
+      uses: astral-sh/setup-uv@v10
       with:
         python-version: '3.14'
 
@@ -227,7 +227,7 @@ runs:
       run: pnpm install --frozen-lockfile
       shell: bash
     - if: ${{ github.repository != 'Pistonight/mono-dev' && steps.wkspenvjs.outputs.mono_dev_install == 'checkout' }}
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: Pistonight/mono-dev
         ref: ${{ steps.wkspenvjs.outputs.mono_dev_ref }}
@@ -237,7 +237,7 @@ runs:
     # -- mdbook system wide tooling cache
     - if: ${{ inputs.tool-mdbook != 'false' }}
       id: mdbook-tool-cache
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ~/.cache/mono-dev-mdbook
