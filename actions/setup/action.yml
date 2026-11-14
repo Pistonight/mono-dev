@@ -218,7 +218,7 @@ runs:
       with:
         python-version: '3.14'
     - if: ${{ inputs.python == 'uv' }}
-      uses: astral-sh/setup-uv@v10
+      uses: astral-sh/setup-uv@v10.3.3
       with:
         python-version: '3.14'
 
