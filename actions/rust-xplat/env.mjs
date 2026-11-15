@@ -15,7 +15,9 @@ if (MONODEV_RUST_XPLAT_RUNNER_OS === "macOS") {
         build_args.push("--target", "aarch64-apple-darwin");
     }
 }
-build_args.push(...MONODEV_RUST_XPLAT_BUILD_ARGS);
+if (MONODEV_RUST_XPLAT_BUILD_ARGS) {
+    build_args.push(MONODEV_RUST_XPLAT_BUILD_ARGS);
+}
 
 writeGitHubOutput({
     cargo_build_args: build_args.join(" "),
