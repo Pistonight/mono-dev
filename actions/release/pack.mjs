@@ -42,9 +42,10 @@ if (packPattern === "true" || packPattern === "**") {
 
 const appendVersion = `${MONODEV_RELEASE_APPEND_VERSION}`.toLowerCase() === "true";
 const hasMinisignKey = `${MONODEV_RELEASE_HAS_MINISIGN_KEY}`.toLowerCase() === "true";
-const outputFiles = (MONODEV_RELEASE_FILES || "").split(" ").filter((file) => file.trim());
 
-const artifactsPath = path.join(MONODEV_RELEASE_WORKSPACE, MONODEV_RELEASE_ARTIFACTS_PATH);
+const workspace = MONODEV_RELEASE_WORKSPACE;
+const artifactsPathInput = (MONODEV_RELEASE_ARTIFACTS_PATH || "").trim();
+const artifactsPath = artifactsPathInput ? path.resolve(workspace, artifactsPathInput) : "";
 const BIN = "7z";
 const packDir = (dir_name) => {
     if (!packPatternMatcher(dir_name)) {
@@ -107,25 +108,63 @@ const packDir = (dir_name) => {
     console.log(`Output file: ${outputFile}`);
     return outputFile;
 };
-const files = fs.readdirSync(artifactsPath);
-for (const file of files) {
-    // check if the file is a directory
-    const filePath = path.join(artifactsPath, file);
-    if (!fs.statSync(filePath).isDirectory()) {
-        continue;
+// pack each artifact directory (only when artifacts-path is set,
+// otherwise the workspace root would be packed)
+const packedFiles = [];
+if (artifactsPath && fs.existsSync(artifactsPath)) {
+    for (const file of fs.readdirSync(artifactsPath)) {
+        // check if the file is a directory
+        const filePath = path.join(artifactsPath, file);
+        if (!fs.statSync(filePath).isDirectory()) {
+            continue;
+        }
+        const outputFile = packDir(file);
+        if (!outputFile) {
+            continue;
+        }
+        packedFiles.push(outputFile);
     }
-    const outputFile = packDir(file);
-    if (!outputFile) {
-        continue;
-    }
-    outputFiles.push(outputFile);
+} else {
+    console.log("No artifacts path to pack");
 }
 
-const signatureFiles = hasMinisignKey ? outputFiles.map((file) => `${file}.sig`) : [];
-const uploadFiles = [...outputFiles, ...signatureFiles];
+// expand pass-through files, which can be globs relative to the workspace
+const GLOB_CHARS = /[*?[\]{}]/;
+const passThroughFiles = [];
+const filePatterns = (MONODEV_RELEASE_FILES || "").split(/\s+/).filter(Boolean);
+for (const pattern of filePatterns) {
+    let matches;
+    if (GLOB_CHARS.test(pattern)) {
+        if (typeof fs.globSync !== "function") {
+            throw new Error(`Node ${process.version} does not support fs.globSync, cannot expand: ${pattern}`);
+        }
+        matches = fs
+            .globSync(pattern, { cwd: workspace })
+            .map((file) => path.resolve(workspace, file))
+            .filter((file) => fs.statSync(file).isFile())
+            .sort();
+    } else {
+        matches = [path.resolve(workspace, pattern)];
+        if (!fs.existsSync(matches[0])) {
+            matches = [];
+        }
+    }
+    if (!matches.length) {
+        throw new Error(`No files matched: ${pattern}`);
+    }
+    console.log(`Pass-through files for ${pattern}:`);
+    for (const file of matches) {
+        console.log(`  ${file}`);
+    }
+    passThroughFiles.push(...matches);
+}
+
+const releaseFiles = [...new Set([...packedFiles, ...passThroughFiles])];
+const signatureFiles = hasMinisignKey ? releaseFiles.map((file) => `${file}.sig`) : [];
+const uploadFiles = [...releaseFiles, ...signatureFiles];
 
 writeGitHubOutput({
-    packed_files: outputFiles.join(" "),
-    signature_files: signatureFiles.join(" "),
+    release_files: releaseFiles.join("\n"),
+    signature_files: signatureFiles.join("\n"),
     upload_files: uploadFiles.join("\n"),
 });

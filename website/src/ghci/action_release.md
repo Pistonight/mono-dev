@@ -32,20 +32,24 @@ jobs:
           # optional: determine how releases are packed
           # by default, each artifact is packed into an archive
           # use pattern with * in the beginning or end to match the artifact
-          # name. ** or true matches everything (the default). false disables packing
-          # and only files in `files` are uploaded
+          # name. ** or true matches everything (the default). false disables packing.
+          # artifacts that are not packed are not uploaded; use `files` for that
           pack: server-*
           
           # whether to append the version tag to the archive name
           # default is true
           append-version: true
 
-          # optional. if provided, release artifacts will be signed
+          # optional. if provided, packed archives and `files` will be signed
+          # (each file gets a `.sig` file uploaded next to it)
           minisign-key: ${{ secrets.MINISIGN_KEY }}
 
+          # optional: extra files uploaded as-is (not packed)
+          # relative to the workspace, globs are supported (e.g. **/*.whl).
+          # each entry must match at least one file
           files: |
             path/to/file1.zip
-            path/to/file2.tar.gz
+            dist/*.tar.gz
 
           # default
           tag: ${{ github.ref_name }}

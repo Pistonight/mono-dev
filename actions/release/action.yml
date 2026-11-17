@@ -12,7 +12,7 @@ inputs:
     description: >
       Automatically pack downloaded artifacts as .zip or .tar.gz, per artifact. 
       Could be a pattern with * to match beginning or end of the artifact name. 
-      false disables packing. ** or true packs everything"
+      false disables packing. ** or true packs everything
     default: true
   append-version:
     description: "Append version tag to packed artifacts"
@@ -21,17 +21,20 @@ inputs:
     description: "Task to run after downloading artifacts but before packing or signing"
     default: ""
   minisign-key:
-    description: "Minisign secret key to sign the packed artifacts"
+    description: "Minisign secret key to sign the packed artifacts and pass-through files"
     default: ""
   signing-comment:
-    description: "Comment to use when signing the packed artifacts"
+    description: "Comment to use when signing the release files"
     default: "Signed by mono-dev release GitHub action"
 
   files:
-    description: "Paths to files to upload to the release"
+    description: >
+      Files to upload to the release as-is (not packed), separated by whitespace or newlines.
+      Paths are relative to the workspace and can be globs (e.g. dist/*.whl).
+      Each entry must match at least one file. Paths with spaces are not supported
     default: ""
   tag:
-    description: "Release tag (defaults to github.ref_name"
+    description: "Release tag (defaults to github.ref_name)"
     default: "${{ github.ref_name }}"
 
 runs:
@@ -64,7 +67,7 @@ runs:
         MONODEV_RELEASE_VERSION: ${{ inputs.tag }}
       shell: bash
 
-    - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.packed_files != '' }}
+    - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.release_files != '' }}
       uses: robinraju/release-downloader@v1
       with:
         repository: jedisct1/minisign
@@ -72,37 +75,39 @@ runs:
         fileName: "*-linux.tar.gz"
         out-file-path: .minisign
         extract: true
-    - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.packed_files != '' }}
+    - if: ${{ inputs.minisign-key != '' && steps.pack.outputs.release_files != '' }}
       run: |
-        printf "%s" "${{ inputs.minisign-key }}" > .minisign/minisign.key
+        mapfile -t FILES <<< "$RELEASE_FILES"
+        printf "%s" "$MINISIGN_KEY" > .minisign/minisign.key
         chmod +x .minisign/minisign-linux/x86_64/minisign
-        ./.minisign/minisign-linux/x86_64/minisign -S -W -s .minisign/minisign.key -t "${{ inputs.signing-comment }}" -m ${{ steps.pack.outputs.packed_files }} 
-        for f in "${{ inputs.artifacts-path }}"/*.minisig ; do
-          mv -- "$f" "${f%.minisig}.sig"
-        done
-      shell: bash
-    - if: ${{ inputs.minisign-key != '' && inputs.files != '' }}
-      run: |
-        for f in "${{ inputs.files }}"; do
+        ./.minisign/minisign-linux/x86_64/minisign -S -W -s .minisign/minisign.key -t "$SIGNING_COMMENT" -m "${FILES[@]}"
+        rm -f .minisign/minisign.key
+        for f in "${FILES[@]}"; do
           mv -- "$f.minisig" "$f.sig"
         done
+      env:
+        RELEASE_FILES: ${{ steps.pack.outputs.release_files }}
+        MINISIGN_KEY: ${{ inputs.minisign-key }}
+        SIGNING_COMMENT: ${{ inputs.signing-comment }}
       shell: bash
 
     - uses: johnyherangi/create-release-notes@v1
       id: release-notes
       env:
         GITHUB_TOKEN: ${{ github.token }}
-    - run: mkdir -p .github
-      shell: bash
     - run: |
-        if [ -f .github/RELEASE_NOTES_HEADR.md ]; then
+        mkdir -p .github
+        : > .github/RELEASE_NOTES.md
+        if [ -f .github/RELEASE_NOTES_HEADER.md ]; then
           cat .github/RELEASE_NOTES_HEADER.md >> .github/RELEASE_NOTES.md
         fi
-        echo "${{ steps.release-notes.outputs.release-notes }}" > .github/RELEASE_NOTES.md
+        printf "%s\n" "$RELEASE_NOTES" >> .github/RELEASE_NOTES.md
         if [ -f .github/RELEASE_NOTES_FOOTER.md ]; then
           cat .github/RELEASE_NOTES_FOOTER.md >> .github/RELEASE_NOTES.md
         fi
         cat .github/RELEASE_NOTES.md
+      env:
+        RELEASE_NOTES: ${{ steps.release-notes.outputs.release-notes }}
       shell: bash
     - uses: softprops/action-gh-release@v3
       with:
