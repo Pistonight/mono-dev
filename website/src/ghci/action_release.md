@@ -20,6 +20,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      # checkout is only needed if there is RELEASE_NOTES_*.md
+      # - uses: actions/checkout@v7
       - uses: Pistonight/mono-dev/actions/release@main
         with:
           # optional: download artifacts from a previous workflow
